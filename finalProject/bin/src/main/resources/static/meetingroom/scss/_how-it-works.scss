@@ -1,0 +1,33 @@
+.how-it-works{
+    padding: 78px 0 158px;
+    .how-it-works-wrapper{
+        .section-title{
+            max-width: 670px;
+            margin: 0 auto 52px;
+            .title{
+                color: $gray-900;
+                font-weight: $font-weight-bolder;
+                line-height: 78px;
+                letter-spacing: 0.01em;
+                margin-bottom: 8px;
+                .primary-text{
+                    color: $primary;
+                }
+            }
+        }
+        .work-fetures{
+            .work-fetures-img{
+                margin-bottom: 40px;
+            }
+            .work-fetures-content{
+                padding: 0 15px;
+                .feture-title{
+                    letter-spacing: 0.01em;
+                    line-height: 40px;
+                    font-weight: $font-weight-bold;
+                    margin-bottom: 14px;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 34" width="32" height="34">
+	<title>CoinT</title>
+	<defs>
+		<image  width="32" height="34" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAiCAMAAAAJbCvNAAAAAXNSR0IB2cksfwAAAGBQTFRFAAAAEBs6Eh49Eh4+Eh49ER89Eh4+Ex09ECA4EBw8Eh8+Eh8+Ex09ECBAEh8+Eh4+ECA+ECA6ECBAER89Eh8+Eh4/ECA9Eh4+Ex89ER8+ER8+ECA8ECA9Eh4+EiA+ECA94UALAAAAACB0Uk5TADBwj5+/gFAgQO//YCDff28wEK/Pn3CQv9/PQGCggFBtwY7MAAAA8UlEQVR4nI1T4RqCIAykZKaAlmgaYfT+b9mnwgJlX90/dge7G8BYjNO54AC8vFQsg7oQEgFqTzcgU7TXhL8JeUDbIa37I70gHKKHPI+KOxYEL9U4PXBt9No/LJ82OJ7Nxq9xm+BvikO9kMcGZZrbBb7J84yNfpzK28kNd4W3PJMC30FTfOcvhzzAHiOmUESG/wW+BScFfk5PUsDEj5hhULSJ0b+E7ENeoAUxqmvY4mQ2SCHbKj0CCwu6ISq88QnyeqvUfbrFoUIKABi+fyQYixQJDDbNK0xkypojP6XTdTsJWLbH3KM7cMTddG9VjspG7AdixRg3AKE7kwAAAABJRU5ErkJggg=="/>
+	</defs>
+	<style>
+	</style>
+	<use id="Background" href="#img1" x="0" y="0"/>
+</svg>

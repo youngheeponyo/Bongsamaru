@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<style>
+.content {
+	width: 700px;
+	margin: auto
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+		<div class="body-wrapper">
+			<!--  Header Start -->
+			<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+			<!--  Header End -->
+			<div class="container-fluid">
+				<div class="container">
+					<div class="page_tits">
+						<h3>문의내역-관리자 답변</h3>
+					</div>
+					<br> <br>
+					<div class="content">
+						<section>
+							<form name="inquireComments" action="inquireComments" method="post">
+								<div class="col-md-12">
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="author"> 작성자 </label> 
+											<input type="text" name="memId" class="form-control" th:value="${info.memId}" readonly>
+										</div>
+										<div class="form-group">
+											<label for="author">문의 날짜</label> 
+											<input type="text" name="memId" class="form-control" th:value="${#dates.format(info.writeDate, 'yyyy년 MMM dd일')}" readonly>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="title">제목</label> 
+											<input class="form-control" name="title" th:value="${info.title}" readonly>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="content"> 내용 </label>
+											<textarea class="form-control" cols="50"
+												rows="5" th:text="${info.content}" readonly></textarea>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="content"> 답변내용 </label>
+											<textarea class="form-control" cols="50"
+												rows="5" th:text="${comm.content}" readonly></textarea>
+										</div>
+										<div class="form-group">
+											<label for="author">답변 날짜</label> 
+											<input type="text" name="memId" class="form-control" th:value="${#dates.format(comm.commDate, 'yyyy년 MMM dd일')}" readonly>
+										</div>
+									</div>
+									<p class="btn_set">
+										<a class="btn btn-success m-1" style="float: right;" th:href="@{/inquireList?category=b02}">목록으로 가기</a>
+									</p>
+								</div>
+							 <script>
+								$('form[name="inquireComments"]').on('submit',commentInsert);
+	
+								function commentInsert(event){
+									event.preventDefault();
+									let content = $('[name="content"]');
+									console.log(content);
+									
+									if(content.val()==''){
+										alert('내용이 입력되지 않았습니다.');
+										content.focus();
+										return;
+									};
+									
+									$("#confimModal").modal("show");
+									
+									$("#noBtn").on('click',function () {
+									    $("#confimModal").modal("hide");
+									    return;
+									});
+									
+									let id = [[${info.boardId}]];
+									$('#yesBtn').on('click',function(){
+										$.ajax('../updateInquire?boardId='+ id)
+										.done(result=>{
+											inquireComments.submit();
+										})
+										.fail(err=>console.log(err));
+									});
+								};
+								
+							</script>
+						</form>
+					</section>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

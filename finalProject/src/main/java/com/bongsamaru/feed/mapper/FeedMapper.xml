@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.bongsamaru.feed.mapper.FeedMapper">
+ 
+	<!-- 회원 상세 조회 -->
+ 	<select id="getFeedList" resultType="FeedVO">
+        SELECT b.mem_id, 
+               b.mem_nick, 
+               c.file_path as mem_profile,
+               sum(a.temp_change) as temp_change 
+        FROM HEART A 
+        LEFT JOIN MEMBER B ON A.MEM_ID = B.MEM_ID
+        LEFT JOIN files C ON b.mem_id = c.code_user AND c.code = 'p01'
+        
+        WHERE B.MEM_ID = #{memId}
+        
+        GROUP BY b.mem_id, b.mem_nick, c.file_path
+ 	</select>
+ 	<!-- 피드 첫번째들 불러오기 -->
+ 	<select id="getFeedFirstList" resultType="FeedVO">
+        SELECT  a.board_id, 
+        		a.title,
+        		b.file_path,
+        		c.board_id as likes
+		
+		FROM BOARD a 
+		LEFT JOIN FILES b	ON a.board_id = b.code_no
+        LEFT JOIN likes c   ON a.board_id = c.board_id
+        
+		WHERE a.mem_id = #{memId}
+		AND a.category = 'b04'
+		AND b.code = 'p15'
+		AND b.file_order = 1
+		ORDER BY a.board_id DESC
+ 	</select>
+ 	<!-- 회원 해당하는 피드게시글 상세조회 -->
+ 	<select id="getFeedDetail" resultType="FeedVO">
+ 	    SELECT  a.board_id, 
+                a.content,
+                a.mem_id,
+                a.write_date,
+        		a.title,
+        		b.file_path,
+        		c.board_id as likes
+		
+		FROM BOARD a 
+		LEFT JOIN FILES b	ON a.board_id = b.code_no
+        LEFT JOIN likes c   ON a.board_id = c.board_id
+        
+		WHERE a.mem_id = #{memId}
+        AND a.board_id = #{boardId}
+		AND b.code = 'p15'
+		ORDER BY b.file_order ASC,a.board_id DESC
+ 	</select>
+ 	
+ 	<!-- 회원별 관심사 조회 -->
+	<select id="getInterestList" resultType="InterestVO">
+             SELECT select_sub(interest_code) as interest_code
+             FROM interest
+             WHERE mem_id = #{memId}
+             ORDER BY interest_code
+	</select>
+	<!-- 좋아요 여부확인 -->
+	<select id="getLike" resultType="LikeVO">
+             SELECT mem_id, board_id
+             FROM likes
+             WHERE mem_id = #{memId}
+             AND board_id = #{boardId}
+	</select>
+	<!-- 해당 게시글의 댓글과 댓글의 댓글 조회 -->
+	<select id="getFeedCommentsList" resultType="CommentsVO">
+		   SELECT
+					  a.comm_id,
+					  a.mem_id,
+					  a.content,
+					  a.comm_date,
+					  a.parent_id,
+					  a.code,
+					  b.comm_id AS reply_id,
+					  b.mem_id AS reply_mem_id,
+					  b.content AS reply_content,
+					  b.comm_date AS reply_comm_date,
+					  b.parent_id AS reply_parent_id,
+					  b.code AS reply_code
+			FROM COMMENTS a
+			LEFT JOIN COMMENTS b ON a.comm_id = b.parent_id
+			WHERE a.code = 'c03'
+			  AND a.detail_code = 100
+	</select>
+	<!-- 댓글 작성 -->
+ 	<insert id="FeedCommentInsert" parameterType="CommentsVO">
+		INSERT INTO COMMENTS(
+			comm_id,
+			mem_id,
+			content,
+			parent_id,
+			code,)
+		VALUES(COMMENTS_SEQ.NEXTVAL
+				,#{memId}
+				,#{content}
+				,parent_id
+				,code)
+	</insert>
+	
+ 	<insert id="insertLike" parameterType="LikeVO">
+		INSERT INTO likes(
+			like_id,
+			mem_id,
+			board_id,
+			created_at,
+			category)
+		VALUES(likes_SEQ.NEXTVAL
+				,#{memId}
+				,#{boardId}
+				,sysdate
+				,'l01')
+	</insert>
+	<!-- 좋아요 되있으면 삭제 -->
+	<delete id="deleteLike" parameterType="LikeVO">
+		DELETE
+		FROM likes
+		WHERE board_id = #{boardId}
+		AND mem_id = #{memId}
+	</delete>
+ </mapper>

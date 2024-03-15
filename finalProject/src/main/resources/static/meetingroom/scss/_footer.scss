@@ -1,0 +1,117 @@
+.main-footer{
+    background-color: $gray-900;
+    .footer-wrapper{
+        padding: 80px 0 90px;
+        .footer-logo-content{
+            .footer-logo{
+                margin-bottom: 43px;
+            }
+            .footer-item-content{
+                max-width: 453px;
+                width: 100%;
+                .text{
+                    color: $gray-300;
+                    margin-bottom: 38px;
+                    letter-spacing: 0.04em;
+                    font-weight: $font-weight-normal;
+                }
+            }
+            .socials-icon{
+                ul{
+                    li{
+                        margin-right: 15px;
+                        &:last-child{
+                            margin-right: 0;
+                        }
+                        a{
+                            width: 40px;
+                            height: 40px;
+                            color: $white;
+                            transition: all .5s ease-in-out;
+                            &:hover{
+                                transform: translateY(-8px);
+                            }
+                        }
+                        .facebook-icon{
+                            background-color: $indigo;
+                        }
+                        .twitter-icon{
+                            background-color: $purple;
+                        }
+                        .instagram-icon{
+                            background-color: $pink;
+                        }
+                        .youtube-icon{
+                            background-color: $orange;
+                        }
+                    }
+                }
+            }
+        }
+        .footer-link-list{
+            .footer-title{
+                color: $white;
+                margin-bottom: 18px;
+            }
+            ul{
+                li{
+                    margin-bottom: 14px;
+                    &:last-child{
+                        margin-bottom: 0;
+                    }
+                    a{
+                        color: $white;
+                        letter-spacing: 0.04em;
+                        &:hover{
+                            color: $blue;
+                        }
+                    }
+                }
+            }
+        }
+        .footer-contact-us{
+            padding-left: 40px;
+            .footer-title{
+                color: $white;
+                margin-bottom: 18px;
+            }
+            .call{
+                margin-bottom: 23px;
+                a{
+                    
+                    letter-spacing: 0.04em;
+                    color: $gray-300;
+                    img{
+                        margin-right: 15px;
+                    }
+                }
+            }
+            .mailto{
+                margin-bottom: 16px;
+                a{
+                    letter-spacing: 0.04em;
+                    color: $gray-300;
+                    img{
+                        margin-right: 10px;
+                    }
+                }
+            }
+            .address{
+                .text{
+                    letter-spacing: 0.04em;
+                    color: $gray-300;
+                    img{
+                        margin-right: 15px;
+                    }
+                }
+            }
+        }
+    }
+    .copyright-text{
+        padding: 40px 0;
+        border-top: 1px solid rgba($gray-700, 0.2);  
+        .text{
+            color: $gray-300;
+        }
+    }
+}

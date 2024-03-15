@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<style>
+.content {
+	width: 700px;
+	margin: auto
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+		<div class="body-wrapper">
+			<!--  Header Start -->
+			<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+			<!--  Header End -->
+			<div class="container-fluid">
+				<div class="container">
+					<div class="page_tits">
+						<h3>공지사항</h3>
+					</div>
+					<br> <br>
+					<div class="content">
+						<section>
+							<form name="updateNotice" action="updateNotice" method="post">
+								<div class="col-md-12">
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="priority">중요도</label>
+											<select name="priority" id="priority" class="nav-item dropdown form-control">
+												<option class="dropdown-item" selected th:if="${info.priority}==0" th:text="일반" hidden value="0"></option>
+												<option class="dropdown-item" selected th:if="${info.priority}==1" th:text="중요" hidden value="1"></option>
+												<option class="dropdown-item" value="0">일반</option>
+												<option class="dropdown-item" value="1">중요</option>
+											</select>
+											<input name="category" value="b01" type="hidden">
+											<input name="detailCate" th:value="${info.detailCate}" type="hidden">
+										</div>
+										<div class="form-group">
+											<label for="author"> 작성자 </label> 
+											<input type="text" name="memId" id="memId" class="form-control" value="관리자" readonly>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="title">제목</label> 
+											<input class="form-control" name="title" id="title" th:value="${info.title}">
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="content"> 내용 </label>
+											<textarea class="form-control" cols="50"
+												rows="5" th:text="${info.content}" name="content" id="content"></textarea>
+										</div>
+										<div class="form-group">
+											<div class="subheading">
+												<em class="highlight"></em>파일첨부
+											</div>
+											<input class="form-control" id="imageInput"
+												name="uploadFiles" type="file" multiple>
+												<br>
+												<div th:each="file : ${files}">
+													<div id="imagePreview1"><img th:src="${file.filePath}" th:if="${file.filePath != null}"
+													style="width: 100px; height: 100px;"><a th:onclick="delFile([[${file.filePath}]])">삭제</a></div>
+												</div>
+												<br>
+												<img id="imagePreview" src="/userresources/image/미리보기.jpg"
+											style="width: 100px;display:none; height: 100px;">
+											<input type="text" class="form-control" id="textFiles" value ="" style="display:none;" readonly>
+										</div>
+									</div>
+									<p class="btn_set">
+										<button type="submit" id="modNo" style="float: right;" class="btn btn-success m-1">수정</button>
+										<button type="button" id="delNo" th:onclick="conf([[${info.category}]],[[${info.detailCate}]])" style="float: right;" class="btn btn-danger m-1">삭제</button>
+									</p>
+								</div>
+							<div class="modal fade" id="confimModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+							    <div class="modal-dialog" role="document">
+							        <div class="modal-content">
+							            <div class="modal-header">
+							                <h5 class="modal-title" id="deleteConfirmationModalLabel">삭제 확인</h5>
+							            </div>
+							            <div class="modal-body">
+							                <p>정말 삭제하시겠습니까?</p>
+							            </div>
+							            <div class="modal-footer">
+							                <button type="button" class="btn btn-secondary" id="yesBtn" data-dismiss="modal" aria-hidden="false">네</button>
+							                <button type="button" class="btn btn-danger" id="noBtn" data-dismiss="modal" aria-hidden="false">아니오</button>
+							            </div>
+							        </div>
+							    </div>
+							 </div>
+							 <script>
+							 	function delFile(del){
+							 		$.ajax('../delFile?filePath='+encodeURI(del))
+								    .done(result => {
+								    	//location.href="noticeInfo?category=[[${info.category}]]&detailCate=[[${info.detailCate}]]&codeNo=[[${info.detailCate}]]"
+								 		var image1 = document.getElementById('imagePreview1');
+								 		image1.style.display='none';
+								 		
+								 		$.ajax('../deleteFiles?filePath='+encodeURI(del))
+									    .done(result => {
+									    	if(result=="ok"){
+										    	console.log('실제 파일 삭제 완료');
+									    	}
+									    })
+									    .fail(err => console.log(err));
+								    })
+								    .fail(err => console.log(err));
+							 	}
+							 	
+								function conf(ca,de){
+									$("#confimModal").modal("show");
+									$(".btn-secondary").click(function () {
+								    	$.ajax('../delNotice?category='+ca+'&detailCate='+de)
+									    .done(result => {
+									    	location.href="boardList?category=b01"
+									    })
+									    .fail(err => console.log(err));
+									});
+								};
+								
+								$("#noBtn").click(function () {
+									$("#confimModal").modal("hide");
+								});
+								
+								$('form[name="updateNotice"]').on('submit',boardUpdate);
+	
+								function boardUpdate(event){
+									event.preventDefault();
+									let title = $('[name="title"]');
+									let content = $('[name="content"]');
+	
+									if(title.val()==''){
+										alert('제목이 입력되지 않았습니다.');
+										title.focus();
+										return;
+									}
+									if(content.val()==''){
+										alert('내용이 입력되지 않았습니다.');
+										content.focus();
+										return;
+									};
+									updateNotice.submit();
+									fileSub();
+								};
+								
+								document.getElementById('imageInput').addEventListener('change', function (event) {
+									var image = document.getElementById('imagePreview');
+									var text = document.getElementById('textFiles');
+									
+									image.src = "/userresources/image/미리보기.jpg";
+									var file = event.target.files[0];
+									let type = (event.target.files[0].type).substring(0,5)
+									if(type!='image'){
+										text.value = event.target.files[0].name
+										text.style.display='block';
+										return;
+									}
+									var reader = new FileReader();
+
+									reader.onloadend = function () {
+										image.src = reader.result;
+										image.style.display='block';
+									}
+
+									if (file) {
+										reader.readAsDataURL(file);
+									} else {
+										image.src = "";
+									}
+								});
+								
+								function fileSub() {
+									var formData = new FormData(); //FormData 객체 생성
+									var inputFile = $("input[type='file']");
+									//input 태그의 type이 file인것을 찾아서 inputFile이라는 변수로 지정
+									var files = inputFile[0].files;
+									//files : 선택한 모든 파일을 나열하는 FileList 객체입니다.
+									//multiple 특성을 지정하지 않닸다면 두 개 이상의 파일을 포함하지 않습니다.
+									if(files.length==0){
+										return;
+									}
+									
+									for (var i = 0; i < files.length; i++) {
+										formData.append("uploadFiles", files[i]); //키,값으로 append 
+									}
+									formData.append("code", "p05")
+									formData.append("codeNo", [[${info.detailCate}]]);
+
+									//jQuery.ajax
+									$.ajax({
+										url: '/uploadsAjax',
+										type: 'POST',
+										processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+										contentType: false, // multipart/form-data타입을 사용하기위해 false 로 지정합니다.
+										data: formData,
+										success: function (result) {
+											console.log('사진성공!');
+										},
+										error: function (reject) {
+											console.log('실풰! : '+reject)
+										}
+									});
+								};
+								
+							</script>
+						</form>
+					</section>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

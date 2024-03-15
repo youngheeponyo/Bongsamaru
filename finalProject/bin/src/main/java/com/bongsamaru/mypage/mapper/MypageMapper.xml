@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bongsamaru.mypage.mapper.MypageMapper">
+	<!-- 마음온도 조회 -->
+	<select id="getHeart" resultType="Double">
+		    SELECT sum(temp_change) as tempChange
+		    FROM heart
+		    WHERE mem_id = #{memId}
+	</select>
+	<!-- 기부 내역 조회 -->
+	<select id="getGibuList" resultType="DonledgerVO">
+			SELECT 
+					don_led_id,
+					a.don_id,
+					don_amt,
+					pay_method,
+					pay_date,
+					pay_stat,
+					pay_id,
+					anon_check,
+					mem_id,
+					title
+			FROM don_ledger a LEFT JOIN donation b
+			ON a.don_id = b.don_id
+			WHERE mem_id = #{memId}
+			ORDER BY don_led_id
+	</select>
+	<!-- 기부 횟수 조회 -->
+	<select id="getGibuCount" resultType="Integer">
+			SELECT count(*)
+			FROM don_ledger
+			WHERE mem_id = #{memId}
+	</select>	
+	<!-- 기부 총금액 조회 -->
+	<select id="getSumAmt" resultType="Integer">
+			SELECT sum(don_amt) as sum
+			FROM don_ledger
+			WHERE mem_id = #{memId}
+	</select>
+ 	<!-- 이메일 변경 -->
+	<update id="updateEmail" parameterType="UserVO">
+		UPDATE MEMBER SET mem_Email = #{memEmail}
+		WHERE mem_Id = #{memId}
+	</update>
+</mapper>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<style scoped="scoped">
+.hidden {
+	display: none;
+}
+* {
+	list-style: none;
+}
+.div-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.select {
+    padding: 15px 10px;
+}
+.select input[type=radio]{
+    display: none;
+}
+.select input[type=radio]+label{
+    display: inline-block;
+    cursor: pointer;
+    height: 30px;
+    width: 100px;
+    border: 1px solid #333;
+    line-height: 30px;
+    text-align: center;
+    font-weight:bold;
+    font-size:17px;
+}
+.select input[type=radio]+label{
+    background-color: transparent; 
+    color: #000; 
+    transition: all 0.25s ease;
+}
+.select input[type=radio]:checked+label{
+     border: 1px solid #000; 
+     background-color: #fbb200;
+     color: #fff;
+}
+.listyle{
+	margin-bottom: 30px;
+	margin-top: 30px;
+}
+.form-control {
+	width: 300px;
+	text-align:center;
+	justify-content: center;
+	align-items: center;
+	margin:0 auto;
+}
+.flexstyle {
+    display: flex;
+    justify-content: space-between; /* 요소들 사이에 공간을 균등하게 분배 */
+    align-items: center; /* 수직 중앙 정렬 */
+    width: 300px; /* 부모 컨테이너의 전체 너비 사용 */
+    margin-bottom: 1rem; /* 아래쪽 여백 추가 */
+    margin:0 auto;
+}
+
+.flexstyle input[type="text"], 
+.flexstyle input[type="email"], 
+.flexstyle input[type="button"] {
+    flex: 1; /* 모든 자식 요소가 동일한 비율로 공간 차지 */
+    margin-right: 8px; /* 요소 사이의 간격 */
+}
+
+.flexstyle input[type="button"] {
+    width: auto; /* 버튼 너비 자동 조정 */
+    cursor: pointer; /* 마우스 오버 시 포인터 모양 변경 */
+    padding: 0.5rem 1rem; /* 패딩으로 내부 여백 추가 */
+}
+
+/* 마지막 요소의 마진 제거 */
+.flexstyle :last-child {
+    margin-right: 0;
+}
+#deleteBtn {
+	margin-bottom: 40px;
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div th:insert="~{banner/empty::banner}"></div>
+	<div class="container" style="margin:0 auto; justify-content: center; align-items: center; text-align:center;">
+		<th:block th:each="item : ${list}">
+				<div id="listyle">
+					<div class="area_thumb">
+					    <div style="position: relative; display: inline-block; margin-bottom: 40px;">
+					      <img th:if="${item.memProfile} == null" id="profileImage" alt="프로필 이미지" src="/userresources/image/banner/nullimage.jpg" style="border-radius: 50%; width: 200px; height: 200px;">
+					      <img th:if="${item.memProfile} != null" id="profileImage" style="border-radius: 50%; width: 200px; height: 200px;" alt="프로필 이미지" class="img_thumb" th:src="@{${item.memProfile}}">
+					      <label for="imageInput" class="custom-file-upload" style="position: absolute; top: 170px; left: 90px; z-index: 1;">
+					        <i class="fas fa-cloud-upload-alt"></i>
+					      </label>
+					      <input class="form-control" style="display:none;" id="imageInput" name="uploadFiles" type="file" multiple>
+					    </div>
+					    <div>
+					    	<input type="button" class="btn btn-primary" id="deleteBtn" value="삭제">
+					    </div>
+					</div>
+				<div class="hidden">
+					<label> 아이디</label>
+					<input type="text" id="id" th:value="${item.memId}" >
+				</div>
+				<div>
+					<label> 닉네임</label>
+					<input type="text" id="nick" th:value="${item.memNick}" class="form-control">
+				</div>
+				<div id="to1">
+					<label>전화번호</label>
+					<div class="flexstyle">
+						<input type="text" id="to" name="to" th:value="${item.memPhone}" class="form-control" maxlength="12"> <!-- 인증번호 받을사람 휴대폰 번호 -->
+						<input type="button" class="btn btn-primary" id="send" value="인증번호 전송"><br> <!-- 문자보내는 전송버튼 -->
+					</div>
+				</div>
+				<div id="to2" class="hidden">
+					<label>전화번호</label>
+					<div class="flexstyle">
+					<input type="text" id="userTel" placeholder="인증번호 4자리를 입력하세요" class="form-control" maxlength="4">   <!-- 인증번호 입력창 -->
+					<input type="button" class="btn btn-primary" id="enterBtn" value="인증번호 확인">  <!-- 인증번호와 내가 입력창에 입력한 인증번호 비교하는 창 -->		
+					</div>
+				</div>
+				<div id="email1">
+				  <label>이메일</label>
+				  <div class="flexstyle">
+					  <input type="email" id="recipientEmail" placeholder="변경하실 이메일 주소를 입력하세요" th:value="${item.memEmail} "class="form-control" >
+					  <input type="button" id="sendButton" class="btn btn-primary" value="인증번호 전송">
+				  </div>
+				</div>
+				<div id="email2" class="hidden">
+				  <label id="name">이메일</label>
+				  <div class="flexstyle">
+					  <input type="text" id="verificationCode" placeholder="인증번호 4자리를 입력하세요" class="form-control" maxlength="4">
+					  <input type="button" class="btn btn-primary" id="verifyButton" value="인증번호 확인">
+				  </div>
+				  <div id="message"></div>
+				</div>			
+				<div>
+					<div class="write_item user">
+						<div class="flexstyle" style="margin-top: 30px;">
+						<input id="zipCheck" readonly style="display: inline;" type="text" class="form-control" th:value="${item.memZip} ">
+						<input id="addrBnt" type="button" style="display: inline; text-align:right; "class="btn btn-primary"  value="주소찾기">
+
+						</div>
+						
+						<div class="error-message" id="zipCheckError"></div>
+						<input id="addrCheck" readonly th:value="${item.memAddr}" style="display: inline; margin-top: 10px" type="text"
+							class="form-control plus-bnt" placeholder="주소">
+						<div class="error-message" id="addrCheckError"></div>						
+	
+					</div>
+				</div>
+				<div style="margin-top:30px;">
+					<label>이메일수신동의</label>
+					<div class="select">
+						<span>
+							<input type="radio" id="emailAgreeYes" name="emailAgree" value="1" th:checked="${item.emailAgree} == 1 " >
+							<label for="emailAgreeYes">예</label>
+						</span>
+						<span>
+							<input type="radio" id="emailAgreeNo" name="emailAgree" value="0" th:checked="${item.emailAgree} == 0">
+							<label for="emailAgreeNo">아니오</label>
+						</span>
+					</div>
+				</div>
+				<div>
+					<label>문자수신동의</label>
+					<div class="select">
+						<span>
+							<input type="radio" id="smsAgreeYes" name="smsAgree" value="1" th:checked="${item.smsAgree} == 1 ">
+							<label for="smsAgreeYes">예</label>
+						</span>
+						<span>
+							<input type="radio" id="smsAgreeNo" name="smsAgree" value="0" th:checked="${item.smsAgree} == 0">
+							<label for="smsAgreeNo">아니오</label>
+						</span>
+					</div>
+				</div>
+				<div>
+					<input type="button" class="btn btn-dark btn-lg" id="updateProfileBtn" value="저장하기">
+				</div>
+			</div>
+		<th:block th:each="item : ${list}">
+	</div>
+	<script th:inline="javascript">
+    let memId = $("#id").val();
+    console.log(memId,'아이디');
+	
+	let checkNum = 0;
+	
+	
+	$('#send').on('click',function() {
+		const to = $('#to').val();
+		
+		if (to == "") {
+			alert("전화번호를 입력하세요.");
+			return;
+		}
+			alert('메세지를 전송하였습니다. 메세지를 확인해주세요.');
+			  $("#to1").hide();
+			  $("#to2").show();
+			
+			$.ajax ({
+				url: '/sendSMS',
+				type: 'GET',
+				data: {
+					"to" : to
+				},
+				success: function(data) {
+					checkNum = data;
+					console.log('번호',checkNum)
+					
+				}
+			});
+	});
+	
+	$('#enterBtn').on('click',function() {	
+		const userNum = $('#userTel').val();
+		
+		if(checkNum == userNum) {
+			alert('인증되었습니다');
+			$("#to2").addClass('hidden');
+			$("#to3").removeClass('hidden');
+	     	
+	     	$("#changeBtn").on('click', function(){
+	        	alert('변경이 완료되었습니다.');
+			    $("#ChangeTelBtn").hide();
+			    $("#to1").show();
+	        })
+	        
+		}
+		else {
+			alert('인증번호가 일치하지 않습니다. 다시 확인해주세요.');
+		}
+	});
+// 인증번호 전송
+$('#sendButton').on('click',function() {
+  let recipientEmail = $("#recipientEmail").val();
+  
+  if (recipientEmail == "") {
+    alert("이메일 주소를 입력하세요.");
+    return;
+  }
+
+  alert("인증번호가 발송되었습니다.");
+  $("#email1").hide();
+  $("#email2").show();
+  $.ajax({
+    type: "POST",
+    url: "/email/send",
+    data: { recipientEmail: recipientEmail },
+    success: function (response) {
+      // 이메일 전송 성공 시 처리3
+      /* document.getElementById("message").innerText = "이메일이 성공적으로 전송되었습니다.";
+      document.getElementById("message").style.color = "green"; // 성공 메시지를 초록색으로 표시 */
+    },
+    error: function (xhr, status, error) {
+      // 이메일 전송 실패 시 처리
+      alert("인증번호 전송 중 오류가 발생했습니다.");
+     /*  document.getElementById("message").innerText = "이메일 전송 중 오류가 발생했습니다.";
+      document.getElementById("message").style.color = "red"; // 실패 메시지를 빨간색으로 표시 */
+    },
+  });
+});
+
+// 인증번호 확인
+$('#verifyButton').on('click',function() {
+  let verificationCode = $("#verificationCode").val();
+  let recipientEmail = $("#recipientEmail").val();
+  
+  
+  if (verificationCode == "") {
+    alert("인증번호를 입력하세요.");
+    return;
+  }
+  
+	$.ajax({
+	  type: "POST",
+	  url: "/email/verify",
+	  data: {
+	    recipientEmail: recipientEmail,
+	    verificationCode: verificationCode,
+	  },
+	  success: function (response) {
+	    // 인증 성공 시 처리
+	    if (response == "success") {
+	      alert("인증되었습니다.");
+	      $("#email1").show();
+	      $("#sendButton").hide();
+	      $("#ChangeEmailBtn").show();
+	      $("#verificationCode").hide();
+	      $("#verifyButton").hide();
+	      $("#name").hide();
+	    } else {
+	      alert("인증번호가 일치하지 않습니다. 다시 확인해주세요.");
+/* 	      $("#message").text("인증번호가 일치하지 않습니다. 다시 확인해주세요.");
+	      $("#message").css("color", "red"); // 실패 메시지를 빨간색으로 표시 */
+	    }
+	  },
+	});
+});
+
+// 프로필 수정
+$(document).ready(function() {
+    $("#updateProfileBtn").click(function() {
+    	let type = 0;
+    	
+        var userVO = {
+            memId: $("#id").val(),
+            memNick: $("#nick").val(),
+            memEmail: $("#recipientEmail").val(),
+            memPhone: $("#to").val(),
+            emailAgree: $("input[name='emailAgree']:checked").val(),
+            smsAgree: $("input[name='smsAgree']:checked").val(),
+            memZip: $("#zipCheck").val(),
+            memAddr: $("#addrCheck").val()
+        };
+    	
+    	var formData = new FormData(); //FormData 객체 생성
+    	var inputFile = $("input[type='file']");
+    	//input 태그의 type이 file인것을 찾아서 inputFile이라는 변수로 지정
+    	var files = inputFile[0].files;
+    	//files : 선택한 모든 파일을 나열하는 FileList 객체입니다.
+    	//multiple 특성을 지정하지 않닸다면 두 개 이상의 파일을 포함하지 않습니다.
+    	for (var i = 0; i < files.length; i++) {
+    		console.log(files[i]);
+    		formData.append("uploadFiles", files[i]); //키,값으로 append 
+    	}
+    	formData.append("code", "p01");
+    	formData.append("codeUser", $('#id').val());
+    	formData.append("type", type);
+    	console.log($('#id').val());
+
+        $.ajax({
+            url: "/updateProFile", // 서버 사이드 스크립트 파일의 경로
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(userVO), // 객체를 폼 데이터로 직렬화
+            success: function(response) {
+                window.location.href = "/my";
+            },
+            error: function(xhr, status, error) {
+            }
+        });
+        
+    	//jQuery.ajax
+    	$.ajax({
+    		url: '/uploadsAjax',
+    		type: 'POST',
+    		processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+    		contentType: false, // multipart/form-data타입을 사용하기위해 false 로 지정합니다.
+    		data: formData,
+    		success: function (result) {
+				window.location.href = "/my";
+    		},
+    		error: function (reject) {
+    		}
+    	});
+
+    });
+});
+
+// 이미지 파일 변경
+$('#imageInput').on('change', function (event) {
+    var image = $('#profileImage')[0];
+    var file = event.target.files[0];
+    var reader = new FileReader();
+
+    reader.onloadend = function () {
+        image.src = reader.result;
+    }
+
+    if (file) {
+        reader.readAsDataURL(file);
+    } else {
+        image.src = "";
+    }
+});
+/* 
+// 이미지 파일 업로드
+$('#uploadBtn').click(function () {
+	var formData = new FormData(); //FormData 객체 생성
+	var inputFile = $("input[type='file']");
+	//input 태그의 type이 file인것을 찾아서 inputFile이라는 변수로 지정
+	var files = inputFile[0].files;
+	//files : 선택한 모든 파일을 나열하는 FileList 객체입니다.
+	//multiple 특성을 지정하지 않닸다면 두 개 이상의 파일을 포함하지 않습니다.
+	for (var i = 0; i < files.length; i++) {
+		console.log(files[i]);
+		formData.append("uploadFiles", files[i]); //키,값으로 append 
+	}
+	formData.append("code", "p01")
+	formData.append("codeUser", $('#id').val());
+	console.log($('#id').val(),'밸류')
+
+	//jQuery.ajax
+	$.ajax({
+		url: '/uploadsAjax',
+		type: 'POST',
+		processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+		contentType: false, // multipart/form-data타입을 사용하기위해 false 로 지정합니다.
+		data: formData,
+		success: function (result) {
+			console.log(result)
+			alert('성공!')
+
+		},
+		error: function (reject) {
+			alert('실풰!')
+			console.log(reject);
+		}
+	});
+}); */
+
+function addr() {
+	new daum.Postcode({
+		oncomplete: function (data) {
+			// 팝업에서 검색결과 항목을 클릭했을 때 실행할 코드를 작성하는 부분.
+
+			// 도로명 주소 변수
+			var roadAddr = data.roadAddress;
+			var extraRoadAddr = ''; // 참고 항목 변수
+
+			// 법정동명이 있고, "동/로/가"로 끝난다면 추가
+			if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+				extraRoadAddr += data.bname;
+			}
+			// 건물명이 있고, 공동주택일 경우 추가
+			if (data.buildingName !== '' && data.apartment === 'Y') {
+				extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+			}
+			// 표시할 참고항목이 있으면, 괄호까지 추가한 최종 문자열을 만듦
+			if (extraRoadAddr !== '') {
+				extraRoadAddr = ' (' + extraRoadAddr + ')';
+			}
+
+			// 우편번호와 주소 정보를 해당 필드에 넣음
+			document.getElementById('zipCheck').value = data.zonecode;
+			document.getElementById("addrCheck").value = roadAddr;
+		}
+	}).open(); // 여기에 닫는 괄호를 추가함
+}
+
+// 주소 검색 버튼 클릭 이벤트에 addr 함수 연결
+$('#addrBnt').on('click', addr);
+$('#facAddr').on('click', facAddr);
+
+
+function facAddr() {
+	new daum.Postcode({
+		oncomplete: function (data) {
+			// 팝업에서 검색결과 항목을 클릭했을 때 실행할 코드를 작성하는 부분.
+
+			// 도로명 주소 변수
+			var roadAddr = data.roadAddress;
+			var extraRoadAddr = ''; // 참고 항목 변수
+
+			// 법정동명이 있고, "동/로/가"로 끝난다면 추가
+			if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+				extraRoadAddr += data.bname;
+			}
+			// 건물명이 있고, 공동주택일 경우 추가
+			if (data.buildingName !== '' && data.apartment === 'Y') {
+				extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+			}
+			// 표시할 참고항목이 있으면, 괄호까지 추가한 최종 문자열을 만듦
+			if (extraRoadAddr !== '') {
+				extraRoadAddr = ' (' + extraRoadAddr + ')';
+			}
+
+			// 우편번호와 주소 정보를 해당 필드에 넣는다.
+			document.getElementById('facAddr1').value = data.zonecode;
+			document.getElementById("facAddr2").value = roadAddr;
+			// 커서를 상세주소 필드로 이동한다.
+			document.getElementById("facAddr3").focus();
+		}
+	}).open(); // 여기에 닫는 괄호를 추가함
+}
+
+$('#deleteBtn').on('click',function() {
+    $('#imageInput').val('');
+    $('#profileImage').attr('src', '/userresources/image/banner/nullimage.jpg');
+});
+</script>
+</section>
+	
+</body>
+</html>

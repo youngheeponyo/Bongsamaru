@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+ <head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <link rel="icon" href="/image/봉사마루로고.png" type="image/png">
+   <title>봉사마루</title>
+   <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="/userresources/css/bootstrap.css">
+        <link rel="stylesheet" href="/userresources/vendors/linericon/style.css">
+        <link rel="stylesheet" href="/userresources/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/userresources/vendors/owl-carousel/owl.carousel.min.css">
+        <link rel="stylesheet" href="/userresources/vendors/bootstrap-datepicker/bootstrap-datetimepicker.min.css">
+        <link rel="stylesheet" href="/userresources/vendors/nice-select/css/nice-select.css">
+        <link rel="stylesheet" href="/userresources/vendors/owl-carousel/owl.carousel.min.css">
+        <!-- main css -->
+        <link rel="stylesheet" href="/userresources/css/style.css">
+        <link rel="stylesheet" href="/userresources/css/responsive.css">
+        <!-- jquery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <!-- font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Orbit&family=Single+Day&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+		<!-- Bootstrap JS (Popper.js 포함) -->
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+		
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+		
+		<style>
+		  @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Single+Day&display=swap');
+		  .cur { cursor: pointer; }
+		  #exampleModal { width: 300px; }
+		  .modal-dialog {
+		    position: fixed;
+		    top: 10%;
+		    left: 30%;
+		    transform: translate(-50%, -50%);
+		  }
+		  body{
+		  font-family: 'Orbit', sans-serif;
+		  }
+		  .alert-filter {
+		    margin: 0 10px;
+		    cursor: pointer;
+		    color: black; /* 필터 텍스트 색상 */
+		  }
+		  .alert-filter:hover {
+		    text-decoration: underline;
+		  }
+		  .read { color: grey; } /* 읽음 상태의 텍스트 색상 */
+		  .unread { color: black; } /* 안읽음 상태의 텍스트 색상 */
+				  #alertButton {
+		  opacity: 1; /* 기본 상태에서의 불투명도 */
+		}
+		h1 h2 h3 {
+			font-family: "Dongle", sans-serif;
+		}
+
+
+		#alertButton .red-dot {
+		    display: none; /* 초기 상태는 숨김으로 설정 */
+		    position: absolute;
+		    top: 22px;
+		    left: 10px;
+		    width: 10px; /* 빨간 점의 크기 */
+		    height: 10px; /* 빨간 점의 크기 */
+		    background-color: red;
+		    border-radius: 50%;
+		}
+		.cur { cursor: pointer; }
+		
+		</style>
+    </head>
+<body>
+	    <!--================Header Area =================-->
+        <header class="header_area" style="height:100px">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <a class="navbar-brand logo_h" href="/"><img style="width:100px"src="/image/봉사마루로고.png" alt=""><span style="font-weight: 700">봉사마루</span></a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav menu_nav ml-auto" >
+                            <li class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link "  th:href="@{/}">메인</a></li>
+                               <li class="nav-item submenu dropdown">
+                                <a style="cursor: pointer; font-size: 16px; font-weight: 700;" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">소개</a>
+                                <ul class="dropdown-menu" >
+                                    <li class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/intro}">봉사마루</a></li>
+                                    <li class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/facilityList}">시설소개</a></li>
+                                </ul>
+                            </li> 
+                           <li class="nav-item submenu dropdown">
+                                <a style="cursor: pointer; font-size: 16px; font-weight: 700;" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">봉사</a>
+                                <ul class="dropdown-menu" >
+                                    <li class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/daily}">일일봉사</a></li>
+                                    <li class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/Group}">동아리</a></li>
+                                    <li class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/FacilityVol}">시설봉사</a></li>
+                                </ul>
+                            </li> 
+
+                            <li class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/donaMain}">기부</a></li>
+                            <li class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/challengeList}">챌린지</a></li>
+                 
+							</ul>
+							<ul class="nav navbar-nav menu_nav ml-auto">
+                    		<li sec:authorize="!isAuthenticated()" class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/login}">로그인</a></li>
+                   		    <li sec:authorize="isAuthenticated()" class="nav-item" style="padding-top:15px;">
+						        <!-- M02 역할 사용자를 위한 링크 -->
+						        <a sec:authorize="hasRole('M02')" th:href="@{/my}">
+						           <img th:src="${session.profile}" 
+						              style="width: 50px; height: 50px; border-radius: 50%;" alt="프로필 이미지">
+						        </a>
+						        <!-- M03 역할 사용자를 위한 링크 -->
+						        <a sec:authorize="hasRole('M03')" th:href="@{/fac}">
+						           <img th:src="${session.profile}" 
+						              style="width: 50px; height: 50px; border-radius: 50%;" alt="프로필 이미지">
+						        </a>
+						        <!-- 기타 역할 사용자를 위한 링크, 필요에 따라 추가 -->
+						    </li>
+						    <li sec:authorize="hasRole('M02')" class="nav-item" ><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/my}" th:text="|${#authentication.principal.userVO.nick} 님 |">[[${userNickname}]]님 환영합니다</a></li>
+						    <li th:if="${session.name}!=null" class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:text="|${session.name} 님 환영합니다~|" th:href="@{/my}"></a></li>
+						    <li sec:authorize="hasRole('M03')" class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/fac/volJoin}" th:text="|${#authentication.principal.userNickname}님 |">[[${userNickname}]]님 환영합니다</a></li>
+						    <li sec:authorize="!isAuthenticated()" class="nav-item"><a style="font-size: 16px; font-weight: 700;" class="nav-link" th:href="@{/signup}">회원가입</a></li>
+							<li sec:authorize="isAuthenticated()" class="nav-item">
+						    <form th:action="@{/logout}" method="post">
+						        <input type="submit" value="로그아웃" class="nav-link" style=" font-weight: 700;background:none;border:none;padding:0;font-size: 16px; font-weight: 700;">
+						    </form>
+							</li>
+							<li sec:authorize="isAuthenticated()" class="nav-item cur">
+							<a id="alertButton" style="position: relative; display: inline-block;  text-align: center;" class="nav-link nav-icon-hover" data-toggle="modal" data-target="#exampleModal">
+							    <i style="font-size:18px" class="fas fa-bell"></i>
+							       <span class="red-dot"></span> <!-- 빨간 점 추가 --> <!-- 뱃지 추가 -->
+							</a>
+                    </li>
+                        </ul>
+                    </div> 
+                </nav>
+            </div>
+        </header>
+        <!--================Header Area =================-->
+				<section layout:fragment="content">
+				</section>
+
+			<div class="divfooter" th:insert="~{footer::copy}"></div>
+
+	
+ <div class="modal fade" id="exampleModal" tabindex="-100" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLabel" style="text-align:center;">알림</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"> 
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div style="display:flex;justify-content: flex-end; width: 100%; padding-top:10px; padding-right: 20px;">
+		        <span class="alert-filter" data-filter="all">전체</span> |
+		        <span class="alert-filter" data-filter="read">읽음</span> |
+		        <span class="alert-filter" data-filter="unread">안읽음</span>
+    		</div>
+            <div class="modal-body" style="max-height: calc(100vh - 300px); overflow-x: hidden; overflow-y: auto;">
+                <div id="start">
+                    <!-- 모달 내용 -->
+                  <table class="table">
+				    <thead>
+				        <tr  style="text-align:center">
+				            <th>No</th>
+				            <th>제목</th>
+				            <th>날짜</th>
+				            <th>읽음</th>
+				        </tr>
+				    </thead>
+				    <tbody>
+				    </tbody>
+				</table>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+	  $('.alert-filter').click(function() {
+	        var filter = $(this).data('filter'); // 클릭된 필터의 data-filter 값 가져오기
+
+	        // 모든 알림 행 숨기기
+	        $('#exampleModal .modal-body tbody tr').hide();
+
+	        if(filter === 'all') {
+	            // '전체' 필터 클릭 시 모든 알림 보여주기
+	            $('#exampleModal .modal-body tbody tr').show();
+	        } else if(filter === 'read') {
+	            // '읽음' 필터 클릭 시 읽은 알림만 보여주기
+	            $('#exampleModal .modal-body tbody tr.read').show();
+	        } else if(filter === 'unread') {
+	            // '안읽음' 필터 클릭 시 안 읽은 알림만 보여주기
+	            $('#exampleModal .modal-body tbody tr.unread').show();
+	        }
+	    });
+	
+	checkAlarmCount();
+    // 알람 개수를 확인하고 빨간 점을 업데이트하는 함수
+    function checkAlarmCount() {
+        $.ajax({
+            url: '/alarmCount',
+            type: 'GET',
+            dataType: 'json',
+            success: function(result) {
+                if (result > 0) {
+                    $('#alertButton .red-dot').show();
+                } else {
+                    $('#alertButton .red-dot').hide();
+                }
+            }
+        });
+    }
+
+    // 알람 업데이트 함수
+    function updateAlarm(alertId, receiveId) {
+        let data = {
+            alertId: alertId,
+            receiveId: receiveId
+        };
+
+        $.ajax({
+            url: '/updateAlarm',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function() {
+                checkAlarmCount(); // 성공 후 알람 개수 다시 확인
+            },
+            error: function(error) {
+                console.log('Error updating alarm:', error);
+            }
+        });
+    }
+
+    // 알림 모달을 불러오는 함수
+    function loadAlerts() {
+        var modalBody = $('#exampleModal .modal-body tbody');
+        modalBody.empty();
+        modalBody.append('<tr><td colspan="4" class="text-center">로딩 중...</td></tr>');
+
+        $.ajax({
+            url: '/userAlarm',
+            type: 'GET',
+            dataType: 'json',
+            success: function(alerts) {
+                modalBody.empty();
+                if (alerts.length > 0) {
+                    alerts.forEach(function(alert, index) {
+                        var readStatus = alert.readFlag == '0' ? '안읽음' : '읽음';
+                        var statusClass = alert.readFlag == '0' ? 'unread' : 'read';
+                        var formattedDate = formatDate(alert.alertDate);
+                        var alertContent = `
+                        <tr class="${statusClass}"  data-alert-id="${alert.alertId}" data-receive-id="${alert.receiveId}" style="cursor: pointer;">
+                            <td>${index + 1}</td>
+                            <td>${alert.content}</td>
+                            <td>${formattedDate}</td>
+                            <td>${readStatus}</td>
+                        </tr>
+                        `;
+                        modalBody.append(alertContent);
+                    });
+                    updateAlertColors();
+                } else {
+                    modalBody.append('<tr><td colspan="4" class="text-center">새 알림이 없습니다.</td></tr>');
+                }
+            },
+            error: function(error) {
+                console.log('Error loading alerts:', error);
+            }
+        });
+    }
+
+    // 알림 클릭 이벤트 핸들러 설정
+    $('#exampleModal .modal-body tbody').on('click', 'tr', function() {
+        var alertId = $(this).data('alert-id');
+        var receiveId = $(this).data('receive-id');
+        updateAlarm(alertId, receiveId);
+        location.href="/my"
+    });
+
+    // 알림 버튼 클릭 이벤트
+    $('#alertButton').click(function() {
+        loadAlerts();
+        
+    });
+
+    // 알림 개수 확인
+    checkAlarmCount();
+});
+
+// 날짜 포맷 변경 함수
+function formatDate(dateString) {
+    var date = new Date(dateString);
+    return date.getFullYear().toString().substring(2) + '-' 
+    + ('0' + (date.getMonth() + 1)).slice(-2) + '-' 
+    + ('0' + date.getDate()).slice(-2);
+}
+
+// 알림 색상 업데이트 함수
+function updateAlertColors() {
+    $('#exampleModal .modal-body tbody tr').each(function() {
+        var isRead = $(this).hasClass('read');
+        $(this).find('td').css('color', isRead ? 'grey' : 'black');
+    });
+}
+</script>
+
+    <script src="/userresources/js/jquery-3.2.1.min.js"></script>
+    <script src="/userresources/js/popper.js"></script>
+    <script src="/userresources/js/bootstrap.min.js"></script>
+    <script src="/userresources/vendors/owl-carousel/owl.carousel.min.js"></script>
+    <script src="/userresources/js/jquery.ajaxchimp.min.js"></script>
+    <script src="/userresources/js/mail-script.js"></script>
+    <script src="/userresources/vendors/bootstrap-datepicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="/userresources/js/mail-script.js"></script>
+    <script src="/userresources/js/stellar.js"></script>
+    <script src="/userresources/vendors/lightbox/simpleLightbox.min.js"></script>
+    <script src="/userresources/js/custom.js"></script>
+</body>
+
+</html>

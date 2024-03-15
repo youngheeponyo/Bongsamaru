@@ -1,0 +1,195 @@
+<!-- /*
+* Bootstrap 5
+* Template Name: Furni
+* Template Author: Untree.co
+* Template URI: https://untree.co/
+* License: https://creativecommons.org/licenses/by/3.0/
+*/ -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="favicon.png">
+  <meta name="description" content="" />
+  <meta name="keywords" content="bootstrap, bootstrap4" />
+
+		<!-- Bootstrap CSS -->
+		<link href="donation/payment/css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+		<link href="donation/payment/css/tiny-slider.css" rel="stylesheet">
+		<link href="donation/payment/css/style.css" rel="stylesheet">
+		
+		<!-- 아임포트 api -->
+			 <!-- jQuery -->
+			  <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+			 <!-- iamport.payment.js -->
+			  <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
+			  
+
+    <meta charset="UTF-8"/>
+    <title>Sample Payment</title>
+    
+		<title>Payment</title>
+	</head>
+
+	<body>
+
+
+
+		<!-- Start Hero Section -->
+			<div class="hero">
+				<div class="container">
+					<div class="row justify-content-between">
+						<div class="col-lg-5">
+							<div class="intro-excerpt">
+								<h1>기부금결제화면</h1>
+							</div>
+						</div>
+						<div class="col-lg-7">
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		<!-- End Hero Section -->
+
+		<div class="untree_co-section">
+		    <div class="container">
+		      <div class="row mb-5">
+
+		      </div>
+		      <div class="row">
+		        <div class="col-md-6 mb-5 mb-md-0">
+		          <h2 class="h3 mb-3 text-black">기부하기</h2>
+		          <div class="p-3 p-lg-5 border bg-white">
+
+
+
+		            <div class="form-group row">
+		              <div class="col-md-12">
+		                <label for="c_address" class="text-black">기부할 금액 <span class="text-danger">*</span></label>
+		                <input type="text" class="form-control" id="c_address" name="c_address" placeholder="기부할 금액을 입력해주세요">
+		              </div>
+		            </div>
+
+
+	            
+		                <table class="table site-block-order-table mb-5">
+		                  <thead>
+		                    <th>결제금액</th>
+		                    <th></th>
+		                  </thead>
+		                  <tbody>
+
+		                    <tr class="table-success">
+		                      <td class="text-black font-weight-bold" scope="row"><strong></strong></td>
+		                      <td class="text-black font-weight-bold" scope="row"><strong  id="displayAmount">원</strong></td>
+		                    </tr>
+		                    
+	
+		                  </tbody>
+		                </table>
+
+			            <div class="row">
+			                <div class="col-md-3 mb-3">
+			                    <button type="button" class="btn btn-info btn-block disabled" id="depositBtn">무통장입금</button>
+			                </div>
+			                <div class="col-md-3 mb-3">
+			                    <button type="button" class="btn btn-warning btn-block disabled" id="kakaoPayBtn">카카오페이</button>
+			                </div>
+			                <div class="col-md-3 mb-3">
+			                    <button type="button" class="btn btn-success btn-block disabled" id="tossPayBtn">토스페이</button>
+			                </div>
+			                <div class="col-md-3 mb-3">
+			                    <button type="button" class="btn btn-danger btn-block disabled" id="cardPayBtn">카드결제</button>
+			                </div>
+			            </div>
+
+		            <div class="form-group">
+		              <label for="c_create_account" class="text-black" data-bs-toggle="collapse" href="#create_an_account" role="button" aria-expanded="false" aria-controls="create_an_account"><input type="checkbox" value="1" id="c_create_account"> 익명으로 기부하겠습니다.</label>
+	
+		            </div>
+
+
+		            <div class="form-group">
+		              <label for="c_ship_different_address" class="text-black" data-bs-toggle="collapse" href="#ship_different_address" role="button" aria-expanded="false" aria-controls="ship_different_address"><input type="checkbox" value="1" id="c_ship_different_address"> 동의합니다. (약관)</label>
+		              
+		            </div>
+
+		                <div class="form-group">
+		                  <button class="btn btn-black btn-lg py-3 btn-block"  onclick="requestPay()">결제하기</button>
+		                </div>
+
+		          </div>
+		        </div>
+		        <div class="col-md-6">
+
+	        </div>
+		      </div>
+		      <!-- </form> -->
+		    </div>
+		  </div>
+
+		
+
+		<script src="donation/payment/js/bootstrap.bundle.min.js"></script>
+		<script src="donation/payment/js/tiny-slider.js"></script>
+		<script src="donation/payment/js/custom.js"></script>
+		
+
+		
+		<script>
+		    //입력 -> 표
+		    document.getElementById('c_address').addEventListener('input', function() {
+		        let amountInput = this.value;
+		        // 표 업데이트
+		    	document.getElementById('displayAmount').textContent = amountInput + '원';
+		    });
+		    
+		</script>	
+		
+		
+		<script>
+			let selectedPaymentMethod = '';  //결제수단 
+			
+			function selectPaymentMethod(method){
+				selectedPaymentMethod
+			}
+		
+		
+			 var IMP = window.IMP;
+			 IMP.init("imp48428178");
+			
+			 function requestPay() {
+			        	
+			   let amountInput = document.getElementById('c_address').value;
+			        	
+			     IMP.request_pay({
+			        pg: "kakaopay",
+			        pay_method: "card",
+			        merchant_uid: "ORD20180131-0000011",   // 주문번호
+			        name: "노르웨이 회전 의자",
+			        amount:  parseInt(amountInput),   // 숫자 타입
+			        buyer_email: "gildong@gmail.com",
+			        buyer_name: "홍길동",
+			         buyer_tel: "010-4242-4242",
+
+			       }, function (rsp) { // callback
+			          $.ajax({
+			            type: 'POST',
+			            url: '/verify/' + rsp.imp_uid
+			         }).done(function(data) {
+			             if(rsp.paid_amount === data.response.amount){
+			                alert("결제 성공");
+			              } else {
+			                alert("결제 실패");
+			              }
+			          });
+			       });
+			     }
+   		 </script>
+	</body>
+
+</html>

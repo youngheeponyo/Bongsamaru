@@ -1,0 +1,56 @@
+			<div id="faq">
+			<br>
+			<div class="btn-group" style="float:right;padding:10px">
+			  <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+			    카테고리별
+			  </button>
+			  <ul class="dropdown-menu">
+			  	<li><a class="dropdown-item cur" onclick="show2()">전체보기</a></li>
+			  	<li th:each="code : ${code}"><a class="dropdown-item cur" th:onclick="aler([[${code.subCodeId}]])">[[${code.subCodeName}]]</a></li>
+			  </ul>
+			</div>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>내용</th>
+						<th>카테고리</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="board,st : ${faqList}" >
+						<tr>
+							 <td th:text="${board.RN}" >번호</td>
+							 <td><a th:text="${board.title}" class="cur" th:href="@{getFaqOne(faqId=${board.faqId})}"></a></td>
+							 <td th:if="${board.content.length}<20" th:text="${board.content}"></td>
+							 <td th:if="${board.content.length}>=20" th:text="${#strings.substring(board.content, 0, 20)}+'...'"></td>
+							 <td th:if="${board.category}=='a01'" >챌린지</td>
+							 <td th:if="${board.category}=='a02'" >봉사활동</td>
+							 <td th:if="${board.category}=='a03'" >기부</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<div class="content" th:if="${faqList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</div>
+			<a type="button" style="float:right;" class="btn btn-dark m-1" th:href="@{faqInsert}">등록</a>
+			<nav aria-label="Page navigation example" th:if="${faqList.size} != 0" class="cur">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev([[${vo}]],[[${category}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current([[${vo}]],[[${pageNum}]],[[${category}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next([[${vo}]],[[${category}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</div>

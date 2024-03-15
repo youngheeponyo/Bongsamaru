@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<div th:fragment="side">
+        <div class="hotel_img">
+            <img th:src="${session.facilityInfo.filePath}" onError="this.src='../image/기본이미지.jpg'" alt="">
+            <h2 th:text="${session.facilityInfo.facName}"></h2>
+        </div>
+        <h4 class="sec_h4" th:text="'총 기부자 수:' +${session.facilityInfo.donors} + '명'">총기부자수</h4>
+        <h5 class="sec_h5" data-th-text="'총 기부액:' + ${#numbers.formatInteger(session.facilityInfo.donaitonAmt,3,'COMMA')}+'원'">총기부금액</h5>
+ </div> 
+
+</body>
+</html>

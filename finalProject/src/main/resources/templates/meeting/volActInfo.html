@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사활동 게시글</title>
+
+<!-- TUI 에디터 CSS CDN -->
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css"/>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<style>
+.write-1 {
+    height: 30px;
+    width:70%;
+    border : none;
+    font-size: 18px;
+    outline: none;
+}
+.write-2 {
+    width:70%;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<br>
+		<div class="body-wrapper" style="width:50%;margin:auto;">
+			<div class="container-fluid">
+				<div class="container">
+						<h2 style="text-align: center;">봉사 상세 게시글</h2>
+						<br>
+						<label>봉사 제목</label>
+		                <input class='write-1' type="text" name="title" max="30" th:value="${info.title}" readonly>
+						<hr>
+						<label>봉사 일시</label>
+		                <input class='write-1' type="text" name="volDate" max="30" th:value="${#dates.format(info.volDate, 'yyyy년 MM월 dd일')}" readonly>
+						<hr>
+						<label>카테고리</label>
+						<input class='write-1' type="text" name="volDate" max="30" th:if="${info.category}=='f01'" value="아동 및 청소년" readonly>
+						<input class='write-1' type="text" name="volDate" max="30" th:if="${info.category}=='f02'" value="장애인" readonly>	
+						<input class='write-1' type="text" name="volDate" max="30" th:if="${info.category}=='f03'" value="문화,체육" readonly>
+						<input class='write-1' type="text" name="volDate" max="30" th:if="${info.category}=='f04'" value="캠페인" readonly>
+						<input class='write-1' type="text" name="volDate" max="30" th:if="${info.category}=='f05'" value="보건의료" readonly>
+						<input class='write-1' type="text" name="volDate" max="30" th:if="${info.category}=='f06'" value="환경정리" readonly>
+						<input class='write-1' type="text" name="volDate" max="30" th:if="${info.category}=='f07'" value="동물" readonly>
+						<input class='write-1' type="text" name="volDate" max="30" th:if="${info.category}=='f08'" value="기타" readonly>
+						<hr>
+						<label>봉사 장소</label>
+						<input class='write-1' type="text" name="volDate" max="30" th:value="${info.location}">
+						<!-- 에디터를 적용할 요소 (컨테이너) -->
+						<hr>
+						<label>내용</label>
+						<div id="viewer"></div>
+						<hr>
+		                <a th:if="${meeting}==${session.userId}" onclick="modalOpen()" type="button" style="float: right;width:90px" class="btn btn-secondary m-1">삭제</a>
+		                <a id="cham" onclick="withVolAct()" type="button" style="float: right;width:90px;display:none" class="btn btn-secondary m-1">참여하기</a>
+		                <a th:href="@{../volBoardList?(volId=${session.id})}" type="button" style="float: right;width:90px" class="btn btn-primary m-1">돌아가기</a>
+						<!-- 모달창 -->
+						<div class="modal fade" id="confimModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+						    <div class="modal-dialog" role="document">
+						        <div class="modal-content">
+						            <div class="modal-header">
+						                <h5 class="modal-title" id="deleteConfirmationModalLabel">삭제 확인</h5>
+						            </div>
+						            <div class="modal-body">
+						                <p>정말 삭제 하시겠습니까?</p>
+						            </div>
+						            <div class="modal-footer">
+						                <button type="button" class="btn btn-danger" id="noBtn" data-dismiss="modal" aria-hidden="false">아니오</button>
+						                <button type="button" class="btn btn-secondary" id="yesBtn" data-dismiss="modal" aria-hidden="false">네</button>
+						            </div>
+						        </div>
+						    </div>
+						 </div>
+						<!-- 모달창 -->
+						<div class="modal fade" id="actVol" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+						    <div class="modal-dialog" role="document">
+						        <div class="modal-content">
+						            <div class="modal-header">
+						                <h5 class="modal-title" id="deleteConfirmationModalLabel">참여 확인</h5>
+						            </div>
+						            <div class="modal-body">
+						                <p>참여되었습니다!</p>
+						            </div>
+						            <div class="modal-footer">
+						                <button type="button" class="btn btn-secondary" id="actVolBtn" data-dismiss="modal" aria-hidden="false">확인</button>
+						            </div>
+						        </div>
+						    </div>
+						 </div>
+						 
+					<script>
+						function decodeHtml(html) {
+						    var txt = document.createElement('textarea');
+						    txt.innerHTML = html;
+						    return txt.value;
+						}
+
+						const cont = decodeHtml(`[[${info.content}]]`);
+
+						const viewer = new toastui.Editor.factory({
+							  el: document.querySelector('#viewer'),
+							  viewer: true,
+							  height: '500px',
+							  initialValue: cont,
+							});
+						function delAct(){
+							$.ajax({
+				           		url: '/delVolActBoard?volActId='+[[${info.volActId}]],
+				           		type: 'POST',
+				           		processData: false,
+				           		contentType: false,
+				           		success: function(data) {
+				           			location.href="volBoardList?volId="+[[${session.id}]]
+				           		},
+				           		error: function(e) {
+				           			console.log('실패');
+				           		}
+				           	});
+						};
+						
+						function modalOpen(){
+							$("#confimModal").modal("show");
+							
+							$("#yesBtn").on('click',function () {
+								delAct();
+							});
+						};
+						
+						$("#noBtn").on('click',function () {
+						    $("#confimModal").modal("hide");
+						});
+						
+						$.ajax('../chamMem?memId=[[${session.userId}]]&volActId='+[[${info.volActId}]])
+						.done(result => {
+							const abd = [[${after}]]
+							if(result==1 || abd==false){
+								$('#cham').css('display','none')
+							}else{
+								$('#cham').css('display','block')
+							}
+						})
+						.fail(err => console.log(err));
+						
+						function withVolAct(){
+							$.ajax({
+				           		url: '../insertvolActMem?volActId='+[[${info.volActId}]]+'&memId=[[${session.userId}]]',
+				           		type: 'POST',
+				           		processData: false,
+				           		contentType: false,
+				           		success: function(data) {
+				           			$("#actVol").modal("show");
+				           		},
+				           		error: function(e) {
+				           			console.log('실패');
+				           		}
+				           	});
+						}
+						
+						$("#actVolBtn").on('click',function () {
+							$("#actVol").modal("hide");
+						});
+					</script>
+				</div>
+			</div>
+		</div>
+	</section>
+	<br>
+</body>
+</html>

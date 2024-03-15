@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>공지사항/자주하는 질문</title>
+<style>
+.cur{
+	cursor:pointer;
+	color : black;
+}
+#tableData{
+	margin-top : 20px;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>공지사항/자주하는 질문</h2>
+		<div style="float:right;" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">공지사항 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 자주하는 질문</a>
+		</div>
+		<div id=tableData>
+		<div id="notice">
+		<br>
+		<div style="float:right;padding:10px">
+			<input class="form-control-sm me-2" id="search" type="search" placeholder="Search" aria-label="Search" th:value="${vo.searchKeyword}">
+			<button class="btn btn-outline-success" id="searchBtn" type="button">검색</button>
+			<button class="btn btn-outline-primary" id="clean" type="button">초기화</button>
+		</div>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>작성일</th>
+						<th>조회수</th>
+						<th>중요도</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="board,st : ${boardList}" >
+						<tr>
+							 <td th:text="${board.RN}">번호</td>
+							 <td><a th:text="${board.title}" class="cur" th:href="@{noticeInfo(category=${board.category},detailCate=${board.detailCate},codeNo=${board.detailCate})}"></a></td>
+							 <td th:text="${#dates.format(board.writeDate, 'yyyy년 MMM dd일')}" >작성일</td>
+							 <td th:text="${board.views}" >조회수</td>
+							 <td th:if="${board.priority}==0" >일반</td>
+							 <td th:if="${board.priority}==1" >중요</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<div class="content" th:if="${boardList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</div>
+			<a type="button" style="float:right;" class="btn btn-dark m-1" th:href="@{noticeInsert}">등록</a>
+			<nav aria-label="Page navigation example" th:if="${boardList.size} != 0">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/boardList(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1}, category=b01)}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/boardList(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage}, category=b01)}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/boardList(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage}, category=b01)}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+		</div>
+		</div>
+		</div>
+		<script th:inline="javascript">
+			function show1(){
+				$('#tableData').load("../boardList?category=b01 #notice");
+			}
+			
+			function show2(){
+				$('#tableData').load("../faqList?start=1&end=10 #faq");
+			}
+			
+			function prev(vo,category){
+				if(category!=null){
+					$('#tableData').load(`../faqList?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&category=${category} #faq`);
+				}else{
+					$('#tableData').load(`../faqList?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1} #faq`);
+				}
+			}
+			
+			function current(vo,pageNum,category){
+				if(category!=null){
+					$('#tableData').load(`../faqList?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&category=${category} #faq`);
+				}else{
+					$('#tableData').load(`../faqList?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage} #faq`);
+				}
+			}
+			
+			function next(vo,category){
+				if(category!=null){
+					$('#tableData').load(`../faqList?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&category=${category} #faq`);
+				}else{
+					$('#tableData').load(`../faqList?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage} #faq`);
+				}
+			}
+			
+			function aler(sub){
+				$('#tableData').load(`../faqList?category=${sub}&start=1&end=10 #faq`);
+			}
+			
+			$('#searchBtn').on('click',function(){
+				let keyword = $('#search').val();
+				if(keyword == '') {
+					alert('검색하실 내용을 입력하세요');
+				}
+				window.location.href = `../boardList?category=b01&searchKeyword=${keyword}`;
+			});
+			
+			$('#clean').on('click',function(){
+				window.location.href = "../boardList?category=b01";
+			});
+		</script>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

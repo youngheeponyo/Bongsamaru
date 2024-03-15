@@ -1,0 +1,24 @@
+			<table class="table" id="facility">
+				<thead>
+					<tr>
+						<th>시설명</th>
+						<th>사업자등록번호</th>
+						<th>대표자명</th>
+						<th>대표 전화</th>
+						<th>이메일</th>
+						<th>홈페이지 주소</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="user : ${userListDetail}">
+						<tr>
+							 <td th:text="${user.facName}" class="cur" th:onclick="info([[${user.facId}]])">시설명</td>
+							 <td th:text="${user.bizNum}" >사업자등록번호</td>
+							 <td th:text="${user.repName}" >대표자명</td>
+							 <td th:text="${user.repPhone}">대표 전화</td>
+							 <td th:text="${user.facEmail}">이메일</td>
+							 <td th:text="${user.facWeb}">홈페이지</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>

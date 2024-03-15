@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>승인페이지</title>
+<style>
+.cur{
+	cursor:pointer;
+}
+.facility{
+	cursor:pointer;
+}
+#tableData{
+	margin-top : 50px;
+}
+table th {
+	width : 120px;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>승인관리</h2>
+		<div style="float:right;color:black" class="cur">
+			<a style="color:black;font-size:14px" onclick="show()">시설 가입 | </a>
+			<a style="color:black;font-size:14px" onclick="show1()">시설 기부 신청 | </a>
+			<a style="color:black;font-size:14px" onclick="show2()">기부금 신청 | </a>
+			<a style="color:black;font-size:14px" onclick="show3()">기부금 리뷰</a>
+		</div>
+		<div id="tableData">
+			<table class="table" id="bas">
+				<thead class="cent">
+					<tr>
+						<th>시설명</th>
+						<th>시설유형</th>
+						<th>사업자등록번호</th>
+						<th>시설 주소</th>
+						<th>이메일</th>
+						<th>대표자명</th>
+						<th>대표번호</th>
+					</tr>
+				</thead>
+				<tbody class="body">
+				 	<th:block th:each="fac,st : ${facilityList}" th:if="${fac.memApp}==0">
+						<tr>
+							 <td th:text="${fac.facName}" class="cur" th:onclick="info([[${fac.facId}]])">시설명</td>
+							 <td th:text="${fac.facType}" >시설유형</td>
+							 <td th:text="${fac.bizNum}" >사업자등록번호</td>
+							 <td th:text="${fac.facAddr}" >시설 주소</td>
+							 <!--<td th:text="${#dates.format(fac.facEstDate, 'yyyy년 MMM dd일')}" >설립일</td>  -->
+							 <td th:text="${fac.facEmail}" >이메일</td>
+							 <td th:text="${fac.repName}" >대표자명</td>
+							 <td th:text="${fac.repPhone}">대표번호</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			</div>
+			<!-- 첫번째 모달 -->
+			<div class="modal fade" id="myModal" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content" id="content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+			            </div>
+			            <div class="modal-body">
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>시설명</th>
+				                			<td id="name"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설유형</th>
+				                			<td id="type"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>사업자번호</th>
+				                			<td id="bizNum"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>우편번호</th>
+				                			<td id="facZip"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설 주소</th>
+				                			<td id="addr"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>설립일</th>
+				                			<td id="esta"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표자명</th>
+				                			<td id="repName"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표 번호</th>
+				                			<td id="repPhone"></td>
+				                		</tr>
+			                		</thead>
+			                	</table>
+			                	<a href="#" target='_blank' id="homepage">홈페이지로 이동</a>
+			                </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+			                <button type="button" class="btn btn-danger" onclick="approveCk()">승인</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			<!-- 두번째 모달 -->
+			<div class="modal fade" id="myModal2" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content" id="content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+			            </div>
+			            <div class="modal-body">
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>시설명</th>
+				                			<td id="name2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설유형</th>
+				                			<td id="type2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>사업자번호</th>
+				                			<td id="bizNum2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>우편번호</th>
+				                			<td id="facZip2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설 주소</th>
+				                			<td id="addr2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>설립일</th>
+				                			<td id="esta2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표자명</th>
+				                			<td id="repName2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표 번호</th>
+				                			<td id="repPhone2"></td>
+				                		</tr>
+			                		</thead>
+			                	</table>
+			                	<a href="#" target='_blank' id="homepage2">홈페이지로 이동</a>
+			                </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+			                <button type="button" class="btn btn-danger" onclick="approveCk2()">승인</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 세번째 모달 -->
+			<div class="modal fade" id="mys" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content" id="content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+			            </div>
+			            <div class="modal-body">
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>시설아이디</th>
+				                			<td id="facId"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>사업대상</th>
+				                			<td id="object"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>제목</th>
+				                			<td id="title"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>소개</th>
+				                			<td id="intro"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>기대효과</th>
+				                			<td id="expect"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>모집 시작일</th>
+				                			<td id="start"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>모집 종료일</th>
+				                			<td id="end"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>목표금액</th>
+				                			<td id="goal"></td>
+				                		</tr>
+			                		</thead>
+			                	</table>
+			                	<a href="#" target='_blank' id="page">상세페이지로 이동</a>
+			                </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+			                <button type="button" class="btn btn-danger" onclick="approveCk3()">승인</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+		
+		</div>
+			<script th:inline="javascript">
+				function show(){
+					$('#tableData').load("../approve #bas");
+				}
+				function show1(){
+					$('#tableData').load("../facilityApprove #fac");
+				}
+				function show2(){
+					$('#tableData').load("../facilityApprove #don");
+				}
+				function show3(){
+					alert('아직 고민중ㅇ');
+				}
+				
+				function dateFormat(value, format) {
+				    let date = value == "" ? new Date() : new Date(value);
+				    let year = date.getFullYear();
+				    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+				    let day = ("0" + date.getDate()).slice(-2);
+				    let result = format
+				      .replace("yyyy", year)
+				      .replace("MM", month)
+				      .replace("dd", day);
+				    return result;
+				};
+				
+				function wonComma(number) {
+				    if (number < 1000) {
+				      return number
+				    }
+				    return number.toLocaleString();
+				};
+				
+				var facN = '';
+				var facI = '';
+				
+				function info(id) {
+			    	$('#name').empty();
+			        $("#type").empty();
+			        $("#bizNum").empty();
+			        $("#facZip").empty();
+			        $("#addr").empty();
+			        $("#esta").empty();
+			        $("#repName").empty();
+			        $("#repPhone").empty();
+			        $("#homepage").prop('href','')
+			        
+			    	$.ajax('../facInfo?facId='+id)
+			       .done(result => {
+			    	   result.facEstDate = dateFormat(result.facEstDate,'yyyy년 MM월 dd일');
+			    	   facN = result.facName;
+			           $("#name").append(result.facName)
+			           $("#type").append(result.facType)
+			           $("#bizNum").append(result.bizNum)
+			           $("#facZip").append(result.facZip)
+			           $("#addr").append(result.facAddr+' '+result.facAddrDetail)
+			           $("#esta").append(result.facEstDate)
+			           $("#repName").append(result.repName)
+			           $("#repPhone").append(result.repPhone)
+			           $("#homepage").prop('href',result.facWeb)
+			          })
+			       .fail(err => console.log(err));
+			    	
+			    	$("#myModal").modal("show");
+			    };
+			    
+				function info2(id) {
+			    	$('#name2').empty();
+			        $("#type2").empty();
+			        $("#bizNum2").empty();
+			        $("#facZip2").empty();
+			        $("#addr2").empty();
+			        $("#esta2").empty();
+			        $("#repName2").empty();
+			        $("#repPhone2").empty();
+			        $("#homepage2").prop('href','')
+			        
+			    	$.ajax('../facInfo?facId='+id)
+			       .done(result => {
+			    	   result.facEstDate = dateFormat(result.facEstDate,'yyyy년 MM월 dd일');
+			    	   facI = result.facId;
+			           $("#name2").append(result.facName)
+			           $("#type2").append(result.facType)
+			           $("#bizNum2").append(result.bizNum)
+			           $("#facZip2").append(result.facZip)
+			           $("#addr2").append(result.facAddr+' '+result.facAddrDetail)
+			           $("#esta2").append(result.facEstDate)
+			           $("#repName2").append(result.repName)
+			           $("#repPhone2").append(result.repPhone)
+			           $("#homepage2").prop('href',result.facWeb)
+			          })
+			       .fail(err => console.log(err));
+			    	
+			    	$("#myModal2").modal("show");
+			    };
+			    
+
+			    $(document).on("click",".btn-secondary",function () {
+				   $("#myModal").modal("hide");
+				   $("#myModal2").modal("hide");
+				   $("#mys").modal("hide");
+				});
+				
+			    function dona(id) {
+			    	$('#facId').empty();
+			        $("#object").empty();
+			        $("#title").empty();
+			        $("#intro").empty();
+			        $("#expect").empty();
+			        $("#start").empty();
+			        $("#end").empty();
+			        $("#goal").empty();
+			        
+			    	$.ajax('../donInfo?donId='+id)
+			       .done(result => {
+			    	   if(result.intro.length>100||result.expEffect.length>100){
+			    		   result.intro = result.intro.substring(0,100)+' ...';
+			    		   result.expEffect = result.expEffect.substring(0,100)+' ...';
+			    	   }
+			    	   result.recPeriod = dateFormat(result.recPeriod,'yyyy년 MM월 dd일');
+			    	   result.endPeriod = dateFormat(result.endPeriod,'yyyy년 MM월 dd일');
+			    	   result.goalAmt = wonComma(result.goalAmt);
+			    	   facI = result.donId;
+			           $("#facId").append(result.facId)
+			           $("#object").append(result.projTarget)
+			           $("#title").append(result.title)
+			           $("#intro").append(result.intro)
+			           $("#expect").append(result.expEffect)
+			           $("#start").append(result.recPeriod)
+			           $("#end").append(result.endPeriod)
+			           $("#goal").append(result.goalAmt+'원')
+			          })
+			       .fail(err => console.log(err));
+			    	
+			    	$("#mys").modal("show");
+			    };
+			    
+			    function approveCk(){
+			    	$.ajax('../updateFacApp?facName='+facN)
+			        .done(result => {
+			           alert('수정완료');
+			           $("#myModal").modal("hide");
+			           $('#tableData').load("../approve #bas");
+			        })
+			        .fail(err => console.log(err));
+			    }
+			    
+			    function approveCk2(){
+			    	$.ajax('../updateDonApp?facId='+facI)
+			        .done(result => {
+			           alert('두번째 수정완료');
+			           $("#myModal2").modal("hide");
+			           $('#tableData').load("../facilityApprove #fac");
+			        })
+			        .fail(err => console.log(err));
+			    }
+			    
+			    function approveCk3(){
+			    	$.ajax('../updateDonRegApp?donId='+facI)
+			        .done(result => {
+			           alert('세번째 수정완료');
+			           $("#mys").modal("hide");
+			           $('#tableData').load("../facilityApprove #don");
+			        })
+			        .fail(err => console.log(err));
+			    }
+			</script>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

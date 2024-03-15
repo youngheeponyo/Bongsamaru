@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.bongsamaru.dona.mapper.DonaMapper">
+ 
+<!-- 메인페이지 전체리스트조회 -->
+ 	<select id="getDonaList" resultType="DonaVO">
+ 		SELECT 
+ 			d.title,
+ 			d.goal_amt,
+ 			COUNT(f.don_id) AS donationCount,
+ 			nvl(SUM(f.don_amt),0) AS total,
+ 			nvl((SUM(f.don_amt) / d.goal_amt) * 100,0) AS donationRatio,
+ 			c.fac_name AS facilityName,
+ 			d.rec_stat,
+ 			d.don_id,
+ 			c.fac_id,
+ 			d.category	
+ 			d.don_reg_app	
+ 		FROM donation d
+ 			LEFT JOIN don_ledger f ON d.don_id = f.don_id
+ 			LEFT JOIN facility c ON d.fac_id = c.fac_id
+ 		where d.DON_REG_APP = '1' 
+ 		
+ 		GROUP BY d.don_reg_app, d.title, d.goal_amt, c.fac_name, d.rec_stat, d.don_id,c.fac_id, d.category
+ 	
+ 	</select>
+<!--  메인페이지 전체조회 : 모금중 -->
+<select id="randomlyShow" resultType="DonaVO">
+    SELECT 
+        d.title,
+        d.goal_amt,
+        COUNT(f.don_id) AS donationCount,
+        NVL(SUM(f.don_amt), 0) AS total,
+        NVL((SUM(f.don_amt) / d.goal_amt) * 100, 0) AS donationRatio,
+        c.fac_name AS facilityName,
+        d.rec_stat,
+        d.don_id,
+        c.fac_id,
+        d.category,
+        s.sub_code_name,
+        q.file_path
+    FROM donation d
+    LEFT JOIN don_ledger f ON d.don_id = f.don_id
+    LEFT JOIN facility c ON d.fac_id = c.fac_id
+    LEFT JOIN sub_code s ON d.category = s.sub_code_id 
+    LEFT JOIN files q ON q.code_no = d.don_id AND q.code = 'p08' 
+    WHERE d.DON_REG_APP = 1
+        AND d.rec_stat = '1' 
+    
+    GROUP BY d.title, d.goal_amt, c.fac_name, d.rec_stat, d.don_id, c.fac_id, d.category, s.sub_code_name, q.file_path
+	
+</select>
+
+<!--  ★★ 카테고리별 리스트-->
+<select id="getDonaListByCategory" resultType="DonaVO">
+ with  f as  (select  d.don_id,
+                      COUNT(f.don_id) AS donation_count,
+                      SUM(f.don_amt) AS total
+              FROM donation d
+              JOIN don_ledger f ON d.don_id = f.don_id    
+              group by d.don_id)
+ 
+    SELECT *        FROM (        	SELECT ROWNUM RN,  A.*        	FROM (             
+    SELECT 
+        c.fac_name AS facilityName,
+        c.fac_id,
+        d.title,
+        d.goal_amt,        
+        d.rec_stat,
+        d.don_id,
+        d.category,
+        d.ext_period,
+        d.end_period,
+        d.don_reg_app,
+        NVL(f.donation_count, 0) as donation_count,
+        NVL( f.total, 0) as total,
+        (ROUND(f.total / goal_amt, 2)*100) as donation_ratio,
+        s.sub_code_name,
+        q.file_path
+        
+    FROM facility c
+    LEFT JOIN  donation d ON d.fac_id = c.fac_id
+    LEFT JOIN  f  ON d.don_id = f.don_id 
+     LEFT JOIN sub_code s ON d.category = s.sub_code_id 
+     LEFT JOIN files q ON q.code_no = d.don_id AND q.code = 'p08'   
+    <where>
+    <if test = "donRegApp !=  null and donRegApp != ''">
+     d.DON_REG_APP = #{donRegApp }
+    </if>
+	<if test="category != null and category != ''">
+	 AND d.category = #{category}
+	</if>
+	<if test = "recStat != null and recStat != '' ">
+	 AND d.rec_stat = #{recStat}
+    </if>
+    </where>
+    ORDER BY d.end_period ASC
+  ) A ) B  	WHERE RN BETWEEN #{start} AND #{end}
+</select>
+
+
+
+
+
+
+
+<!--  메인페이지 전체조회 : 모금완료 (recStat = 0)-->
+ <select id="selectCompletedItems" resultType="DonaVO">
+    SELECT 
+        d.title,
+        d.goal_amt,
+        COUNT(f.don_id) AS donationCount,
+        NVL(SUM(f.don_amt), 0) AS total,
+        NVL((SUM(f.don_amt) / d.goal_amt) * 100, 0) AS donationRatio,
+        c.fac_name AS facilityName,
+        d.rec_stat,
+        d.don_id,
+        c.fac_id,
+        d.category
+    FROM donation d
+        LEFT JOIN don_ledger f ON d.don_id = f.don_id
+        LEFT JOIN facility c ON d.fac_id = c.fac_id
+    WHERE d.DON_REG_APP = 1
+    	AND d.rec_stat = 0
+    GROUP BY d.title, d.goal_amt, c.fac_name, d.rec_stat, d.don_id, c.fac_id, d.category
+</select>
+ 
+<!-- 상세페이지 조회1 (don_id) -->
+<select id="getDonaDetail" resultType="DonaVO">
+    SELECT 
+    d.don_id,
+    d.title, 
+    (SUM(f.don_amt) / d.goal_amt) * 100 AS donationRatio,
+    d.rec_period,
+    d.end_period,
+    d.ext_period,
+    d.goal_amt,
+    d.category,
+    trunc(d.end_period) - trunc(sysdate) as dday,
+    e.fac_id,
+    e.fac_name,
+    e.fac_intro,
+    e.fac_est_date,
+    d.rec_stat,
+    d.intro_title,
+    d.intro,
+    NVL(SUM(f.don_amt), 0) AS total,
+    z.don_det_id, 
+    z.use_plan,
+    z.link,
+    z.link2,
+    z.use_plan,
+    z.use_plan2,
+    z.use_plan3,
+    z.use_plan_amt,
+    z.use_plan_amt2,
+    z.use_plan_amt3,
+    z.add_intro_title,
+    z.add_intro,
+    d.proj_target,
+    d.exp_effect,
+    s.sub_code_name,
+    q.file_path
+   
+FROM donation d 
+    LEFT JOIN don_ledger f ON d.don_id = f.don_id
+    LEFT JOIN facility e ON d.fac_id = e.fac_id
+    LEFT JOIN don_detail z ON d.don_id = z.don_id
+     LEFT JOIN sub_code s ON d.category = s.sub_code_id 
+     LEFT JOIN files q ON q.code_no = d.don_id AND q.code = 'p08'   
+WHERE  d.don_id = #{donId} and e.fac_id=#{facId}
+GROUP BY d.don_id, d.title, d.rec_period, d.end_period, d.goal_amt, d.category,e.fac_id, e.fac_name, e.fac_intro, e.fac_est_date, d.rec_stat, d.intro_title, d.intro,
+    z.don_det_id, z.use_plan, z.link, z.link2, z.use_plan, z.use_plan2, z.use_plan3, z.use_plan_amt, z.use_plan_amt2, z.use_plan_amt3, z.add_intro_title, z.add_intro, d.proj_target, d.exp_effect, 
+    d.ext_period, s.sub_code_name, q.file_path
+
+</select>
+
+<!-- 연장 메일 -->
+<select id="selectExtensionTargetList" resultType="DonaVO">
+    SELECT 
+        d.don_id AS d, 
+        f.fac_id AS f, 
+        f.fac_email, 
+        d.goal_amt, 
+        d.end_period, 
+        NVL((SELECT SUM(l.don_amt) FROM don_ledger l WHERE l.don_id = d.don_id), 0) AS total, 
+        NVL(((SELECT SUM(l.don_amt) FROM don_ledger l WHERE l.don_id = d.don_id) / d.goal_amt) * 100, 0) AS donation_ratio
+    FROM 
+        donation d
+    JOIN 
+        facility f ON d.fac_id = f.fac_id
+    WHERE 
+        d.rec_stat = 1
+        AND d.ext_period IS NULL
+        AND TRUNC(d.end_period) = TRUNC(SYSDATE) + 1
+</select>
+
+<!-- 모금종료시  update -->
+<update id="updateRecStat" parameterType="DonaVO">
+    UPDATE 
+    	donation
+    SET 
+    	rec_stat = 0
+    WHERE 
+    	TRUNC(end_period) &lt; TRUNC(SYSDATE)
+</update>
+
+<!--  기한연장하기 -->
+ <update id="extendDonationPeriod" parameterType="DonaVO">
+        UPDATE 
+        	donation
+        SET 
+        	ext_period = #{extPeriod}
+        WHERE 
+        	don_id = #{donId}
+         AND ext_period IS NULL
+         
+    </update>
+ 	
+<!-- 기부자목록(don_id) -->
+	<resultMap id="donerListResultMap" type="DonaVO">
+	<result property="donAmt" column="don_amt"/>
+    <result property="payDate" column="pay_date"/>
+    <result property="memId" column="anon_check" />
+     <result property="donId" column="don_id"/>
+	</resultMap>
+	<select id="getDonerList" resultType="DonaVO">
+		SELECT
+			 don_amt
+			 , pay_date
+			 , mem_id
+			 , don_id
+			 , anon_check
+		FROM don_ledger
+		WHERE don_id = #{donId}
+		ORDER BY pay_date
+		
+	</select>	
+ 	
+ 	
+ <!-- 카테고리 -->
+ 	<select id="getCategoryList" parameterType="DonaVO">
+ 		SELECT
+ 		 		sub_code_name, 
+ 		 		sub_code_id
+ 		 		
+		FROM 	sub_code
+		 
+		WHERE	sub_code_id	LIKE CONCAT(#{f}, '%')
+ 	</select>
+
+	
+<!-- 댓글 등록폼  -->	
+	<insert id="insertComment" parameterType="DonaVO">
+	<selectKey keyProperty="commId" resultType="int" order="BEFORE">
+
+		SELECT 
+			COMMENTS_SEQ.nextval 
+		FROM DUAL
+	
+	</selectKey>
+		INSERT INTO comments
+			(
+			comm_id
+			, mem_id
+			, content
+			, comm_date
+			, code
+			 , detail_code
+			)
+		VALUES
+			(
+			#{commId}
+			,#{memId}
+			, #{content}
+			, sysdate
+			,'c01'
+			, #{detailCode}
+			)	
+	</insert>
+ 	
+ 	
+ <!--  댓글 리스트 -->
+ 	<select id = "getCommentsList" resultType="DonaVO">
+	 	SELECT mem_id
+	          ,content
+	          ,comm_date
+	    
+		 FROM comments
+		WHERE detail_code = #{detailCode} 
+		  AND code = 'c01'
+	ORDER BY comm_date desc
+ 	</select>
+ 	
+
+
+ <!-- 기부신청 후 관리자 알림 -->	
+ 	<insert id="applyAlertDona" parameterType="DonaVO">
+ 	 	<selectKey keyProperty="alertId" resultType="int" order="BEFORE">
+		SELECT 
+			ALERT_SEQ.nextval
+		FROM DUAL
+	</selectKey>
+	      INSERT INTO ALERT
+	       (
+	       alert_id
+	       , category
+	       , content
+	       , mem_id
+	       , receive_id
+	       ) 
+      VALUES (
+      	#{alertId},
+      	 'o04'
+      	 , '새로운 기부신청이 등록되었습니다.'
+      	 , #{memId}
+      	 , 'ADMIN'
+      	 )
+ 	</insert>
+ 	
+ <!-- 기부등록폼 -->
+ 	<insert id="insertDonation" parameterType="DonaVO">
+ 	<selectKey keyProperty="donId" resultType="int" order="BEFORE">
+
+		SELECT 
+			DONATION_SEQ.nextval 
+		FROM DUAL
+	
+	</selectKey>
+ 		INSERT INTO donation 
+	 			(
+	 			don_id
+	 			, fac_id
+	 			, title
+	 			, rec_period
+	 			, end_period
+	 			, goal_amt
+	 			, proj_target
+	 			, intro
+	 			, intro_title
+	 			, rec_stat
+	 			, exp_effect
+	 			, category
+	 			) 
+ 			VALUES 
+ 			(
+	 			#{donId}
+	 			, #{facId}
+	 			, #{title}
+	 			, #{recPeriod}
+	 			, #{endPeriod}
+	 			, #{goalAmt}
+	 			, #{projTarget}
+	 			, #{intro}
+	 			, #{introTitle}
+	 			, '1'
+	 			, #{expEffect}
+	 			, #{category}
+ 			)
+ 	</insert>
+ 	
+ 	
+ 	<insert id="insertDonDetail" parameterType="DonaVO">
+ 	<selectKey keyProperty="donDetId" resultType="int" order="BEFORE">
+
+		SELECT 
+			DONDETAIL_SEQ.nextval 
+		FROM DUAL
+	
+	</selectKey>
+ 	  INSERT INTO Don_Detail 
+	 	  (
+		 	 don_id
+		 	  , don_det_id
+		 	  , use_plan
+		 	  , link
+		 	  , link2
+		 	  , use_plan2
+		 	  , use_plan3
+		 	  , use_plan_amt
+		 	  , use_plan_amt2
+		 	  , use_plan_amt3
+		 	  , add_intro_title
+		 	  , add_intro
+	 	  )
+	        VALUES 
+	        (
+		        #{donId}
+		        , #{donDetId}
+		        , #{usePlan}
+		        , #{link}
+		        , #{link2}
+		        , #{usePlan2}
+		        , #{usePlan3}
+		        , #{usePlanAmt}
+		        , #{usePlanAmt2}
+		        , #{usePlanAmt3}
+		        , #{addIntroTitle}
+		        , #{addIntro}
+	        )
+ 	</insert>
+ 
+ <!-- 기부글 등록 후 관리자 알림 -->	
+ 	<insert id="insertAlertDona" parameterType="DonaVO">
+ 	 	<selectKey keyProperty="alertId" resultType="int" order="BEFORE">
+		SELECT 
+			ALERT_SEQ.nextval
+		FROM DUAL
+	</selectKey>
+	      INSERT INTO ALERT
+	       (
+	       alert_id
+	       , category
+	       , content
+	       , mem_id
+	       , receive_id
+	       ) 
+      VALUES (
+      	#{alertId},
+      	 'o05'
+      	 , '새로운 기부등록 글이 등록되었습니다.'
+      	 , #{memId}
+      	 , 'ADMIN'
+      	 )
+ 	</insert>
+ 	
+ <!-- 기부후기등록하기 -->
+ <insert id="insertReview" parameterType="DonaVO">
+ 	<selectKey keyProperty="donRevId" resultType="int" order="BEFORE">
+
+		SELECT 
+			DONREVIEW_SEQ.nextval
+		FROM DUAL
+	
+	</selectKey>
+ 	  INSERT INTO DON_REVIEW 
+		(
+		 	don_rev_id
+		 	, don_id
+		 	, exec_amt
+		 	, start_period
+		 	, end_period
+		 	, title
+		 	, content
+	 	  )
+	        VALUES 
+	        (
+		        #{donRevId}
+		        , #{donId}
+		        , #{execAmt}
+		        , #{startPeriod}
+		        , #{endPeriod}
+		        , #{title}
+		        , #{content}
+	        )
+ 	</insert>
+ 	
+ <!-- 기부후기등록하기(상세테이블 )-->
+  <insert id="insertReviewDetail" parameterType="DonaVO">
+ 	<selectKey keyProperty="donRevExpId" resultType="int" order="BEFORE">
+
+		SELECT 
+			DONREVIEWEXP_SEQ.nextval
+		FROM DUAL
+	
+	</selectKey>
+ 	 INSERT INTO don_review_exp
+			(
+			don_rev_exp_id
+			, don_rev_id
+			, biz_cost
+			, biz_content
+			, biz_content2
+			, biz_content3
+			, biz_amt
+			, biz_amt2
+			, biz_amt3
+			) 
+	        VALUES 
+	        (
+	        	#{donRevExpId}
+		        , #{donRevId}
+		        , #{bizCost}
+		        , #{bizContent}
+		        , #{bizContent2}
+		        , #{bizContent3}
+		        , #{bizAmt}
+		        , #{bizAmt2}
+		        , #{bizAmt3}
+	        )
+ 	</insert>
+ 
+ <update id="updateRevStat" parameterType="DonaVO">
+UPDATE donation SET hasreview = 1 WHERE don_id=#{donId}
+ </update>
+ 
+  <!-- 기부영수증 관리자 알림 -->	
+ 	<insert id="receiptAlertDona" parameterType="DonaVO">
+ 	 	<selectKey keyProperty="alertId" resultType="int" order="BEFORE">
+		SELECT 
+			ALERT_SEQ.nextval
+		FROM DUAL
+	</selectKey>
+	      INSERT INTO ALERT
+	       (
+	       alert_id
+	       , category
+	       , content
+	       , mem_id
+	       , receive_id
+	       ) 
+      VALUES (
+      	#{alertId},
+      	 'o06'
+      	 , '새로운 기부영수증이 등록되었습니다.'
+      	 , #{memId}
+      	 , 'ADMIN'
+      	 )
+ 	</insert>
+ 
+ <!-- 기부후기 개별리스트 불러오기 -->
+ <select id = "getDonaReview" resultType="DonaVO">
+     SELECT 
+	        r.don_rev_id
+	        , r.don_id
+	        , r.exec_amt 
+	        , r.start_period
+	        , r.end_period
+	        , r.rev_app
+	        , r.title
+	        , r.content
+	        , e.don_rev_exp_id
+	        , e.biz_cost
+	        , e.biz_content
+	        ,  e.biz_amt
+	        ,  e.biz_amt2
+	        ,  e.biz_amt3
+	        ,  e.biz_content
+	        ,  e.biz_content2
+	        ,  e.biz_content3
+	        , q.file_path 
+    FROM don_review r
+    LEFT JOIN donation d ON r.don_id = d.don_id
+    LEFT JOIN don_review_exp e ON r.don_rev_id = e.don_rev_id
+    LEFT JOIN files q ON q.code_no = d.don_id AND q.code = 'p07' 
+    WHERE d.don_id = #{donId}
+ </select>
+ 
+ 
+ <!-- 카드결제 -->
+ 	<insert id="paymentProcess" parameterType="DonaVO">
+	 	<selectKey keyProperty="donLedId" resultType="int" order="BEFORE">
+	
+			SELECT 
+				DONLEDGER_SEQ.nextval 
+			FROM DUAL
+		</selectKey>
+		INSERT INTO don_ledger
+			(
+			don_led_id
+			, don_id
+			, don_amt
+			, pay_method
+			, pay_date
+			, pay_stat
+			, pay_id
+			, anon_check
+			, mem_id
+			)
+			VALUES
+			(
+			#{donLedId}
+			, #{donId}
+			, #{donAmt}
+			, #{payMethod}
+			, #{payDate}
+			, #{payStat}
+			, #{payId}
+			, #{anonCheck}
+			, #{memId}
+			)
+ 	</insert>
+ </mapper>

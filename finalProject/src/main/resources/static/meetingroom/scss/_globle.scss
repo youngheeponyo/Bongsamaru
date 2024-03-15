@@ -1,0 +1,24 @@
+img{
+    max-width: 100%;
+}
+p{
+    font-size: $h6-font-size;
+    color: $gray-100;
+}
+.site-content{
+    overflow: hidden;
+}
+body{
+    background-image: url(../../assets/images/shape/body-bg.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.offcanvas{
+    z-index: 1051;
+}
+.offcanvas .offcanvas-header .btn-close{
+    color: $white;
+    background-image: none;
+    opacity: 1;
+    height: 35px;
+}

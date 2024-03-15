@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+		<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true"> 
+		    <div class="modal-dialog" role="document"> 
+		        <div class="modal-content"> 
+		            <div class="modal-header"> 
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel">삭제 확인</h5> 
+			            </div> -->
+		            <div class="modal-body"> 
+		                <p>정말 삭제하시겠습니까? 삭제하면 복구되지 않아요.</p> 
+		            </div> -->
+		            <div class="modal-footer"> -->
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">아니오</button> 
+			                <a href="delete.board?bno=${bno}" class="btn btn-danger">네</a> 
+			            </div> 
+			        </div> 
+		    </div> 
+			</div> 
+
+<script>
+ 		    $(".btn-deleteAsk").click(function () {
+		      $("#deleteConfirmationModal").modal("show");
+ 		    });
+		    
+ 		    $(".btn-secondary").click(function () {
+ 		      $("#deleteConfirmationModal").modal("hide");
+		    });
+</script>
+</body>
+</html>

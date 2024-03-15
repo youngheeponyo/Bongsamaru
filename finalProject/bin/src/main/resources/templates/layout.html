@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+ <head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <link rel="icon" href="/userresources/image/favicon.png" type="image/png">
+   <title>Royal Hotel</title>
+   <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="/userresources/css/bootstrap.css">
+        <link rel="stylesheet" href="/userresources/vendors/linericon/style.css">
+        <link rel="stylesheet" href="/userresources/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/userresources/vendors/owl-carousel/owl.carousel.min.css">
+        <link rel="stylesheet" href="/userresources/vendors/bootstrap-datepicker/bootstrap-datetimepicker.min.css">
+        <link rel="stylesheet" href="/userresources/vendors/nice-select/css/nice-select.css">
+        <link rel="stylesheet" href="/userresources/vendors/owl-carousel/owl.carousel.min.css">
+        <!-- main css -->
+        <link rel="stylesheet" href="userresources/css/style.css">
+        <link rel="stylesheet" href="userresources/css/responsive.css">
+        <!-- jquery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <!-- font -->
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Orbit&family=Single+Day&display=swap" rel="stylesheet">
+		<!-- Bootstrap JS (Popper.js 포함) -->
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+		<style>
+		  @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Single+Day&display=swap');
+		</style>
+    </head>
+<body>
+	    <!--================Header Area =================-->
+        <header class="header_area">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <a class="navbar-brand logo_h" href="index.html"><img src="/userresources/image/Logo.png" alt=""></a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav menu_nav ml-auto">
+                            <li class="nav-item active"><a class="nav-link" th:href="@{/}">메인</a></li>
+                               <li class="nav-item submenu dropdown">
+                                <a style="cursor: pointer" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">소개</a>
+                                <ul class="dropdown-menu" >
+                                    <li class="nav-item"><a class="nav-link" th:href="@{/intro}">봉사마루</a></li>
+                                    <li class="nav-item"><a class="nav-link" th:href="@{/intro2}">시설소개</a></li>
+                                </ul>
+                            </li> 
+                           <li class="nav-item submenu dropdown">
+                                <a style="cursor: pointer" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">봉사</a>
+                                <ul class="dropdown-menu" >
+                                    <li class="nav-item"><a class="nav-link" th:href="@{/}">일일봉사</a></li>
+                                    <li class="nav-item"><a class="nav-link" th:href="@{/}">동아리</a></li>
+                                    <li class="nav-item"><a class="nav-link" th:href="@{/}">시설봉사</a></li>
+                                </ul>
+                            </li> 
+                            <li class="nav-item"><a class="nav-link" th:href="@{/}">기부</a></li>
+                            <li class="nav-item"><a class="nav-link" th:href="@{/}">챌린지</a></li>
+                    		<li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link" th:href="@{/login}">로그인</a></li>
+						    <li sec:authorize="isAuthenticated()" class="nav-item"><a class="nav-link" th:href="@{/my}" th:text="|${userNickname} 님 환영합니다~|">[[${userNickname}]]님 환영합니다</a></li>
+						    <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link" th:href="@{/signup}">회원가입</a></li>
+							<li sec:authorize="isAuthenticated()" class="nav-item">
+						    <form th:action="@{/logout}" method="post">
+						        <input type="submit" value="로그아웃" class="nav-link" style="background:none;border:none;padding:0;">
+						    </form>
+							</li>
+                            <li class="nav-item"><a class="nav-link" href="contact.html">알람</a></li>
+                            <li class="nav-item"><a class="nav-link" href="contact.html">쪽지</a></li>
+                        </ul>
+                    </div> 
+                </nav>
+            </div>
+        </header>
+        <!--================Header Area =================-->
+          <section class="accomodation_area section_gap">
+         	 <div class="container">
+				<section layout:fragment="content"></section>
+       		 </div>
+		</section>
+		<div sec:authorize="isAuthenticated()">
+   			zz
+		</div>
+	<div class="divfooter" th:insert="~{footer::copy}">
+			
+	</div>
+	
+
+</body>
+
+</html>

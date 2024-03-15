@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+   layout:decorate="~{meeting/meetingLayout}">
+<head>
+<style>
+.cur{
+   cursor:pointer;
+}
+</style>
+<meta charset="utf-8">
+<title>봉사모임 페이지</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="" name="keywords">
+<meta content="" name="description">
+</head>
+<body>
+   <section layout:fragment="content">
+      <!-- Features Start -->
+      <div class="container-fluid features mb-5" id="">
+         <div class="container py-5">
+            <h3>이달의 봉사왕</h3>
+            <div class="row g-4">
+               <!-- 시작 -->
+               <div th:if="${cnt.size}=='0'">아직 봉사를 한 회원이 없습니다. 모임에 참여하여 함께 봉사를 해주세요!</div>
+               <div class="col-md-6 col-lg-6 col-xl-3" th:each="cnt,st : ${cnt}" th:if="${st.count}<=3">
+                  <div class="row g-4 align-items-center features-item">
+                     <div class="col-4">
+                        <div class="rounded-circle position-relative">
+                           <div class="overflow-hidden rounded-circle">
+                              <img th:if="${cnt.path}!=null" th:src="@{${cnt.path}}" onError="this.src='../image/기본이미지.jpg'" class="img-zoomin img-fluid rounded-circle w-100" alt="" style="height:80px;">
+                              <img th:if="${cnt.path}==null" src="../image/기본이미지.jpg" class="img-zoomin img-fluid rounded-circle w-100" alt="" style="height:80px;">
+                           </div>
+                           <span class="rounded-circle border border-2 border-white bg-primary text-white position-absolute"
+                              style="top: 10%; right: -10px;" th:text="${st.count}+'등'"></span>
+                        </div>
+                     </div>
+                     <div class="col-8">
+                        <div class="features-content d-flex flex-column">
+                           <p class="text-uppercase mb-2" th:text="${cnt.cnt}+'회'"></p>
+                           <a href="#" class="h6" th:text="${cnt.memId}+'님'"> </a> 
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- 마지막 -->
+            </div>
+         </div>
+      </div>
+      <!-- Features End -->
+      <!-- Latest News Start -->
+      <div class="container-fluid latest-news py-5" style="padding:0 !important">
+         <div class="container py-5" style="padding:0 !important">
+            <h3 class="mb-4 border-bottom">지난 봉사활동</h3>
+            <div class="latest-news-carousel owl-carousel" id="three">
+               <div th:if="${before.size}=='0'">지난 봉사가 없습니다.</div>
+               <div class="latest-news-item" th:each="act : ${before}">
+                  <div class="bg-light rounded">
+                     <div class="rounded-top overflow-hidden">
+                        <img th:if="${act.filePath}==null" src="../image/zz.jpg" class="img-zoomin img-fluid rounded-top w-100" alt="" style="height:230px;">
+                        <img th:if="${act.filePath}!=null" th:src="${act.filePath}" onError="this.src='../image/zz.jpg'" class="img-zoomin img-fluid rounded-top w-100" alt="" style="height:230px;">
+                     </div>
+                     <div class="d-flex flex-column p-4">
+                        <a th:onclick="location.href='volActBoardInfo?volId=[[${session.id}]]&volActId=[[${act.volActId}]]'" class="h4 cur" th:text="${act.title}"></a>
+                        <div class="d-flex justify-content-between">
+                           <p class="text-uppercase mb-2" th:if="${act.category}=='f01'">아동 및 청소년</p>
+                           <p class="text-uppercase mb-2" th:if="${act.category}=='f02'">장애인</p>
+                           <p class="text-uppercase mb-2" th:if="${act.category}=='f03'">문화,체육</p>
+                           <p class="text-uppercase mb-2" th:if="${act.category}=='f04'">캠페인</p>
+                           <p class="text-uppercase mb-2" th:if="${act.category}=='f05'">보건의료</p>
+                           <p class="text-uppercase mb-2" th:if="${act.category}=='f06'">환경정리</p>
+                           <p class="text-uppercase mb-2" th:if="${act.category}=='f07'">동물</p>
+                           <p class="text-uppercase mb-2" th:if="${act.category}=='f07'">기타</p>
+                           <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i>[[${#dates.format(act.volDate, 'yyyy/MM/dd')}]]</small>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      
+      <!-- Most Populer News Start -->
+      <div class="container-fluid populer-news py-5" style="padding:0 !important">
+         <div class="container py-5">
+            <div class="tab-class mb-4">
+               <div class="row g-4">
+                  <div class="col-lg-8 col-xl-9">
+                     <div class="d-flex flex-column flex-md-row justify-content-md-between border-bottom mb-4">
+                        <h3 class="mb-4">예정 봉사활동</h3>
+                     </div>
+                     <div class="tab-content mb-4">
+                        <div id="tab-1" class="tab-pane fade show p-0 active">
+                           <div class="row g-4">
+                              <div th:if="${after.size}=='0'">예정되어있는 봉사가 없습니다.</div>
+                              <div class="col-lg-8" th:each="act,st : ${after}" th:if="${st.count}==1">
+                                 <div class="position-relative rounded overflow-hidden">
+                                    <img th:if="${act.filePath}==null" src="../image/zz.jpg" class="img-zoomin img-fluid rounded-top w-100" alt="" style="height:270px;">
+                                    <img th:if="${act.filePath}!=null" th:src="${act.filePath}" onError="this.src='../image/zz.jpg'" 
+                                       class="img-zoomin img-fluid rounded-top w-100" alt="" style="height:270px;">
+                                    <div class="position-absolute text-white px-4 py-2 bg-primary rounded" th:if="${act.category}=='f01'"
+                                       style="top: 20px; right: 20px;">아동 및 청소년</div>
+                                    <div class="position-absolute text-white px-4 py-2 bg-primary rounded" th:if="${act.category}=='f02'"
+                                       style="top: 20px; right: 20px;">장애인</div>
+                                    <div class="position-absolute text-white px-4 py-2 bg-primary rounded" th:if="${act.category}=='f03'"
+                                       style="top: 20px; right: 20px;">문화,체육</div>
+                                    <div class="position-absolute text-white px-4 py-2 bg-primary rounded" th:if="${act.category}=='f04'"
+                                       style="top: 20px; right: 20px;">캠페인</div>
+                                    <div class="position-absolute text-white px-4 py-2 bg-primary rounded" th:if="${act.category}=='f05'"
+                                       style="top: 20px; right: 20px;">보건의료</div>
+                                    <div class="position-absolute text-white px-4 py-2 bg-primary rounded" th:if="${act.category}=='f06'"
+                                       style="top: 20px; right: 20px;">환경정리</div>
+                                    <div class="position-absolute text-white px-4 py-2 bg-primary rounded" th:if="${act.category}=='f07'"
+                                       style="top: 20px; right: 20px;">동물</div>
+                                    <div class="position-absolute text-white px-4 py-2 bg-primary rounded" th:if="${act.category}=='f08'"
+                                       style="top: 20px; right: 20px;">기타</div>
+                                 </div>
+                                 <div class="my-4">
+                                    <a th:onclick="location.href='volActBoardInfo?volId=[[${session.id}]]&volActId=[[${act.volActId}]]'" class="h4 cur" th:text="${act.title}"></a>
+                                 </div>
+                                 <div class="d-flex justify-content-left">
+                                    <a href="#" class="text-dark link-hover me-3">
+                                    <i class="fa fa-clock"></i>[[${#dates.format(act.volDate, 'yyyy년 MM월 dd일')}]]</a> 
+                                    <a href="#" class="text-dark link-hover me-3"><i class="fa fa-user" id="cnts"></i> [[${act.cnt}]]명</a>
+                                 </div>
+                              </div>
+                              <div class="col-lg-4">
+                                 <div class="row g-4">
+                                    <div class="col-12" th:each="act,st : ${after}" th:if="${st.count}>1">
+                                       <div class="row g-4 align-items-center">
+                                          <div class="col-5">
+                                             <div class="overflow-hidden rounded">
+                                                <img th:if="${act.filePath}==null" src="../image/zz.jpg" class="img-zoomin img-fluid rounded-top w-100" alt="" style="height:80px">
+                                                <img th:if="${act.filePath}!=null" th:src="${act.filePath}" onError="this.src='../image/zz.jpg'" class="img-zoomin img-fluid rounded-top w-100" alt="" style="height:80px">
+                                             </div>
+                                          </div>
+                                          <div class="col-7">
+                                             <div class="features-content d-flex flex-column">
+                                             <p class="text-uppercase mb-2" th:if="${act.category}=='f01'">아동 및 청소년</p>
+                                             <p class="text-uppercase mb-2" th:if="${act.category}=='f02'">장애인</p>
+                                             <p class="text-uppercase mb-2" th:if="${act.category}=='f03'">문화,체육</p>
+                                             <p class="text-uppercase mb-2" th:if="${act.category}=='f04'">캠페인</p>
+                                             <p class="text-uppercase mb-2" th:if="${act.category}=='f05'">보건의료</p>
+                                             <p class="text-uppercase mb-2" th:if="${act.category}=='f06'">환경정리</p>
+                                             <p class="text-uppercase mb-2" th:if="${act.category}=='f07'">동물</p>
+                                             <p class="text-uppercase mb-2" th:if="${act.category}=='f07'">기타</p>
+                                             <a th:onclick="location.href='volActBoardInfo?volId=[[${session.id}]]&volActId=[[${act.volActId}]]'" class="h6 cur" th:text="${act.title}"></a>
+                                             <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i>[[${#dates.format(act.volDate, 'yyyy년 MM월 dd일')}]]</small>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <br>
+                     <div class="border-bottom mb-4">
+                        <h3 class="my-4">봉사 후기</h3>
+                     </div>
+                     <div class="whats-carousel owl-carousel">
+                        <div th:if="${review.size}=='0'">등록된 후기가 없습니다.</div>
+                        <div class="latest-news-item" th:each="review : ${review}">
+                           <div class="bg-light rounded">
+                              <div class="rounded-top overflow-hidden">
+                                 <img th:if="${review.filePath}==null" src="../image/zz.jpg" class="img-zoomin img-fluid rounded-top w-100" alt="" style="height:255px;">
+                                 <img th:if="${review.filePath}!=null" th:src="${review.filePath}" onError="this.src='../image/zz.jpg'" class="img-zoomin img-fluid rounded-top w-100" alt="" style="height:255px;">
+                              </div>
+                              <div class="d-flex flex-column p-4">
+                                 <a th:onclick="location.href='ReviewInfo?volId=[[${session.id}]]&reviewId=[[${review.reviewId}]]'" class="h4 cur" th:text="${review.title}"></a>
+                                 <div class="d-flex justify-content-between">
+                                    <a class="small text-body link-hover" th:text="'by '+${review.writer}+'님'"></a> <small class="text-body d-block"><i
+                                       class="fas fa-calendar-alt me-1"></i>[[${#dates.format(review.writeDate, 'yyyy/MM/dd')}]]</small>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-lg-4 col-xl-3" style="margin-top:8%">
+                     <div class="row g-4">
+                        <div class="col-12">
+                           <div class="p-3 rounded border">
+                              <th:block th:if="${choose.size}!=0">
+                                 <h4 class="mb-4">이런 모임은 어때요?</h4>
+                                 <div class="row g-4" th:each="meet,st : ${choose}" th:if="${st.count}<4">
+                                    <div class="col-12 rounded" style="padding:10px">
+                                       <h5><a class="cur" th:text="${meet.meetName}" th:onclick="newMeet([[${meet.volId}]])">동아리명</a></h5>
+                                         <span th:if="${meet.region}=='z01'" style="color:gray">#서울</span>
+                                         <span th:if="${meet.region}=='z02'" style="color:gray">#부산</span>
+                                         <span th:if="${meet.region}=='z03'" style="color:gray">#대구</span>
+                                         <span th:if="${meet.region}=='z04'" style="color:gray">#인천</span>
+                                         <span th:if="${meet.region}=='z05'" style="color:gray">#광주</span>
+                                         <span th:if="${meet.region}=='z06'" style="color:gray">#대전</span>
+                                         <span th:if="${meet.region}=='z07'" style="color:gray">#울산</span>
+                                         <span th:if="${meet.region}=='z08'" style="color:gray">#세종</span>
+                                         <span th:if="${meet.region}=='z09'" style="color:gray">#경기도</span>
+                                         <span th:if="${meet.region}=='z10'" style="color:gray">#강원도</span>
+                                         <span th:if="${meet.region}=='z11'" style="color:gray">#충북</span>
+                                         <span th:if="${meet.region}=='z12'" style="color:gray">#충남</span>
+                                         <span th:if="${meet.region}=='z13'" style="color:gray">#전북</span>
+                                         <span th:if="${meet.region}=='z14'" style="color:gray">#전남</span>
+                                         <span th:if="${meet.region}=='z15'" style="color:gray">#경북</span>
+                                         <span th:if="${meet.region}=='z16'" style="color:gray">#경남</span>
+                                         <span th:if="${meet.region}=='z17'" style="color:gray">#제주도</span>
+                                            <br>
+                                            <span th:text="'정원 : '+${meet.meetingCnt}+'/'+${meet.cap}+'명'">정원 : 3/10명</span> 
+                                    </div>
+                                 </div>
+                              </th:block>
+                              <hr>
+                              <h4 class="my-4">참여중인 회원</h4>
+                              <th:block th:if="${#lists.size(member)}==0">
+                                 <h5>회원이 존재하지 않습니다.</h5>
+                              </th:block>
+                              <div class="row g-4">
+                                 <div class="col-12" th:each="mem,st : ${member}" th:if="${st.count}<5">
+                                    <div class="row g-4 align-items-center features-item">
+                                       <div class="col-4">
+                                          <div class="rounded-circle position-relative">
+                                             <div class="overflow-hidden rounded-circle">
+                                                <img th:if="${mem.path}!=null" th:src="@{${mem.path}}" onError="this.src='../image/기본이미지.jpg'" class="img-zoomin img-fluid rounded-circle w-100" alt="" style="height:80px;">
+                                                <img th:if="${mem.path}==null" src="../image/기본이미지.jpg" class="img-zoomin img-fluid rounded-circle w-100" alt="" style="height:80px;">
+                                             </div>
+                                             <span th:if="${mem.memId}==${info.memId}" class="rounded-circle border border-2 border-white bg-primary  text-white position-absolute" style="top: 10%; right: -10px;">
+                                             방장
+                                             </span>
+                                          </div>
+                                       </div>
+                                       <div class="col-8">
+                                          <div class="features-content d-flex flex-column">
+                                             <a href="#" class="h6" th:text="${mem.memId}"></a> <small class="text-body d-block">
+                                             <i class="fas fa-calendar-alt me-1"></i>[[${#dates.format(mem.appDate, 'yyyy년 MM월 dd일')}]] 가입</small>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="col-lg-12">
+                                    <a href="#" th:if="${member.size}>4"class="link-hover btn border border-primary rounded-pill text-dark w-100 py-3 mb-4">View More</a>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <script type="text/javascript">
+      	function newMeet(id){
+    		src_width = screen.availWidth*0.1;
+    		src_height = screen.availHeight*0.1;
+    		window.open("meetings?volId="+id, "pop", "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1400, height=800, top="+src_height+",left="+src_width+",location=no");
+    	}
+      </script>
+      <!-- Latest News End -->
+      <!-- Back to Top -->
+      <a href="#" class="btn btn-primary border-2 border-white rounded-circle back-to-top">
+      <i class="fa fa-arrow-up text-white"></i></a>
+
+
+      <!-- JavaScript Libraries -->
+      <script
+         src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+      <script
+         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="../dpdd/lib/easing/easing.min.js"></script>
+      <script src="../dpdd/lib/waypoints/waypoints.min.js"></script>
+      <script src="../dpdd/lib/owlcarousel/owl.carousel.min.js"></script>
+
+      <!-- Template Javascript -->
+      <script src="../dpdd/js/main.js"></script>
+   </section>
+</body>
+
+</html>

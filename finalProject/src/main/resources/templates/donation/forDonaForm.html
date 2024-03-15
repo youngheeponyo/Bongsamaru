@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="image/favicon.png" type="image/png">
+    <title></title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="userresources/css/bootstrap.css">
+    <link rel="stylesheet" href="userresources/vendors/linericon/style.css">
+    <link rel="stylesheet" href="userresources/css/font-awesome.min.css">
+    <link rel="stylesheet" href="userresources/vendors/bootstrap-datepicker/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="userresources/vendors/nice-select/css/nice-select.css">
+    <link rel="stylesheet" href="userresources/vendors/owl-carousel/owl.carousel.min.css">
+    <!-- main css -->
+    <link rel="stylesheet" href="userresources/css/style.css">
+    <link rel="stylesheet" href="userresources/css/responsive.css">
+<style>
+.sample-text-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+}
+
+.file-area {
+    margin-top: 20px; /* 필요에 따라 조절할 수 있습니다. */
+}
+
+.button-group-area {
+    margin-top: 20px; /* 필요에 따라 조절할 수 있습니다. */
+}
+</style>
+</head>
+
+
+<body>
+<section layout:fragment="content" >
+ <div th:insert="~{banner/empty::banner}"></div>
+	<div id="container"  class="container">
+	
+		<form name="applyform">
+			<h2>기부 등록 신청폼</h2>
+			
+			
+			<div class="col-md-12 mt-sm-30 typo-sec">
+				<h3 class="mb-20 title_color">가입조건</h3>
+				<div class="">
+					<ol class="ordered-list">
+						<li><span>법인 등기 : <br>기부금 단체는 법인 등기를 완료하여 법적으로 인정받아야 합니다. 이는 단체의 법적 신분을 확인하는 핵심 단계입니다.</span></li>		
+							<ol class="ordered-list-alpha">
+							<li><span>가입가능한 단체유형은 아래와 같습니다. 
+								<br> 사회복지법인 / 사회복지시설 / 사단법인 / 재단법인 / 비영리민간단체 / 사회적 협동조합</span>
+							</li>
+							</ol>
+						<li><span>목적 및 활동: <br> 단체는 구체적이고 사회적으로 가치 있는 목적을 가져야 합니다. 이 목적은 사회에 긍정적인 변화를 가져올 수 있는 것이어야 합니다.</span></li>
+						<li><span>비영리적인 성격: <br> 기부금 단체는 상업적인 이익을 추구하지 않고, 모든 수익을 목적 달성을 위해 사용해야 합니다.</span></li>
+						<li><span>재무 투명성: <br> 단체는 재무 투명성을 유지해야 하며, 정기적으로 재무 보고서를 작성하여 기부자들에게 제공해야 합니다.</span></li>
+						<li><span>정관 및 규정 준수: <br> 단체의 정관과 규정은 해당 국가 또는 지역의 법과 일치해야 합니다.</span></li>
+						<li><span>사업 및 프로젝트 계획: <br>단체는 목표를 달성하기 위한 구체적인 사업 및 프로젝트 계획을 수립해야 합니다. 또한, 기부금의 사용 계획도 세워야 합니다.</span></li>
+						<li><span>기부금 사용의 투명성:  <br>기부금 사용에 대한 투명성을 제공하기 위해 단체는 자주 업데이트되는 기부금 사용 보고서를 작성하고 공개해야 합니다.</span></li>
+						<li><span>사업 및 프로젝트 계획: <br>기부금 사용에 대한 투명성을 제공하기 위해 단체는 자주 업데이트되는 기부금 사용 보고서를 작성하고 공개해야 합니다.</span></li>
+					</ol>
+				</div>
+			</div>
+			
+			<section class="sample-text-area ">
+				<div class="container ">
+					<h3 class="text-heading title_color">! 안내</h3>
+
+					<p class="sample-text ">
+						서류 심사 후 가입 승인 여부를 <u>이메일</u>로 보내드립니다. <br>
+						단, 신청에 있어 서류접수를 하였더라도 서류심사에서 신청대상 기관/단체가 아닐경우, 신청대상에서 <i>제외 될 수 있음</i>을 양해 바랍니다.
+						<br> [필수첨부서류]
+						<br> <b>사업자소개서, 사업자등록증(고유번호증), 관리자 재직 증명서, 개인정보동의서</b><br>
+					</p>
+					<div  id="downloadButton">
+						<span class="genric-btn link">첨부파일 다운로드</span>
+						
+					</div>
+				</div>
+				
+				<div class="container ">
+					<h3 class="text-heading title_color ">!서류 상세안내</h3>
+
+					<p class="sample-text">
+						기부금유형 증빙서류 : 법인설립허가증, 해당시설신고증, 비영리민간기관/단체 등록증, 재정경제부지정공문 등 <br>
+						인감증명서는 3개월 이내 발급된 것이어야 합니다.
+						<br> 인감 증명서, 통장사본의 인감도장, 입금의뢰 신청서 확인자란의 도장은 모두 일치하여야 합니다.
+						<br> 첨부파일은 압축해서 하나의 파일(zip)로 제출해주세요. <br>
+					</p>
+					
+					<div  class="file-area">
+						<input type="file" name="uploadFiles">
+					</div>
+					
+				</div>
+			</section>
+			
+
+
+
+
+<div>
+<p> 관리자 이메일 : happyWings@google.com   /  연락처: 010-1234-5678
+</div>
+
+					<div class="button-group-area d-flex justify-content-center">
+				
+						<a href="#" class="genric-btn success" onclick="submitForm()">제출하기</a>
+						
+					</div>
+		</form>
+	</div>
+	
+	<!-- 기부신청 완료 모달 -->
+<div class="modal fade" id="donationConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="donationConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="donationConfirmationModalLabel">기부신청 완료</h5>
+            </div>
+            <div class="modal-body">
+                <p>기부신청이 성공적으로 완료되었습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>	
+<script th:inline="javascript">
+	var downloadButton = document.getElementById('downloadButton');
+	
+	downloadButton.addEventListener('click', function() {
+		console.log("버튼클릭됨!");
+		var downloadUrl = '/donation/form/downloadform.hwp';
+		var fileName = 'downloadform.hwp';
+	  var link = document.createElement('a');
+	  link.href = downloadUrl;
+	  link.download = fileName;
+	  link.click();
+	});
+	
+	
+	function submitForm(){
+		
+		console.log('버튼 눌림');
+		
+		let formData = new FormData(document.querySelector('form[name="applyform"]'));
+		
+		
+		
+		let facId = [[${#authentication.name}]];
+		let cno = 300; // codeno 시퀀스
+		
+
+		 
+		    console.log("facId는 ? :  " + facId);
+		   
+		    formData.append("codeUser", facId);
+		    formData.append('codeNo', cno);
+		    formData.append("code", "p07")
+		
+		    
+		let fileInputs = document.querySelector('input[type="file"]').files;
+		    console.log(fileInputs);
+		    
+		    for (var i = 0; i < fileInputs.length; i++) {
+                formData.append("uploadFiles", fileInputs[i]); 
+             }
+
+		 // 첫 번째 AJAX 요청
+			$.ajax({
+				type : 'POST',
+				url : '/uploadsAjax',
+				data : formData,
+				processData: false,
+				contentType: false,
+				success: function(response) {
+					console.log("첫 번째 AJAX 성공: " + response);
+					
+					// 두 번째 AJAX 요청
+					$.ajax({
+						type: 'POST',
+						url: '/applydona',
+						data: {memId : facId},
+						
+						success: function (applyResponse) {
+							console.log("두 번째 AJAX 성공: " + applyResponse);
+							alert("두번째 등록 성공!");
+							  // 기부신청이 성공하면 모달 창 표시
+		                    showDonationConfirmationModal();
+							location.href = "/fac/donaInfo";
+						},
+						error: function (applyError) {
+							console.error("두 번째 AJAX 실패: " + applyError);
+							
+						}
+					});
+				},
+				error: function(error) {
+					console.error("첫 번째 AJAX 실패: " + error);
+				}
+			});
+	}
+	
+	 $(".btn-deleteAsk").click(function () {
+	        $("#deleteConfirmationModal").modal("show");
+	    });
+
+	    $(".btn-secondary").click(function () {
+	        $("#deleteConfirmationModal").modal("hide");
+	    });
+
+	    // 기부신청 완료 모달 표시
+	    function showDonationConfirmationModal() {
+	        $("#donationConfirmationModal").modal("show");
+	    }
+	
+	
+
+	
+</script>
+</section>
+
+    
+     
+
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}">
+<head>
+<style>
+.cur{
+	cursor:pointer;
+}
+</style>
+<meta charset="utf-8">
+<title>봉사 마이페이지</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="" name="keywords">
+<meta content="" name="description">
+<link rel="stylesheet" href="css/owl.carousel.min.css">
+<link rel="stylesheet" href="css/owl.theme.default.min.css">
+<link rel="stylesheet" href="css/jquery.fancybox.min.css">
+<link rel="stylesheet" href="css/daterangepicker.css">
+<link rel="stylesheet" href="css/aos.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+	<section layout:fragment="content">
+    <div class="untree_co-section">
+		<div class="container">
+			<div class="row mb-5 justify-content-center">
+				<div class="col-lg-6 text-center">
+					<h2 class="section-title text-center mb-3">About [[${info.meetName}]]</h2>
+					<p>[[${info.oneLiner}]]</p>
+				</div>
+			</div>
+			<div class="row align-items-stretch">
+				<div class="col-lg-4 order-lg-1 contact-form" data-aos="fade-up" data-aos-delay="200">
+					<div class="h-100" th:if="${info.path}!=null"><div class="frame h-100"><div class="feature-img-bg h-100" th:style="'background-image: url('+${info.path}+');'"></div></div></div>
+					<div class="h-100" th:if="${info.path}==null"><div class="frame h-100"><div class="feature-img-bg h-100" style="background-image: url('../dpdd/img/news-7.jpg');"></div></div></div>
+				</div>
+
+				<div class="col-6 col-sm-6 col-lg-4 feature-1-wrap d-md-flex flex-md-column order-lg-1">
+					<div class="feature-1 d-md-flex">
+						<div class="align-self-center">
+							<h3>주요 봉사 분야</h3>
+							<p class="mb-0" th:if="${info.category}=='f07'">동물</p>
+						</div>
+					</div>
+					<div class="feature-1 ">
+						<div class="align-self-center">
+							<h3>동아리 설명</h3>
+							<p class="mb-0">[[${info.meetDesc}]]</p>
+						</div>
+					</div>					
+				</div>
+
+				<div class="col-6 col-sm-6 col-lg-4 feature-1-wrap d-md-flex flex-md-column order-lg-1">
+					<div class="feature-1 d-md-flex">
+						<div class="align-self-center">
+							<h3>방장</h3>
+							<p class="mb-0">[[${info.memId}]]님 <button><i class="bi bi-chat"></i></button></p>
+						</div>
+					</div>
+					<div class="feature-1 d-md-flex">
+						<div class="align-self-center">
+							<h3>목적</h3>
+							<p class="mb-0">[[${info.meetPurp}]]</p>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.fancybox.min.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/moment.min.js"></script>
+  <script src="js/daterangepicker.js"></script>
+  <script src="js/typed.js"></script>
+  <script src="js/custom.js"></script>
+	</section>
+</body>
+
+</html>

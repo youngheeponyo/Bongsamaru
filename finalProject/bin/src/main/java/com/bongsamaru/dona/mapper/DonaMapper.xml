@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.bongsamaru.dona.mapper.DonaMapper">
+ 
+<!-- 메인페이지 전체리스트조회 -->
+ 	<select id="getDonaList" resultType="DonaVO">
+ 		SELECT 
+ 			d.title,
+ 			d.goal_amt,
+ 			COUNT(f.don_id) AS donationCount,
+ 			(SUM(f.don_amt) / d.goal_amt) * 100 AS donationRatio,
+ 			c.fac_name AS facilityName,
+ 			d.rec_stat,
+ 			d.don_id,
+ 			c.fac_id
+ 		FROM donation d
+ 			LEFT JOIN don_ledger f ON d.don_id = f.don_id
+ 			LEFT JOIN facility c ON d.fac_id = c.fac_id
+ 		
+ 		GROUP BY d.title, d.goal_amt, c.fac_name, d.rec_stat, d.don_id,c.fac_id
+ 	
+ 	</select>
+ 	
+<!-- 상세페이지 조회1 (don_id) -->
+ 	<select id="getDonaDetail" resultType="DonaVO">
+ 		SELECT 
+ 			 d.don_id,
+		     d.title, 
+		     (SUM(f.don_amt) / d.goal_amt) * 100 AS donationRatio,
+		     d.rec_period,
+		     d.end_period,
+		     d. goal_amt,
+		     trunc(d.end_period- d.rec_period) as dday,
+		     e.fac_id,
+		     e.fac_name,
+		     e.fac_intro,
+		     e. fac_est_date
+		FROM donation d 
+			LEFT JOIN don_ledger f ON d.don_id = f.don_id
+			LEFT JOIN facility e ON d.fac_id = e.fac_id
+		WHERE  d.don_id = #{donId} and e.fac_id=#{facId}
+		GROUP BY d.title, d.goal_amt, d.rec_period, d.end_period, d.goal_amt, e.fac_id, e.fac_name, e.fac_intro, e. fac_est_date, d.don_id		
+ 	</select>
+ 	
+<!-- 기부자목록(don_id) -->
+	<select id="getDonerList" resultType="DonaVO">
+		SELECT
+			 don_amt
+			 , pay_date
+			 , mem_id
+			 , don_id
+		FROM don_ledger
+		WHERE don_id = #{donId}
+	</select>	
+ 	
+ 	
+ <!-- 카테고리 -->
+ 	<select id="getCategoryList" parameterType="DonaVO">
+ 		SELECT
+ 		 		sub_code_name
+		FROM 	sub_code 
+		WHERE	sub_code_id 
+		LIKE CONCAT(#{h}, '%')
+ 	</select>
+
+	
+<!-- 댓글 등록폼  -->	
+	<insert id="insertComments" parameterType="DonaVO">
+	<selectKey keyProperty="commId" resultType="int" order="BEFORE">
+
+		SELECT 
+			COMMENTS_SEQ.nextval 
+		FROM DUAL
+	
+	</selectKey>
+		INSERT INTO comments
+			(
+			comm_id
+			, content
+			,comm_date
+			, code
+			)
+		VALUES
+			(
+			#{commId}
+			, #{content}
+			, sysdate
+			,'c01'
+			)	
+	</insert>
+ 	
+ 	
+ <!--  댓글 리스트 -->
+ 	<select id = "getCommentsList" resultType="DonaVO">
+	 	SELECT 
+	 		c.comm_id 
+	        , c.mem_id
+	        , c.content
+	        , c.comm_date
+	        , c.parent_id
+		FROM comments c 
+		JOIN donation d ON c.parent_id = d.don_id
+		JOIN member m  ON c.mem_id = m.mem_id
+		WHERE d.don_id = #{donId}
+ 	</select>
+ 	
+ 	
+ <!-- 기부등록폼 -->
+ 	<insert id="insertDonation" parameterType="DonaVO">
+ 		INSERT INTO donation 
+	 			(
+	 			don_id
+	 			, fac_id
+	 			, title
+	 			, rec_period
+	 			, end_period
+	 			, goal_amt
+	 			, proj_target
+	 			, intro
+	 			, rec_stat
+	 			, exp_effect
+	 			) 
+ 			VALUES 
+ 			(
+	 			donation_seq
+	 			, #{facId}
+	 			, #{title}
+	 			, #{recPeriod}
+	 			, #{endPeriod}
+	 			, #{goalAmt}
+	 			, #{projTarget}
+	 			, #{intro}
+	 			, #{recStat}
+	 			, #{expEffect}
+ 			)
+ 	</insert>
+ </mapper>

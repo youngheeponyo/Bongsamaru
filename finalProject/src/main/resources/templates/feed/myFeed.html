@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style scoped="scoped">
+.feedList {
+	margin : 0 auto;
+	width: 800px;
+	text-align : center;
+	color: black;
+}
+.mainhead{
+	margin-bottom : 50px;
+}
+.image-container {
+	display: flex;
+	justify-content: space-between;
+}
+.circle {
+  display: inline-block;
+  width: 100px;
+  border: 1px solid #000;
+  background-color: #f2f2f2;
+  text-align: center;
+  font-weight: bold;
+  color: #333;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div th:insert="~{banner/empty::banner}"></div>
+		<div class="container">
+			<th:block th:each="item : ${list}">
+			<div class="mainhead">
+				<div class="contenttext" id="temperature" title="">
+					<div style="font-size:14px; font-weight: bold;">[[${item.tempChange}]]ºC
+						<img alt="마음 온도" src="/userresources/image/banner/heart.jpg" style="width:30px; height: 30px;">
+					</div>
+				
+				</div>
+				<div class="contenttext">
+						<span class="profile_thumb">
+						<img th:if="${item.memProfile} == null" alt="프로필 이미지" src="/userresources/image/banner/nullimage.jpg" style="border-radius: 50%; width: 200px; height: 200px;">
+						<img th:if="${item.memProfile} != null"id="profileImage" style="border-radius: 50%; width: 200px; height: 200px;" alt="프로필 이미지" class="img_thumb" th:src="@{${item.memProfile}}">
+						</span>
+				</div>
+				<p style="color: black; font-size: 25px; font-weight: bold;" th:text="${item.memNick + '님'}"></p>
+				<th:block th:each="interest, iterStat : ${InterestList}">
+				  <span th:text="${interest.interestCode}" class="circle"></span>
+				  <span style="display: inline-block; width: 10px;"></span>
+				</th:block>
+			</div>
+			</th:block>
+			<div class="feedList">
+				<hr>
+				<div class="image-container" style="display: flex; flex-wrap: wrap;">
+					<th:block th:each="list, iter : ${feedList}">
+					  <div style="display: flex; flex-direction: column; width: calc(33.33% - 10px); margin-right: 10px; margin-bottom: 10px;">
+					    <span style="position: relative;">
+					      <img style="width: 200px; height: 200px;" alt="" class="img_thumb" th:src="@{${list.filePath}}">
+					    </span>
+					    <span th:text="${list.title}"></span>
+					  </div>
+					</th:block>
+				  <div style="flex-basis: 33.33%; flex-grow: 1;"></div>
+				  <div style="flex-basis: 33.33%; flex-grow: 1;"></div>
+				  <div style="flex-basis: 33.33%; flex-grow: 1;"></div>
+				</div>
+				<h5 th:if="${feedList == null || feedList.size() == 0}" style="margin-top: 250px; height: 500px; color: gray;">아직 작성된 후기가 없어요. 🌱</h5>
+			</div>
+		</div>
+	<script>
+$("#temperature").attr( 'title', 
+`마음온도란 무엇인가요?
+		
+회원가입 시, 여러분의 마음온도는 기본 36.5도로 시작합니다.
+사이트 내 활동에 따라 마음온도가 오르거나 내려갑니다.
+여러분의 활발한 참여로 마음온도를 따뜻하게 유지해주세요!
+` );
+
+function likes(boardId) {
+    console.log(boardId);
+    
+    // AJAX 요청
+    $.ajax({
+        type: 'POST',
+        url: '/likes',
+        data: {
+            boardId: boardId
+        },
+        success: function(result) {
+        	if(result == "0"){
+        		alert('로그인 하세요');
+        	}
+            console.log(result);
+            
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+	</script>
+	</section>
+</body>
+</html>

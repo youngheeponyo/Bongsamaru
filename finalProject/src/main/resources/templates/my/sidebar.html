@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+</style>
+</head>
+<!-- jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<!-- Bootstrap JS (Popper.js 포함) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<body>
+<!-- 마이페이지 사이드바 -->
+<div th:fragment="side">
+<div style="background-color: #fff; margin-bottom: 40px; border-bottom: 1px solid #dcdcdc;">
+    <ul id="mainList" class="container" style="display: flex; justify-content: center; list-style: none; padding-bottom: 10px;">
+      <li style="cursor: pointer;">
+        <a style="display: inline-block; padding: 30px 45px; color: #797979; font-size: 1.125rem; font-weight: 500;" id="donation" data-target="#donationSub">기부</a>
+      </li>
+      <li style="cursor: pointer;">
+        <a style="display: inline-block; padding: 30px 45px; color: #797979; font-size: 1.125rem; font-weight: 500;" id="infoUpdate" data-target="#volunteerSub">봉사</a>
+      </li>
+      <li style="cursor: pointer;">
+        <a style="display: inline-block; padding: 30px 45px; color: #797979; font-size: 1.125rem; font-weight: 500;" id="myPage">마이페이지</a>
+      </li>
+    </ul>
+    <div id="donationSub" class="container" style="display: none; justify-content: center; list-style: none; margin-top: 10px;">
+      <a th:href="@{/gibuList}" style="font-size: 1.25rem; margin-right: 20px;">기부내역</a>
+      <a th:href="@{/gibuReceipt}" style="font-size: 1.25rem; margin-right: 20px;">기부영수증</a>
+    </div>
+    <div id="volunteerSub" class="container" style="display: none; justify-content: center; list-style: none; margin-top: 10px;">
+      <a th:href="@{/dayList}" style="font-size: 1.25rem; margin-right: 20px;">일일봉사</a>
+      <a th:href="@{/clubList}" style="font-size: 1.25rem; margin-right: 20px;">동아리</a>
+      <a th:href="@{/facility}" style="font-size: 1.25rem; margin-right: 20px;">시설봉사</a>
+    </div>
+  </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script th:inline="javascript">
+$(document).ready(function() {
+	$(function () {
+        // 현재 페이지의 URL을 가져옵니다.
+        var currentUrl = window.location.href;
+
+        // 리스트 항목을 순회하며 현재 페이지와 연관된 항목을 찾습니다.
+        $('#donationSub a').each(function () {
+            var href = $(this).attr('href');
+            
+            // 현재 페이지와 id 속성 값이 일치하는 경우 해당 항목에 스타일을 적용합니다.
+            if (currentUrl.indexOf(href) > -1) {
+                $(this).css({
+                    'color': 'black', // 글씨 색상을 파란색으로 변경
+                    'font-size' : '24px',
+                    'font-weight': 'bold', 
+                    	'box-shadow': '0 1px 0 0 #689f38'
+                });
+            } else {
+                // 다른 항목들은 기본 스타일로 설정합니다.
+                $(this).css({
+                    'color': 'gray', // 기본 글씨 색상으로
+                    'font-weight': '' // 기본 글씨 두께로
+                });
+            }
+        });
+    });
+	
+	$(document).ready(function() {
+	    var currentUrl = window.location.href;
+
+	    // donationSub 항목에 대한 스타일 변경
+	    $('#donationSub a').each(function () {
+	        var href = $(this).attr('href');
+
+	        if (currentUrl.indexOf(href) > -1) {
+	            $(this).css({
+	                'color': 'yellow',
+	                'font-size': '24px',
+	                'font-weight': 'bold',
+	                'box-shadow': '0 1px 0 0 #689f38'
+	            });
+	        } else {
+	            $(this).css({
+	                'color': 'gray',
+	                'font-weight': ''
+	            });
+	        }
+	    });
+
+	    // volunteerSub 항목에 대한 스타일 변경
+	    $('#volunteerSub a').each(function () {
+	        var href = $(this).attr('href');
+
+	        if (currentUrl.indexOf(href) > -1) {
+	            $(this).css({
+	                'color': 'black',
+	                'font-size': '24px',
+	                'font-weight': 'bold',
+	                'box-shadow': '0 1px 0 0 #689f38'
+	            });
+	        } else {
+	            $(this).css({
+	                'color': 'gray',
+	                'font-weight': ''
+	            });
+	        }
+	    });
+	});
+	
+    $('#mainList a').on('click', function (e) {
+        e.preventDefault(); // 기본 동작 방지
+
+        // 모든 소분류 숨기기 및 스타일 초기화
+        resetSubcategories();
+
+        // 활성화된 대분류에 스타일 적용
+        setActiveStyle($(this));
+
+        // 관련 소분류 표시
+        var target = $(this).data('target');
+        $(target).css({
+          'display': 'flex',
+          'flex-direction': 'row', // 가로로 나열
+          'justify-content': 'center', // 가운데 정렬
+          'align-items': 'center', // 세로 방향에서도 가운데 정렬
+          'font-size': '1.25rem', // 글자 크기 조정
+          'margin-top': '10px' // 상단 마진 조정
+        });
+    });
+
+    function resetSubcategories() {
+        $('div[id$="Sub"]').hide();
+        $('div[id$="Sub"] a').css({
+            'font-weight': 'normal',
+            'color': '#000'
+        });
+    }
+
+    function setActiveStyle(element) {
+        // 모든 대분류 링크 스타일 초기화
+        $('#mainList a').css({
+            'color': '#797979',
+            'font-size': '1.125rem',
+            'font-weight': '500',
+            'box-shadow': 'none'
+        });
+
+        // 활성화된 대분류에 스타일 적용
+        element.css({
+            'color': 'black',
+            'font-size': '24px',
+            'font-weight': 'bold',
+            'box-shadow': '0 1px 0 0 #689f38'
+        });
+    }
+});
+
+$("#myPage").on('click',function(){
+	window.location.href = "/my";
+});
+</script>
+<script>
+$(document).ready(function() {
+    // 현재 페이지의 URL을 가져옵니다.
+    var currentPath = window.location.pathname;
+
+    // 각 메뉴 항목의 대상 URL과 비교합니다.
+    $('#mainList a').each(function() {
+        var menuItem = $(this);
+        var targetPath = menuItem.data('target-path'); // HTML에서 data-target-path 속성으로 경로를 설정해야 합니다.
+
+        // 현재 페이지의 경로가 메뉴 항목의 대상 경로와 일치하는 경우
+        if (currentPath.indexOf(targetPath) !== -1) {
+            menuItem.css({
+                'color': 'black',
+                'font-size': '24px',
+                'font-weight': 'bold',
+                'box-shadow': '0 1px 0 0 #689f38'
+            });
+
+            // 관련된 소분류 항목을 보여줍니다.
+            var targetSub = menuItem.data('target');
+            $(targetSub).show().css({
+              'display': 'flex',
+              'flex-direction': 'row',
+              'justify-content': 'center',
+              'align-items': 'center',
+              'font-size': '1.25rem',
+              'margin-top': '10px'
+            });
+        }
+    });
+});
+</script>
+</div>
+</body>
+</html>

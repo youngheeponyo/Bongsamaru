@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>시설마이페이지 - 봉사완료리스트</title>
+ <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+ <style>
+ button{
+    background-color: #689f38; 
+    color: white;
+ }
+ button:hover,
+ button:focus {
+ background-color:white ; 
+    color: #689f38 ;
+ }
+ p{
+	font-weight:bold;
+	font-size:15px;
+}
+ </style>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+ <section layout:fragment="content">
+ <div class="container">
+ 	<div th:insert="~{banner/empty::banner}"></div>
+ 	<div th:insert="~{facility/sidebar::side}"></div>
+    <div>
+    <div class="container">
+		<div class="row justify-content-center hotel_booking_table">
+        	
+            		<div class="col-md-2" style="background-color:#689f38; text-align:center;">
+                		<div class="book_tabel_item">
+                    	<p style="color:white;  font-size:20px">봉사제목</p>
+                		</div>
+            		</div>
+        			<div class="col-md-4" style="background-color:#689f38; text-align:center;">
+            			<div class="book_tabel_item">
+                		<p style="color:white;  font-size:20px">봉사내용</p>
+            			</div>
+          			</div>
+        			<div class="col-md-2" style="background-color:#689f38; text-align:center;">
+            			<div class="book_tabel_item">
+                		<p style="color:white;  font-size:20px">봉사일시</p>
+		            	</div>
+        			</div>
+       				<div class="col-md-2" style="background-color:#689f38; text-align:center;">
+           				<div class="book_tabel_item">
+              			<p style="color:white; font-size:20px" >참여자</p>
+           				</div>
+       				</div>
+       				<div class="col-md-2" style="background-color:#689f38; text-align:center;">
+           				<div class="book_tabel_item">
+              			<p style="color:white;  font-size:20px" >후기작성</p>
+       	    			</div>
+       				</div>
+   				   <th:block th:each="list: ${volList}">
+   				   <input type="hidden" id="volActId" th:data-vol-act-id="${list.volActId}" >
+			       <div class="col-md-2">
+			           <div class="book_tabel_item">
+			            <p style="color:black; font-size:15px" th:text="${list.title}"></p>
+			           </div>
+			       </div>
+			       <div class="col-md-4">
+			           <div class="book_tabel_item box">
+			             <p class="content" style="color:black; font-size:15px"th:text="${list.content}"></p>
+			           </div>
+			       </div>
+			       <div class="col-md-2">
+			           <div class="book_tabel_item">
+			              <p style="color:black; font-size:15px"th:text="${#dates.format(list.volDate, 'yyyy-MM-dd')}"></p>
+			              
+			           </div>
+			       </div>
+			       <div class="col-md-2">
+			           <div class="book_tabel_item">
+			            
+										<p style="color:black; font-size:15px"
+   th:data-vol-act-id="${list.volActId}"
+   th:attr="data-vol-act-id=${list.volActId}"
+   data-toggle="modal"
+   data-target="#myModal">참여자보기</p>
+
+			          </div>
+			      </div>
+			      
+			      <div class="col-md-2">
+                      <div class="book_tabel_item">
+                        
+                       <a th:href="@{/volReviewInsert(volActId=${list.volActId})}"><button id="reviewButton" class="btn" >후기작성</button></a>
+                      </div>
+                  </div>
+			         </th:block>
+	
+
+			
+				
+<!-- 시설이 신청자의 등록내용을 보기위한 모달 -->			
+	
+    <div class="modal" tabindex="-1" id="myModal">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">참여자내역보기</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span></button>
+			    </div>
+			<div class="modal-body">
+				<div class="form-group">
+				<table class="table">
+				<thead>
+				<tr>
+				<th>참여자이름</th>
+				<th>성실봉사자</th>
+				<th>태도불량</th>
+				</tr>
+				</thead>
+				<tbody id="showTableBody">
+				
+				</tbody>
+				</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+			</div>
+		    </div>
+	  </div>
+  </div>				
+<th:block th:if="${volList != null and #lists.size(volList)!=0}">				
+<nav class="blog-pagination justify-content-center d-flex">
+	<ul class="pagination">
+		<li class="page-item">
+			<a th:href="@{/fac/volFinish(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1})}" class="page-link"
+				aria-label="Previous"> <span aria-hidden="true"> <span class="lnr lnr-chevron-left"></span></span></a></li>
+		<li class="page-item" th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+            <a class="page-link" th:href="@{/fac/volFinish(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage})}"th:text="${pageNum}"></a>
+        </li>
+		<li class="page-item"><a th:href="@{/fac/volFinish(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}" class="page-link"
+			aria-label="Next"><span aria-hidden="true"><span class="lnr lnr-chevron-right"></span>
+			</span>
+		</a></li>
+	</ul>
+</nav>
+</th:block>	
+		</div>
+	</div>
+</div>
+</div>
+<script th:inline="javascript">
+var volActId='';
+window.onload = function() {
+    // 봉사 후기가 작성되었는지 확인
+
+	 volActId = $('#volActId').data('vol-act-id');
+
+	   console.log(volActId);
+  		    $.ajax({
+  		        url: '/getFacRevCheck',
+  		        type: 'GET',
+  		        data: {
+  		        	detailCate: volActId
+  		        },
+  		        success: function(response) {
+  		            if(response > 0) {
+  		            	 var button = document.getElementById("reviewButton");
+  		            	 button.disabled = true;
+  		            } else {
+  		              
+  		            }
+  		        },
+  		        error: function(xhr, status, error) {
+  		            // 오류 처리
+  		        }
+  		    });
+
+};
+
+function good(memId,volActId) {
+	let info = {
+	        memId: memId,
+	        tempChange:2,
+	        heartNo:volActId
+	    };
+    // memId 값을 서버로 전송
+    $.ajax({
+        url: '/InsertVolHeart',
+        type: 'POST',
+        contentType: 'application/json', // 컨텐츠 타입을 JSON으로 지정
+		data: JSON.stringify(info), // JavaScript 객체를 JSON 문자열로 변환
+        success: function(response) {
+            
+        	swalWithBootstrapButtons.fire({
+				  title: "마음온도",
+				  text: "회원의 마음온도가 2도 상승하였습니다",
+				  icon: "success",
+				  showCancelButton: false,
+				  confirmButtonText: "확인",
+				  //cancelButtonText: "취소",
+				  reverseButtons: true
+				})
+        },
+        error: function(err) {
+            
+            console.error(err);
+        }
+    });
+};
+
+
+
+
+function bad(memId,volActId) {
+	let info = {
+	        memId: memId,
+	        tempChange:-1,
+	        heartNo:volActId
+	    };
+	console.log(info);
+    // memId 값을 서버로 전송
+    $.ajax({
+        url: '/InsertVolHeart',
+        type: 'POST',
+        contentType: 'application/json', // 컨텐츠 타입을 JSON으로 지정
+		data: JSON.stringify(info), // JavaScript 객체를 JSON 문자열로 변환
+        success: function(response) {
+        	swalWithBootstrapButtons.fire({
+				  title: "마음온도",
+				  text: "회원의 마음온도가 1도 하락하였습니다",
+				  icon: "success",
+				  showCancelButton: false,
+				  confirmButtonText: "확인",
+				  //cancelButtonText: "취소",
+				  reverseButtons: true
+				})
+        },
+        error: function(err) {
+            console.error(err);
+        }
+    });
+};
+
+$(document).ready(function() {
+  
+	$('#myModal').on('show.bs.modal', function(e) {
+      // 클릭된 요소에서 vol-act-id 가져오기
+ 
+        // 참여자 목록 초기화
+        $("#showTableBody").empty();
+
+        // Ajax를 통해 데이터 가져오기
+        $.ajax({
+            url: '/VolAppList?volActId='+volActId,
+            type: 'GET',
+            success: function(result) {
+              
+                console.log(result);
+                for (var i = 0; i < result.length; i++) {
+                	
+                	let memId=result[i].memId;
+                	console.log(memId);
+                	console.log(volActId);
+                	 $("#showTableBody").append(
+                             `<tr> 
+                                 <td> ${result[i].memId }</td>
+                                 <td> <button><svg class="svcBtG" onclick="good('${memId}',${volActId})" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up-fill" viewBox="0 0 16 16">
+                                 <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a10 10 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733q.086.18.138.363c.077.27.113.567.113.856s-.036.586-.113.856c-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.2 3.2 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.8 4.8 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z"/>
+                                	 </svg></button></td> 
+                                 <td> <button><svg class="svcBtnD" onclick="bad('${memId}',${volActId})"xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-down-fill" viewBox="0 0 16 16">
+                                 <path d="M6.956 14.534c.065.936.952 1.659 1.908 1.42l.261-.065a1.38 1.38 0 0 0 1.012-.965c.22-.816.533-2.512.062-4.51q.205.03.443.051c.713.065 1.669.071 2.516-.211.518-.173.994-.68 1.2-1.272a1.9 1.9 0 0 0-.234-1.734c.058-.118.103-.242.138-.362.077-.27.113-.568.113-.856 0-.29-.036-.586-.113-.857a2 2 0 0 0-.16-.403c.169-.387.107-.82-.003-1.149a3.2 3.2 0 0 0-.488-.9c.054-.153.076-.313.076-.465a1.86 1.86 0 0 0-.253-.912C13.1.757 12.437.28 11.5.28H8c-.605 0-1.07.08-1.466.217a4.8 4.8 0 0 0-.97.485l-.048.029c-.504.308-.999.61-2.068.723C2.682 1.815 2 2.434 2 3.279v4c0 .851.685 1.433 1.357 1.616.849.232 1.574.787 2.132 1.41.56.626.914 1.28 1.039 1.638.199.575.356 1.54.428 2.591"/>
+                                     </svg></button></td>
+                                
+                             </tr>`);
+                }
+                
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    })
+    
+});
+const swalWithBootstrapButtons = Swal.mixin({
+	  customClass: {
+	    confirmButton: "btn btn-success",
+	    cancelButton: "btn btn-danger"
+	  },
+	  buttonsStyling: false
+	});
+</script>
+</section>
+</body>
+</html>

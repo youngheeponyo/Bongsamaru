@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}"
+>
+<head>
+<meta charset="UTF-8">
+<title>기부 프로젝트</title>
+<style>
+.cur{
+	cursor:pointer;
+}
+</style>
+<script>
+function show1(){
+	$('#tableData').load("../donationList?recStat=1 #donationing");
+};
+function show2(){
+	$('#tableData').load("../donationDone?recStat=0 #donationDone");
+};
+
+function handleKeyPress(event) {
+    if (event.keyCode === 13) {
+        search();
+    }
+};
+
+function search(){
+	let keyword = $('#search').val();
+	if(keyword == '') {
+		alert('검색하실 내용을 입력하세요');
+		return;
+	}
+	$('#tableData').load(`../donationList?recStat=1&searchKeyword=${keyword} #donationing`);
+};
+
+function handleKeyPress2(event) {
+    if (event.keyCode === 13) {
+        search2();
+    }
+};
+
+function search2(){
+	let keyword = $('#search').val();
+	if(keyword == '') {
+		alert('검색하실 내용을 입력하세요');
+		return;
+	}
+	$('#tableData').load(`../donationDone?recStat=0&searchKeyword=${keyword} #donationDone`);
+};
+//모금완료 recStat=0
+function prev(vo){
+	$('#tableData').load(`../donationDone?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&recStat=0 #donationDone`);
+}
+
+function current(vo,pageNum){
+	$('#tableData').load(`../donationDone?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&recStat=0 #donationDone`);
+}
+
+function next(vo){
+	$('#tableData').load(`../donationDone?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&recStat=0 #donationDone`);
+}
+</script>
+</head>
+<body>
+<section layout:fragment="content">
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+      <div id="tableData">
+      	<div id="donationing">
+		<h2>기부 프로젝트</h2>
+		<div style="float:left;padding:10px">
+			<input class="form-control-sm me-2" onkeypress="handleKeyPress(event)" id="search" type="search" placeholder="프로젝트명을 검색하세요" aria-label="Search" th:value="${vo.searchKeyword}">
+			<button class="btn btn-outline-success" onclick="search()" type="button">검색</button>
+			<button class="btn btn-outline-primary" type="button" onclick="show1()">초기화</button>
+		</div>
+		<br>
+		<div style="float:right;color:black" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">진행 중인 프로젝트 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 종료된 프로젝트</a>
+		</div>
+		<br><hr>
+	        <div class="row">
+	        <th:block th:if=${dona.size}==0 style="text-align:center">
+				<h3>데이터가 존재하지 않습니다</h3>
+	        </th:block>
+	          <div class="col-sm-6 col-xl-3" style="color:black;width:25%" th:each="dona : ${dona}">
+	            <div class="card overflow-hidden rounded-2">
+	              <div class="position-relative">
+	                <a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" target='_blank'>
+	                <img src="../donation/board/img/fruite-item-5.jpg" class="card-img-top rounded-0" alt="..." style="height:200px">
+	                </a>
+	              </div>
+	              <div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+				    <span>모금중</span><br>
+				</div>
+	               <div class="d-flex align-items-center justify-content-between">
+		            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+		                <h3><a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" target='_blank' th:text="${dona.title}" style="color:black;font:bolder"> 제목</a></h3>
+		                <a href="#" style="color:gray">
+						   <span th:text="${dona.facilityName}"></span>
+						</a>
+						<br>
+		                <div class="progress">
+		                    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" th:style="'width: ' + ${dona.donationRatio} + '%'" aria-valuenow="${dona.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+		                </div><br>
+		                <h5>
+		                    <span th:text="${dona.donationRatio}"></span> %
+		                    
+		                    <span style="float:right" data-th-text="${#numbers.formatInteger(dona.total, 1, 'COMMA') + '원'}"></span>
+		                </h5>
+						 <br>
+		            </div>
+	               </div>
+	            </div>
+	          </div>
+	        </div>
+	        <nav aria-label="Page navigation example">
+		    <ul class="pagination justify-content-center">
+		        <!-- 이전 버튼 -->
+		        <li class="page-item" th:if="${vo.prev}">
+		            <a class="page-link" th:href="@{/donationList(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1},recStat=1)}">이전</a>
+		        </li>
+		        <!-- 페이지 번호 출력 -->
+		        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+		            <a class="page-link" th:href="@{/donationList(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage},recStat=1)}"
+		               th:text="${pageNum}"></a>
+		        </li>
+		        <!-- 다음 버튼 -->
+		        <li class="page-item" th:if="${vo.next}">
+		            <a class="page-link" th:href="@{/donationList(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage},recStat=1)}">다음</a>
+		        </li>
+		    </ul>
+			</nav>
+        </div>
+      	</div>
+      </div>
+    </div>
+</section>
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}">
+<head>
+<style>
+.cur{
+	cursor:pointer;
+}
+</style>
+<meta charset="UTF-8">
+<title>후기게시판</title>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <div class="container-fluid">
+		<div class="container">
+		<h2>>후기게시판</h2>
+		<br>
+			<th:block th:if="${board.size} == 0">
+			<div style="text-align:center;">
+				<h5>현재 등록된 게시글이 없습니다.</h5>
+				<br>
+			</div>
+			</th:block>
+			<th:block th:if="${board.size} != 0">
+			<table class="table" id="classic">
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th>봉사번호</th>
+						<th>봉사제목</th>
+						<th>작성자</th>
+						<th>작성날짜</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="board,st : ${board}" >
+						<tr>
+							 <td th:text="${st.count}">No</td>
+							 <td th:text="${board.volActId}">봉사번호</td>
+							 <td class="cur" th:text="${board.title}" th:onclick="location.href='../ReviewInfo?volId=[[${session.id}]]&reviewId=[[${board.reviewId}]]'">제목</td>
+							 <td th:text="${board.writer}" >작성자</td>
+							 <td th:text="${#dates.format(board.writeDate, 'yyyy/MM/dd')}" >날짜</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/reviewBoardList(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1},volId=${session.id})}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/reviewBoardList(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage},volId=${session.id})}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/reviewBoardList(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage},volId=${session.id})})}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+		</div>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

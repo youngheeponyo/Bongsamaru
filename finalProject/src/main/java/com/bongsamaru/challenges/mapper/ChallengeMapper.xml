@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.bongsamaru.challenges.mapper.ChallengeMapper">
+<!-- 챌린지리스트 -->
+<resultMap id="challengeWithFileResultMap" type="ChallengesVO">
+    <id property="chalId" column="CHAL_ID"/>
+    <result property="chalDetId" column="CHAL_DET_ID"/>
+    <result property="memId" column="MEM_ID"/>
+    <result property="title" column="TITLE"/>
+    <result property="content" column="CONTENT"/>
+    <result property="regDate" column="REG_DATE"/>
+    <result property="endDate" column="END_DATE"/>
+    <result property="profil" column="PROFIL"/>
+    <result property="participants" column="PARTICIPANTS"/>
+    <result property="allParticipants" column="ALLPARTICIPANTS"/>
+    
+    <association property="file" javaType="FilesVO" >
+        <result property="filePath" column="FILE_PATH"/>
+        <result property="fileOrder" column="FILE_ORDER"/>
+        <result property="codeNo" column="CODE_NO"/>
+    </association>
+</resultMap> 
+
+<select id="getChallengeList" resultMap="challengeWithFileResultMap">
+
+SELECT  C.CHAL_ID, 
+		C.MEM_ID,
+		C.TITLE, 
+		C.CONTENT,
+        C.REG_DATE,
+        END_DATE,
+		F.FILE_PATH, 
+		F.FILE_ORDER, 
+		F.CODE_NO,
+        (SELECT F.FILE_PATH FROM FILES F WHERE C.MEM_ID = F.CODE_USER AND F.CODE='p01')                         AS PROFIL,
+        (SELECT COUNT(MEM_ID) FROM CHAL_DETAIL WHERE CHAL_ID=C.CHAL_ID)                                         AS PARTICIPANTS,
+        (SELECT COUNT(MEM_ID) FROM CHAL_DETAIL)                                                                 AS ALLPARTICIPANTS
+  FROM  CHALLENGE C 
+  LEFT  JOIN FILES F ON CAST(C.CHAL_ID AS VARCHAR2(100)) = F.CODE_NO
+   AND  F.CODE ='p03'
+ WHERE  FILE_ORDER = 1
+ ORDER BY END_DATE DESC
+ 
+ 
+  
+</select>
+
+<!-- 챌린지인포 -->
+<select id="getChallengeInfo" resultType="ChallengesVO">
+
+SELECT  CHAL_ID, 
+		MEM_ID,
+		TITLE, 
+		CONTENT, 
+        EXP_IMPACT,
+        ACTION_REASON,
+        REG_DATE,
+        END_DATE,
+        PART_METHOD1,
+        PART_METHOD2
+  FROM  CHALLENGE
+  WHERE  CHAL_ID=#{chalId}
+</select>
+
+<!--파일첨부 리스트-->
+
+<select id="getFileList" resultType="FilesVO">
+
+            SELECT FILE_PATH, 
+                   FILE_ORDER, 
+                   CODE,
+                   CODE_NO
+            FROM FILES F 
+           
+            WHERE CODE_NO = #{codeNo}
+              AND CODE = #{code}
+            
+</select>
+
+<resultMap id="challengeWithFiles" type="ChallengesVO">
+    <id property="chalDetId" column="CHAL_DET_ID"/>
+    <result property="chalId" column="CHAL_ID"/>
+    <result property="memId" column="MEM_ID"/>
+    <result property="content" column="CONTENT"/>
+    <result property="partDate" column="PART_DATE"/>
+    <result property="profil" column="PROFIL"/>
+    
+    <collection property="file" ofType="FilesVO" >
+        <result property="filePath" column="FILE_PATH"/>
+        <result property="extension" column="EXTENSION"/>
+        <result property="fileOrder" column="FILE_ORDER"/>
+        <result property="codeNo" column="CODE_NO"/>
+    </collection>
+</resultMap>
+<!-- 한 챌린지 내 참여리스트  -->
+<select id="getChallengesList" resultMap="challengeWithFiles">
+ 	
+SELECT  C.CHAL_DET_ID,
+		C.CHAL_ID, 
+		C.MEM_ID,
+		C.CONTENT, 
+		C.PART_DATE, 
+		F.FILE_PATH,
+		F.EXTENSION,
+		(SELECT F.FILE_PATH FROM FILES F WHERE C.MEM_ID = F.CODE_USER AND F.CODE='p01')                         AS PROFIL
+   FROM CHAL_DETAIL C 
+   LEFT JOIN FILES F ON CAST(C.CHAL_DET_ID AS VARCHAR2(100)) = F.CODE_NO
+    AND F.CODE ='p04'
+  WHERE C.CHAL_ID=#{chalId}
+ ORDER BY PART_DATE DESC
+  
+</select>
+<!-- 오늘 등록한적 있는지 체크 -->
+<select id="getChallCheck" parameterType="int">
+  Select count(*)
+    FROM CHAL_DETAIL
+   WHERE MEM_ID=#{memId}
+     AND PART_DATE=#{partDate}
+     AND CHAL_ID=chalId 
+</select>
+<!-- 챌린지 등록-->
+<insert id="getChallengeInsert" parameterType="ChallengesVO">
+	<selectKey keyProperty="chalId" resultType="int"	order="BEFORE">
+			SELECT NVL(MAX(CHAL_ID),0)+1 FROM CHALLENGE
+	</selectKey>
+		INSERT
+		
+		INTO CHALLENGE
+			(CHAL_ID,
+			 MEM_ID,
+			 TITLE,
+			 CONTENT,
+			 EXP_IMPACT,
+			 ACTION_REASON,
+			 REG_DATE,
+			 END_DATE,
+			 PART_METHOD1,
+			 PART_METHOD2)
+		 VALUES
+			(#{chalId},
+			 #{memId},
+			 #{title},
+			 #{content},
+			 #{expImpact},
+			 #{actionReason},
+			 sysdate,
+			 #{endDate},
+			 #{partMethod1},
+			 #{partMethod2})
+ 
+    	
+
+</insert>
+
+<!-- 한 챌린지  참여 등록-->
+<insert id="getChallengesInsert" parameterType="ChallengesVO">
+	<selectKey keyProperty="chalDetId" resultType="int"	order="BEFORE">
+			SELECT NVL(MAX(CHAL_DET_ID),0)+1 FROM CHAL_DETAIL
+	</selectKey> 
+		INSERT	INTO CHAL_DETAIL	(
+		     CHAL_DET_ID,
+			 CHAL_ID,
+			 CONTENT,                 
+			 PART_DATE,
+			 MEM_ID)
+		 VALUES
+			(#{chalDetId},
+			#{chalId},
+			#{dContent},
+			sysdate,
+			#{memId})
+ 	
+</insert>
+
+<!-- 챌린지 좋아요 -->
+	<select id="getChallengeLike" resultType="LikeVO">
+             SELECT mem_id, board_id, category
+             FROM likes
+             WHERE mem_id = #{memId}
+             AND board_id = #{boardId}
+             AND category = #{category}
+             
+	</select>
+ 	<insert id="challengesLikeInsert" parameterType="int">
+		INSERT INTO likes(
+			like_id,
+			mem_id,
+			board_id,
+			created_at,
+			category)
+		VALUES(likes_SEQ.NEXTVAL
+				,#{memId}
+				,#{boardId}
+				,sysdate,
+				'l02')
+	</insert>
+	<delete id="DeleteChallengeLike" parameterType="int">
+		DELETE
+		FROM likes
+		WHERE board_id = #{boardId}
+		AND CATEGORY = 'l02'
+	</delete>
+<!-- 챌린지 수정 -->
+<update id="getChallengeUpdate" parameterType="ChallengesVO">
+
+</update>
+<!-- 한 챌린지 참여 수정-->
+<update id="getChallengesUpdate" parameterType="ChallengesVO">
+
+</update>
+
+<!-- 한 챌린지 참여 삭제-->
+<delete id="getChallengesDel" parameterType="int">
+
+</delete>
+<!-- 신고하기 -->
+<insert id="reportInsert" parameterType="ReportVO">
+INSERT INTO REPORT(REP_ID,
+				   CATEGORY,
+				   MEM_ID,
+				   REP_DATE,
+				   CATEGORY_NO,
+				   REP_REASON,
+				   REQ_CODE)
+			VALUES(REPORT_SEQ.NEXTVAL,
+				   #{category},
+				   #{memId},
+				   sysdate,
+				   #{categoryNo},
+				   #{repReason},
+				   0)	   
+
+</insert>
+</mapper>

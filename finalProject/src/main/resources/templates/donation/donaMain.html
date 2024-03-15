@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+	
+
+
+    <head>
+  
+        <meta charset="utf-8">
+        <title> </title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="" name="keywords">
+        <meta content="" name="description">
+		
+        <!-- Google Web Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" >
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet"> 
+
+        <!-- Icon Font Stylesheet -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Libraries Stylesheet -->
+        <link href="donation/board/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+        <link href="donation/board/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+        <!-- Customized Bootstrap Stylesheet -->
+        <link href="donation/board/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link href="donation/board/css/style.css" rel="stylesheet">
+        
+		<style>
+			.bg-secondary{
+			background-color: ##ffb524 important!
+			}
+			
+		  .grayscale {
+		        filter: grayscale(90%);
+		    }
+		 .completed-list.bg-secondary .rounded {
+        filter: grayscale(0%) important!;
+    }
+		    
+		  /* 카드 크기 및 세로 길이 일정하게 조정 */
+    .recruit-list,
+    .completed-list {
+        width: calc(24% - 20px); /* 계산된 크기로 조정 */
+        margin-right: 20px; /* 마진 추가 */
+        float: left;
+        margin-bottom: 20px;
+        height: 550px; /* 세로 길이 고정값 추가 */
+    }    
+		/* For large screens, display 4 items in a row */
+		.recruit-list,
+		.completed-list {
+		    width: 24%; /* Set the width to 24% for 4 items in a row */
+		    float: left; /* Float items to the left to display them in a row */
+		    margin-right: 1%; /* Adjust the margin to create space between items */
+		    margin-bottom: 20px; /* Adjust the margin to create space between rows */
+		}
+		
+		/* Clear the float after every 4 items to start a new row */
+		.recruit-list:nth-child(4n),
+		.completed-list:nth-child(4n) {
+		    margin-right: 0; /* Reset margin for the last item in each row */
+		    clear: both; /* Clear the float to start a new row */
+		}
+		
+		/* For medium screens, display 2 items in a row */
+		@media (max-width: 992px) {
+		    .recruit-list,
+		    .completed-list {
+		        width: 48%; /* Set the width to 48% for 2 items in a row */
+		    }
+		
+		    /* Clear the float after every 2 items for medium screens */
+		    .recruit-list:nth-child(2n),
+		    .completed-list:nth-child(2n) {
+		        margin-right: 0; /* Reset margin for the last item in each row */
+		        clear: both; /* Clear the float to start a new row */
+		    }
+		}
+		
+		/* For small screens, display 1 item in a row */
+		@media (max-width: 576px) {
+		    .recruit-list,
+		    .completed-list {
+		        width: 100%; /* Set the width to 100% for 1 item in a row */
+		    }
+		
+		    /* Clear the float after every item for small screens */
+		    .recruit-list,
+		    .completed-list {
+		        margin-right: 0; /* Reset margin for the last item in each row */
+		        clear: both; /* Clear the float to start a new row */
+		    }
+		    
+		    
+		}
+		
+		.button::hover {
+			cursor : pointer;
+			}
+		
+		</style>
+
+
+    </head>
+
+
+
+    <body>
+	
+	<section layout:fragment="content">
+	 <div th:insert="~{banner/dona::banner}"></div>
+	
+
+<!-- Fruits Shop Start-->
+<div class="container-fluid fruite py-5"  >
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-12">   
+
+                <div class="row g-4">
+                    <div class="col-lg-12" style="margin-left : 150px;">
+
+
+                        <div class="mb-3">
+                            <div class="row">
+                            <!-- 전체보기 (유형) -->
+                                <div class="col-md-4 rounded" >
+								    <div id="donaCategory" class="d-flex justify-content-between fruite-name">
+								        <button class="rounded" 
+								                style="background-color: white; border: 2px solid #d3d3d3;  border-radius: 10px; margin-bottom: 10px;"
+								                data-category=""
+								                onclick="filterByCategory(this)">
+								            <a href="#" style="color: black; font-weight: bold;'">전체</a>
+								        </button>
+								    </div>
+								</div>
+								
+                                <!-- 유형유형 -->
+                                <div class="col-md-4 rounded" th:each="category : ${categoryList}">
+								    <div id="donaCategory" class="d-flex justify-content-between fruite-name">
+								        <button class="rounded"  id="cateBtn"
+								                style="background-color: white; border: 2px solid #d3d3d3;  border-radius: 10px; margin-bottom: 10px;"
+								                th:attr="data-category=${category.subCodeId}"
+								                onclick="filterByCategory(this)">
+								            <a href="#" th:text="${category.subCodeName}" th:style="'color: black; font-weight: bold;'"></a>
+								        </button>
+								    </div>
+								</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 모집중, 모금완료 섹션 -->
+                    <div class="col-lg-12 d-flex justify-content-center"> 
+                        <div class="mb-4">
+                            
+                            <div class="btn-group" role="group">
+                                <a href="#" id="btnRecruiting" class="btn bs-light mr-2 rounded"    onclick="toggleList('1')">모금중</a>
+                                <a href="#" id="btnCompleted" class="btn bs-light rounded" onclick="toggleList('0')">모금완료</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12" id="result-container">
+                      
+                      
+                        
+                        <!-- 카테고리별 리스트를 표시할 부분 -->
+                           <div  th:each="dona : ${list}" th:if="${dona.donRegApp == '1'}" style="width:">
+                                <div class="col-md-3 col-lg-3 col-xl-3 recruit-list"   >
+                                    <!-- 리스트 아이템 표시 -->
+                                    <div class="rounded position-relative fruite-item">
+                                        <div class="fruite-img">
+                                            <a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}"><img th:if="${dona.filePath} != null" th:src="@{${dona.filePath}}" onError="this.src='../image/bonsamaru.png'" class="img-fluid w-100 rounded-top" style="height:250px" alt=""></a>
+                                            <a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}"><img th:if="${dona.filePath} == null" src="../image/bonsamaru.png" class="img-fluid w-100 rounded-top" style="height:250px" alt=""></a>
+                                        </div>
+
+                                        <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px; background-color: #ffb524; filter: grayscale(0%);">
+                                            <span th:text="${dona.recStat} == '1' ? '모금중' : '모금완료'"></span>
+                                        </div>
+
+                                        <!-- 테두리 없애부분 -->
+                                        <div class="p-4 border-top-0 rounded-bottom" style="color: black;">
+                                            <h6><a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" th:text="${dona.title}" style="color: black;"> 제목</a></h6>
+											<div class="info-item" style="color: darkgreen;">
+                                                # <strong><span th:text="${dona.subCodeName}"></span></strong>
+                                            </div>
+                                            <div class="info-item" style = "margin-bottom:10px;">
+                                                목표금액 : <strong><span th:text="${#numbers.formatInteger(dona.goalAmt,3, 'COMMA') }"></span></strong> 원
+                                                
+                                            </div>
+                                            <div class="info-item">
+                                                <strong><span th:text="${dona.donationCount}"></span></strong>명 참여
+                                            </div>
+
+                                            <div class="progress">
+											    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" th:style="'width: ' + ${dona.donationRatio} + '%'" aria-valuenow="${dona.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+											</div>
+											<div class="info-item" style="display: flex; justify-content: space-between;">
+											    <div style="text-align: left;">
+											        <strong><span th:text="${dona.donationRatio}"></span></strong> %
+											    </div>
+											    <div style="text-align: right; margin-bottom:20px;">
+											        <strong><span th:text="${#numbers.formatInteger(dona.total, 3, 'COMMA')}"></span></strong>원
+											    </div>
+											</div>
+
+                                            <div class="d-flex justify-content-center align-items-center flex-lg-wrap" style = "margin-bottom:5px;" >
+                                                <a href="#" class="btn border border-secondary rounded-pill px-3 text-dark mx-auto"><span th:text="${dona.facilityName}" style="color: black;"></span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        
+                    </div>
+                </div>
+                <!-- pagination 
+                
+                          <div class="col-12 mt-5">
+                            <div class="pagination d-flex justify-content-center mt-5">
+                                <a href="#" class="rounded">&laquo;</a>
+                                <a href="#" class="active rounded">1</a>
+                                <a href="#" class="rounded">2</a>
+                                <a href="#" class="rounded">3</a>
+                                <a href="#" class="rounded">4</a>
+                               
+                                <a href="#" class="rounded">&raquo;</a>
+                            </div>
+                        </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Fruits Shop End-->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>   
+
+
+    <form action="donaMain" name="mainform">
+    	<input type="hidden" name="category" th:value="${donaVO.category}">
+    	<input type="hidden" name="recStat" th:value="1">
+    	<input type="hidden" name="page" th:value="1">
+    	<input type="hidden" name="donRegApp" th:value="1">
+    	
+    </form>
+
+        
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="donation/board/lib/easing/easing.min.js"></script>
+    <script src="donation/board/lib/waypoints/waypoints.min.js"></script>
+    <script src="donation/board/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="donation/board/lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="donation/board/js/main.js"></script>
+
+    
+    
+    <script th:inline="javascript">
+    
+    $(document).ready(function () {
+
+
+    	mainform.donRegApp.value;
+    	   // URL에서 쿼리 파라미터 값 가져오기
+        var urlParams = new URLSearchParams(window.location.search);
+        var category = urlParams.get('category'); // 'category' 쿼리 파라미터 값 읽기
+		var recStat = urlParams.get('recStat');
+        
+        if(recStat == '1' || recStat == null){
+        	$('#btnRecruiting').css({
+        		 'background-color': '#ccc',
+        		 'color' : 'black'
+        		 
+        	})
+        }else{
+        	$('#btnCompleted').css({
+       		 'background-color': '#ccc',
+       		'color' : 'black'
+       	})
+        }
+        
+        // 모든 카테고리 버튼에 대해 반복
+        $("#donaCategory button").each(function() {
+            var buttonCategory = $(this).data("category"); // 버튼의 데이터 속성 값 읽기
+            // URL의 'category' 파라미터 값과 버튼의 데이터 값이 일치하면
+            if (buttonCategory === category) {
+                // 해당 버튼에 'active' 클래스 추가
+                
+                $(this).css({
+            		    /* 활성화된 버튼에 대한 스타일 */
+            		    'background-color': '#ccc' /* 예시: 파란색 배경 */
+                	
+                });
+            }
+        });
+   });
+    function filterByCategory(button) {
+        var category = button.getAttribute("data-category"); // 클릭된 버튼의 'data-category' 값 읽기
+        mainform.category.value = category; // 폼에 값 설정
+        mainform.submit(); // 폼 제출
+    }
+    function toggleList(type) {
+    	
+    	
+        mainform.recStat.value = type;
+        mainform.submit();	
+    }
+    
+    
+    function filterByCategory(button) {
+        console.log('filterByCategory called'); // 확인용 로그
+        var category = button.getAttribute("data-category");
+        console.log(category);
+        mainform.category.value = category;
+        mainform.submit();
+        
+        //location.href='donaMain?category='+ category
+    }
+    function filterByCategory(button) {
+        var category = button.getAttribute("data-category"); // 클릭된 버튼의 'data-category' 값 읽기
+        mainform.category.value = category; // 폼에 값 설정
+        mainform.submit(); // 폼 제출
+    }
+
+
+    </script>
+ 
+ 
+ 	
+      </section>
+    </body>
+
+</html>

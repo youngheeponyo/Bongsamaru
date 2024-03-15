@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+ layout:decorate="~{layout}"
+ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8">
+<title>기부 등록</title>
+ <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+<style>
+
+.insertf{
+	cursor:pointer;
+	color:#689f38;
+	font-size:18px;
+	font-weight:bold;
+
+p{
+	font-weight:bold;
+	font-size:15px;
+
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div class="container">
+ <div th:insert="~{banner/empty::banner}"></div>
+<div class="container" style=" text-align:center;">
+<div class="side " th:insert="~{facility/sidebar::side}"></div>	
+ <div class="main-content container" th:if="${#authentication.principal.userVO.donApp} == 0">
+
+<p class="insertf" onclick="openapplyform()">기부신청하기</p>
+<div class=" hotel_booking_table" style="text-align:right;" >
+<h1>           아직 기부권한이 없으신 상태입니다
+				<br>기부를 하시려면 권한이 필요합니다
+<br>
+               기부 권한을 먼저 얻어주세요 
+<br>
+               기부 신청하기로 이동해주세요
+</h1>
+</div>
+</div>
+
+
+<div class="col-md-10 main-content container" th:if="${#authentication.principal.userVO.donApp} == 1">
+
+	<p onclick="openregitform()" style=" cursor: pointer; font-size:18px; color:#689f38">기부등록하기</p>
+
+
+		<div class="row justify-content-center hotel_booking_table" >
+					
+                            <div class="row">
+                            <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                     <p style="color:black; font-size:20px">기부제목</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                     <p style="color:black; font-size:20px">목표금액</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                      <p style="color:black; font-size:20px">모집기간</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                       <p style="color:black; font-size:20px">승인상태</p>
+                                       
+                                    </div>
+                                </div>
+                           
+                      
+                
+                    <th:block th:each="dona:${donaList}">
+                       
+                       
+              <div class="col-md-3">
+                 <div class="book_tabel_item">
+                  <p><a  th:text="${dona.title}"></a></p>
+                 
+                 </div>
+             </div>
+             <div class="col-md-3">
+                 <div class="book_tabel_item">
+                  <p><a  th:text="${#numbers.formatInteger(dona.goalAmt,3,'COMMA')+'원'}"></a></p>
+                 
+                 </div>
+             </div>
+             <div class="col-md-3">
+                 <div class="book_tabel_item">
+                  <p><a  th:text="${#dates.format(dona.recPeriod,'yyyy-MM-dd')} +'~'+${#dates.format(dona.endPeriod,'yyyy-MM-dd')}"></a></p>
+                 
+                 </div>
+             </div>
+             <div class="col-md-3">
+                 <div class="book_tabel_item">
+                  <p><a  th:text="${dona.donRegApp}== 0 ? '승인 전' : '승인완료'"></a></p>
+                 
+                 </div>
+             </div>
+        
+                           
+                   
+               
+                </div>
+                   
+               </th:block>
+  </div>
+                </div>
+</div>    
+
+<script th:inline="javascript">
+//기부신청폼
+function openapplyform(){
+	location.href = "/applyform";
+}
+
+//기부등록폼
+function openregitform(){
+	location.href = "/form";
+}
+</script>          
+</div>
+</section>                
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>공지사항/자주하는 질문</title>
+<style>
+.cur{
+	cursor:pointer;
+	color : black;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>공지사항/자주하는 질문</h2>
+		<div style="float:right;" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">공지사항 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 자주하는 질문</a>
+		</div>
+		<div id=tableData>
+			<div id="notice">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>작성일</th>
+						<th>조회수</th>
+						<th>중요도</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="board,st : ${boardList}" >
+						<tr>
+							 <td th:text="${st.count}">번호</td>
+							 <td><a th:text="${board.title}" class="cur" th:href="@{noticeInfo(category=${board.category},detailCate=${board.detailCate})}"></a></td>
+							 <td th:text="${#dates.format(board.writeDate, 'yyyy년 MMM dd일')}" >작성일</td>
+							 <td th:text="${board.views}" >조회수</td>
+							 <td th:if="${board.priority}==0" >일반</td>
+							 <td th:if="${board.priority}==1" >중요</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<a type="button" style="float:right;" class="btn btn-dark m-1" th:href="@{noticeInsert}">등록</a></div>
+		</div>
+		</div>
+		<script th:inline="javascript">
+			function show1(){
+				$('#tableData').load("../boardList?category=b01 #notice");
+			}
+			function show2(){
+				$('#tableData').load("../faqList #faq");
+			}
+		</script>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

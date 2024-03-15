@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}">
+<head>
+<style>
+.cur{
+	cursor:pointer;
+}
+</style>
+<meta charset="utf-8">
+<title>모임 마이페이지</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="" name="keywords">
+<meta content="" name="description">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/jquery.fancybox.min.css">
+	<link rel="stylesheet" href="css/daterangepicker.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="untree_co-section count-numbers py-5">
+		<div class="container">
+			<div class="row">
+				<div class="col-6 col-sm-6 col-md-6 col-lg-3" style="margin:auto">
+					<div class="counter-wrap" style="width:400px">
+						<span class="caption">가입 날짜</span>
+						<div class="counter">
+							<span style="font-size: 40px" th:text="${#dates.format(date, 'yyyy년 MM월 dd일')}"></span>
+						</div>
+					</div>
+				</div>
+				<div class="col-6 col-sm-6 col-md-6 col-lg-3" style="margin:auto">
+					<div class="counter-wrap">
+						<span class="caption">봉사 참여횟수 </span><a style="cursor: pointer;" onclick="show()"> 자세히 보기</a>
+						<div class="counter">
+							<span id="count"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="untree_co-section">
+		<div class="container">
+			<div class="row text-center justify-content-center mb-5">
+				<div class="col-lg-7"><h2 class="section-title text-center">작성한 봉사후기</h2></div>
+			</div>
+			<div class="owl-carousel owl-3-slider">
+				<th:block th:if="${review} == null">
+					<p>작성한 후기가 없습니다! 봉사 후 첫 후기를 작성해보세요:)</p>
+				</th:block>
+				<div class="item" th:each="review : ${review}">
+					<a class="media-thumb" th:href="${review.filePath}" data-fancybox="gallery">
+						<div class="media-text">
+							<h3>[[${review.title}]]</h3>
+							<span class="location">[[${#dates.format(review.writeDate, 'yyyy년 MM월 dd일')}]]</span>
+						</div>
+						<img th:src="@{${review.filePath}}" onError="this.src='../image/zz.jpg'" alt="Image" class="img-fluid" style="width:430px;height:290px">
+					</a> 
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 모달창 -->
+	<div class="modal fade" id="confimModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+	    <div class="modal-dialog modal-lg" role="document">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="deleteConfirmationModalLabel">봉사활동 내역</h5>
+	            </div>
+	            <div class="modal-body">
+	            <th:block th:if="${MemVolActList} == null">
+	            	<h6 style="text-align:center">활동한 봉사내역이 없습니다. 첫 봉사를 참여해보세요!</h6>
+	            </th:block>
+	            <th:block th:unless="${MemVolActList} == null">
+	                <table class="table">
+						<thead>
+							<tr>
+								<th>번호</th>
+								<th>봉사제목</th>
+								<th>봉사날짜</th>
+								<th>후기작성</th>
+							</tr>
+						</thead>
+						<tbody>
+						 	<th:block th:each="vol,st : ${MemVolActList}" >
+								<tr>
+									 <td th:text="${st.count}">번호</td>
+									 <td><a th:text="${vol.title}" class="cur"></a></td>
+									 <td th:text="${#dates.format(vol.volDate, 'yyyy년 MMM dd일')}" ></td>
+									 <td th:if="${vol.bigo}==before and ${vol.checking}=='ok'"><a th:href="@{../reviewBoardInsertPage(volId=${session.id},volActId=${vol.volActId})}"><i class="bi bi-brush"></i>작성하기</a></td>
+									 <td th:if="${vol.bigo}==after">봉사 완료 후 작성 가능</td>
+									 <td th:if="${vol.checking}=='no'">작성 완료</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+				</th:block>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-danger" id="noBtn" data-dismiss="modal" aria-hidden="false">닫기</button>
+	            </div>
+	        </div>
+	    </div>
+	 </div>
+	<div class="untree_co-section testimonial-section mt-5">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-lg-7 text-center">
+					<h2 class="section-title text-center mb-5">Testimonials</h2>
+
+					<div class="owl-single owl-carousel no-nav">
+						<div class="testimonial mx-auto">
+							<figure class="img-wrap">
+								<img src="../dpdd/img/news-7.jpg" alt="Image" class="img-fluid">
+							</figure>
+							<h3 class="name">Adam Aderson</h3>
+							<blockquote>
+								<p>&ldquo;There live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.&rdquo;</p>
+							</blockquote>
+						</div>
+
+						<div class="testimonial mx-auto">
+							<figure class="img-wrap">
+								<img src="../dpdd/img/news-7.jpg" alt="Image" class="img-fluid">
+							</figure>
+							<h3 class="name">Lukas Devlin</h3>
+							<blockquote>
+								<p>&ldquo;There live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.&rdquo;</p>
+							</blockquote>
+						</div>
+
+						<div class="testimonial mx-auto">
+							<figure class="img-wrap">
+								<img src="../dpdd/img/news-7.jpg" alt="Image" class="img-fluid">
+							</figure>
+							<h3 class="name">Kayla Bryant</h3>
+							<blockquote>
+								<p>&ldquo;There live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.&rdquo;</p>
+							</blockquote>
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="overlayer"></div>
+	<div class="loader">
+		<div class="spinner-border" role="status">
+			<span class="sr-only">Loading...</span>
+		</div>
+	</div>
+
+	<script src="js/jquery-3.4.1.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/owl.carousel.min.js"></script>
+	<script src="js/jquery.animateNumber.min.js"></script>
+	<script src="js/jquery.waypoints.min.js"></script>
+	<script src="js/jquery.fancybox.min.js"></script>
+	<script src="js/aos.js"></script>
+	<script src="js/moment.min.js"></script>
+	<script src="js/daterangepicker.js"></script>
+
+	<script src="js/typed.js"></script>
+	<script>
+		const cnt = [[${cnt}]];
+		console.log(cnt)
+		$(function() {
+			var slides = $('.slides'),
+			images = slides.find('img');
+
+			images.each(function(i) {
+				$(this).attr('data-id', i + 1);
+			})
+		});
+		
+		$.ajax('../reviewCnt?volId='+[[${session.id}]]+'&writer=[[${session.userId}]]&volActId=h02')
+	    .done(result => {
+	    	if(result==0){
+	    		$('.regBtnMod').css('display','none')
+	    	}
+	    })
+	    .fail(err => console.log(err));
+		
+		let countBox = document.querySelector('#count');
+		let count = 0;
+		let num = cnt;
+		
+		if(num  > 50){
+			let counting = setInterval(function () {
+			    if (count >= num) {
+			        count = num;
+			        clearInterval(counting);
+			    } else {
+			        count += 1;
+			    }
+			    countBox.innerHTML = new Intl.NumberFormat().format(count)+'회';
+			}, 10);
+		}else{
+			let counting = setInterval(function () {
+			    if (count >= num) {
+			        count = num;
+			        clearInterval(counting);
+			    } else {
+			        count += 1;
+			    }
+			    countBox.innerHTML = new Intl.NumberFormat().format(count)+'회';
+			}, 200);
+		}
+		
+		function show(){
+			$("#confimModal").modal("show");
+		}
+		
+		$("#noBtn").on('click',function () {
+		    $("#confimModal").modal("hide");
+		});
+	</script>
+
+	<script src="js/custom.js"></script>
+	</section>
+</body>
+
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+ layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<style>
+.write-1 {
+    height: 30px;
+    width:25%;
+    border : none;
+    font-size: 18px;
+    color:balck;
+    outline: none;
+}
+#content{
+	height:1200px;
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+	<div class="body-wrapper" style="width:50%;margin:auto">
+		<div class="container-fluid">
+		<div class="container">
+		<div id="content">
+			<h2 style="text-align: center;">봉사 후기 등록</h2>
+			<br>
+		
+			<label>후기 제목</label>
+               <input class='write-1' type="text" name="title" max="30" placeholder="제목을 작성해 주세요">
+			
+			<!-- 에디터를 적용할 요소 (컨테이너) -->
+			<hr>
+			<div id="contents"></div>
+			
+			<button type="button" style="float: right;width:80px" onclick="checking()" class="btn btn-success m-1">등록</button>
+              
+		</div>
+		<!-- TUI 에디터 JS CDN -->
+		<!-- 모달창 -->
+		<div class="modal fade" id="confimModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+		    <div class="modal-dialog" role="document">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <h5 class="modal-title" id="deleteConfirmationModalLabel">등록 확인</h5>
+		            </div>
+		            <div class="modal-body">
+		                <p>등록 후 수정이 불가능합니다.<br>등록하시겠습니까?</p>
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-danger" id="noBtn" data-dismiss="modal" aria-hidden="false">아니오</button>
+		                <button type="button" class="btn btn-secondary" id="yesBtn" data-dismiss="modal" aria-hidden="false">네</button>
+		            </div>
+		        </div>
+		    </div>
+		 </div> 
+		 
+
+<script th:inline="javascript">
+const urlParams = new URLSearchParams(window.location.search);
+const volActId = urlParams.get('volActId');
+th:inline="javascript"
+var cateNo = 0;
+$.ajax({
+		url: '/findBoradNo',
+		type: 'GET',
+		processData: false,
+		contentType: false,
+		success: function(data) {
+			cateNo = data;
+		},
+		error: function(e) {
+			console.log('실패');
+		}
+	});
+	const editor = new toastui.Editor({
+		el : document.querySelector('#contents'), // 에디터를 적용할 요소 (컨테이너)
+		height : '500px', // 에디터 영역의 높이 값 (OOOpx || auto)
+		initialEditType : 'wysiwyg', // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+		previewStyle : 'vertical', // 마크다운 프리뷰 스타일 (tab || vertical)
+		placeholder : "내용을 입력하세요",
+		hooks: {
+	    	addImageBlobHook: (blob, callback) => {
+	    		
+	    		const formData = new FormData();
+	        	formData.append('uploadFiles', blob);
+	        	formData.append("code",  "p15");
+	        	formData.append("type",  0);
+	        	
+          			formData.append("codeNo", cateNo);
+          			$.ajax({
+	           		url: '/uploadsAjax',
+	           		type: 'POST',
+	           		processData: false,
+	           		contentType: false,
+	           		data: formData,
+	           		success: function(datas) {
+	           			
+	           			datas = (""+datas).replace(/\\/g, '/');
+	           			callback(datas);
+	           		},
+	           		error: function(e) {
+	           			callback('image_load_fail', '사진을 읽어들일 수가 없습니다.');
+	           		}
+	           	});	
+	        	
+	        }
+	    }
+	});
+	
+
+function checking(){
+	
+
+	const title = $("input[name='title']").val();
+	const content = editor.getMarkdown();
+    if(title==''){
+		alert('제목을 입력하세요!');
+		return;
+	}else if(content==''){
+		alert('내용을 입력하세요!');
+		return;
+	}
+    
+	var formData = new FormData();
+	formData.append("title",title);
+	formData.append("content",content);
+	formData.append("memId",[[${userId}]]);
+	formData.append("detailCate",volActId);
+	$.ajax({
+         		url: 'volReviewInsert',
+         		type: 'POST',
+         		processData: false,
+         		contentType: false,
+         		data: formData,
+         		success: function(data) {
+         			
+         			//location.href="volBoardList?volId="+[[${session.id}]]
+         		},
+         		error: function(e) {
+         			console.log('실패');
+         		}
+         	});
+}
+
+</script>
+		</div>
+	</div>
+</div>		
+</section>
+
+</body>
+</html>

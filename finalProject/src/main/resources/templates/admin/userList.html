@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>고객정보</title>
+<style>
+#content{
+	height:650px;
+	width:500px
+}
+.modal-title{
+	margin : auto;
+	padding-top : 20px;
+	text-align : center;
+}
+.modal-body{
+	margin : auto;
+	background-color:#e6e6fa;
+	width : 400px;
+	height : 700px;
+}
+.btn-deleteAsk{
+	cursor:pointer;
+}
+.cur{
+	cursor:pointer;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>회원관리</h2>
+		<div style="float:right;color:black" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">일반회원 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 시설회원</a>
+		</div>
+		<br>
+		<hr>
+		<div id="tableData">
+		<div id="classic">
+			<div style="float:right">
+				<input class="form-control-sm me-2" onkeypress="handleKeyPress(event)" id="search" type="search" placeholder="이름을 검색하세요" aria-label="Search" th:value="${vo.searchKeyword}">
+				<button class="btn btn-outline-success" onclick="search()" type="button">검색</button>
+				<button class="btn btn-outline-primary" type="button" onclick="show1()">초기화</button>
+			</div>
+			<th:block th:if="${userList.size} == 0" style="text-align:center">
+				<h3>데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${userList.size} != 0">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>No</th>
+						<th>닉네임</th>
+						<th>아이디</th>
+						<th>전화번호</th>
+						<th>학과</th>
+						<th>이메일</th>
+						<th>기부영수증 처리 여부</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="user : ${userList}" >
+						<tr>
+							 <td th:text="${user.RN}">이름</td>
+							 <td th:text="${user.memNick}" class="btn-deleteAsk" th:onclick="who([[${user.memId}]])">이름</td>
+							 <td th:text="${user.memId}" >아이디</td>
+							 <td th:text="${user.memPhone}" >전화번호</td>
+							 <td th:if="${user.memDept}=='d01'">해당사항 없음</td>
+							 <td th:if="${user.memDept}==null">해당사항 없음</td>
+							 <td th:if="${user.memDept}=='d02'">인문계열</td>
+							 <td th:if="${user.memDept}=='d03'">사회계열</td>
+							 <td th:if="${user.memDept}=='d04'">교육계열</td>
+							 <td th:if="${user.memDept}=='d05'">공학계열</td>
+							 <td th:if="${user.memDept}=='d06'">자연계열</td>
+							 <td th:if="${user.memDept}=='d07'">의학계열</td>
+							 <td th:if="${user.memDept}=='d08'">예체능계열</td>
+							 <td th:if="${user.memDept}=='d09'">보건계열</td>
+							 <td th:text="${user.memEmail}">이메일</td>
+							 <td th:if="${user.donReceipt}=='0'">처리</td>
+							 <td th:if="${user.donReceipt}=='1'">비처리</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/userList(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1})}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/userList(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage})}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/userList(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+		</div>
+		</div>
+			<!-- 첫번째 -->
+			<div class="modal fade" id="myModal" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content" id="content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+			            </div>
+			            <div class="modal-body">
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>봉사횟수</th>
+				                			<td id="volCnt"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>기부횟수</th>
+				                			<td id="donCnt"></td>
+				                		</tr>
+				                		<tr><td id="totals"></td></tr>
+			                		</thead>
+			                	</table>
+			                </div>
+			            </div>
+			            <div class="modal-body" style="background-color:white;text-align:center">
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>참여중인 모임</th>
+				                			<th>가입날짜
+				                		</tr>
+			                		</thead>
+			                		<tbody id="bodys">
+			                		</tbody>
+			                	</table>
+			                </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">확인</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			<!-- 둬번째 모달 -->
+			<div class="modal fade" id="mymodals" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content" id="content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+			            </div>
+			            <div class="modal-body">
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>시설명</th>
+				                			<td id="name"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설유형</th>
+				                			<td id="type"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>사업자번호</th>
+				                			<td id="bizNum"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>우편번호</th>
+				                			<td id="facZip"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설 주소</th>
+				                			<td id="addr"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>설립일</th>
+				                			<td id="esta"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표자명</th>
+				                			<td id="repName"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표 번호</th>
+				                			<td id="repPhone"></td>
+				                		</tr>
+			                		</thead>
+			                	</table>
+			                	<a href="#" target='_blank' id="homepage">홈페이지로 이동</a>
+			                </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			
+		</div>
+		<script th:inline="javascript">
+			function show1(){
+				$('#tableData').load("../userList #classic");
+			};
+			
+			function show2(){
+				$('#tableData').load("../userListDetail?memApp=1 #facility");
+			};
+			
+			function prev(vo){
+				$('#tableData').load(`../userListDetail?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&memApp=1 #facility`);
+			}
+			
+			function current(vo,pageNum){
+				$('#tableData').load(`../userListDetail?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&memApp=1 #facility`);
+			}
+			
+			function next(vo){
+				$('#tableData').load(`../userListDetail?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&memApp=1 #facility`);
+			}
+			
+			function handleKeyPress(event) {
+			    if (event.keyCode === 13) {
+			        search();
+			    }
+			}
+			
+			function handleKeyPress2(event) {
+			    if (event.keyCode === 13) {
+			        search1();
+			    }
+			}
+			
+			function search(){
+				let keyword = $('#search').val();
+				if(keyword == '') {
+					alert('검색하실 내용을 입력하세요');
+					return;
+				}
+				$('#tableData').load(`../userList?searchKeyword=${keyword} #classic`);
+			}
+			
+			function search1(){
+				let keyword = $('#search').val();
+				if(keyword == '') {
+					alert('검색하실 내용을 입력하세요');
+					return;
+				}
+				$('#tableData').load(`../userListDetail?searchKeyword=${keyword} #facility`);
+			}
+			
+			function dateFormat(value, format) {
+			    let date = value == "" ? new Date() : new Date(value);
+			    let year = date.getFullYear();
+			    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+			    let day = ("0" + date.getDate()).slice(-2);
+			    let result = format
+			      .replace("yyyy", year)
+			      .replace("MM", month)
+			      .replace("dd", day);
+			    return result;
+			};
+			
+			function wonComma(number) {
+			    if (number < 1000) {
+			      return number
+			    }
+			    return number.toLocaleString();
+			};
+			
+		    function who(id) {
+		    	$('.modal-title').empty();
+		    	$('#bodys').empty();
+		    	$.ajax('../userInfo?memId='+id)
+		       .done(result => {
+		           $(".modal-title").append(result.memName+'님의 활동 내역')
+		       })
+		       .fail(err => console.log(err));
+		    	
+		    	$.ajax('../userMeet?memId='+id)
+		       .done(result => {
+		    	   for(let i=0;i<5;i++){
+		    	   	$('#bodys').append('<tr><td>'+result[i].facName+'</td><td>'+dateFormat(result[i].appDate,'yyyy년 MM월 dd일')+'</td></tr>')   		   
+		    	   }
+		        })
+		       .fail(err => console.log(err));
+		    	
+		    	$('#volCnt').empty();
+		    	$.ajax('../volCount?memId='+id+'&mId='+id)
+		       .done(result => {
+		           $("#volCnt").append((result.fac+result.vol)+'회')
+		          })
+		       .fail(err => console.log(err));
+		    	
+		    	$('#donCnt').empty();
+		    	$('#totals').empty();
+		    	$.ajax('../donCount?memId='+id)
+		       .done(result => {
+		           $("#donCnt").append((result.cnt)+'회')
+		           $("#totals").append('총 기부금액 : '+wonComma(result.totals)+'원')
+		          })
+		       .fail(err => console.log(err));
+		    	
+		    	$("#myModal").modal("show");
+		    }
+		    
+		    $(".btn-secondary").click(function () {
+		      $("#myModal").modal("hide");
+		      $("#mymodals").modal("hide");
+		    });
+		    
+			function info(id) {
+		    	$('#name').empty();
+		        $("#type").empty();
+		        $("#bizNum").empty();
+		        $("#facZip").empty();
+		        $("#addr").empty();
+		        $("#esta").empty();
+		        $("#repName").empty();
+		        $("#repPhone").empty();
+		        $("#homepage").prop('href','')
+		        
+		    	$.ajax('../facInfo?facId='+id)
+		       .done(result => {
+		    	   console.log(result)
+		    	   result.facEstDate = dateFormat(result.facEstDate,'yyyy년 MM월 dd일');
+		           $("#name").append(result.facName)
+		           $("#type").append(result.facType)
+		           $("#bizNum").append(result.bizNum)
+		           $("#facZip").append(result.facZip)
+		           $("#addr").append(result.facAddr+' '+result.facAddrDetail)
+		           $("#esta").append(result.facEstDate)
+		           $("#repName").append(result.repName)
+		           $("#repPhone").append(result.repPhone)
+		           $("#homepage").prop('href',result.facWeb)
+		          })
+		       .fail(err => console.log(err));
+		        
+		    	$("#mymodals").modal("show");
+		    };
+		</script>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

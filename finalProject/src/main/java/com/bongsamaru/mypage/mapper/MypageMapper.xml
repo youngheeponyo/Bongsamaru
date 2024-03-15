@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bongsamaru.mypage.mapper.MypageMapper">
+	<!-- 일일봉사내역 -->
+	<select id="getDayList" resultType="VolMemVO">
+	    SELECT 
+                a.vol_mem_id,
+                a.vol_id,
+                a.fac_id,
+                a.app_code,
+                a.app_date,
+                a.mem_id,
+                b.meet_type,
+                b.meet_name    
+        FROM vol_mem a
+        LEFT JOIN volunteer b ON a.vol_id = b.vol_id
+        WHERE a.mem_id = #{memId}
+        AND b.meet_type = 'e01'
+	</select>
+	<!-- 동아리내역 -->
+	<select id="getClubList" resultType="VolMemVO">
+	    SELECT 
+                a.vol_mem_id,
+                a.vol_id,
+                a.fac_id,
+                a.app_code,
+                a.app_date,
+                a.mem_id,
+                b.meet_type,
+                b.meet_name    
+        FROM vol_mem a
+        LEFT JOIN volunteer b ON a.vol_id = b.vol_id
+        WHERE a.mem_id = #{memId}
+        AND b.meet_type = 'e02'
+	</select>
+	<!-- 시설내역 -->
+	<select id="getFacList" resultType="VolMemVO">
+	    SELECT 
+                a.vol_mem_id,
+                a.vol_id,
+                a.fac_id,
+                a.app_code,
+                a.app_date,
+                a.mem_id,
+                b.meet_type,
+                b.meet_name    
+        FROM vol_mem a
+        LEFT JOIN volunteer b ON a.vol_id = b.vol_id
+        WHERE a.mem_id = #{memId}
+        AND b.meet_type = 'e03'
+	</select>
+	<!-- 마음온도 조회 -->
+	<select id="getHeart" resultType="Double">
+		    SELECT sum(temp_change) as tempChange
+		    FROM heart
+		    WHERE mem_id = #{memId}
+	</select>
+	<!-- 프로필 조회 -->
+	<select id="getProfile" resultType="UserVO">
+			SELECT 
+			       file_path as mem_profile,
+			       mem_id,
+			       mem_pwd,
+			       mem_nick,
+			       mem_phone,
+			       mem_zip,
+			       mem_addr,
+			       mem_bdate,
+			       mem_dept,
+			       mem_email,
+			       don_receipt,
+			       mem_ssn,
+			       email_agree,
+			       sms_agree,
+			       acct_num,
+			       bank_name,
+			       mem_stat
+			 FROM  member a LEFT JOIN files b
+			 ON    a.mem_id = b.code_user
+			 AND b.code = 'p01'
+			 WHERE a.mem_id = #{memId}
+	</select>
+	<!-- 기부 내역 조회 -->
+	<select id="getGibuList" resultType="DonledgerVO">
+			SELECT 
+					a.don_id,
+					don_led_id,
+					don_amt,
+					pay_method,
+					pay_date,
+					pay_stat,
+					pay_id,
+					anon_check,
+					mem_id,
+					title
+			
+			FROM don_ledger a 
+			LEFT JOIN donation b ON a.don_id = b.don_id
+			
+			WHERE mem_id = #{memId}
+			ORDER BY don_led_id DESC
+	</select>
+	<!-- 기부 횟수 조회 -->
+	<select id="getGibuCount" resultType="Integer">
+			SELECT count(*)
+			FROM don_ledger
+			WHERE mem_id = #{memId}
+	</select>	
+	<!-- 기부 총금액 조회 -->
+	<select id="getSumAmt" resultType="Integer">
+			SELECT sum(don_amt) as sum
+			FROM don_ledger
+			WHERE mem_id = #{memId}
+	</select>
+ 	<!-- 프로필 수정 -->
+	<update id="updateProFile" parameterType="UserVO">
+		UPDATE MEMBER
+		SET 
+			mem_nick = #{memNick},
+			mem_email = #{memEmail},
+		    mem_phone = #{memPhone},
+		    email_agree = #{emailAgree},
+		    mem_zip = #{memZip},
+		    mem_addr = #{memAddr},
+			sms_agree = #{smsAgree}
+		WHERE mem_Id = #{memId}
+	</update>
+	<!-- 회원탈퇴 -->
+	<update id="deleteMember" parameterType="UserVO">
+		UPDATE MEMBER
+		SET 
+			mem_pwd = null,
+			mem_nick = null,
+		    mem_phone = null,
+		    mem_zip = null,
+		    mem_addr = null,
+		    mem_bdate = null,
+		    don_receipt = null,
+		    mem_ssn = null,
+		    email_agree = null,
+			sms_agree = null,
+		    acct_num = null,
+		    bank_name = null,
+		    mem_stat = 'm04',
+		    mem_name = null,
+            mem_dept = null,
+		    SOCIAL = null
+		WHERE mem_Id = #{memId}
+	</update>
+	
+	<insert id="insertHeart" parameterType="HeartVO">
+	insert into heart 
+					( heart_temp_id
+					  ,Mem_id
+					  ,temp_code
+					  ,temp_change
+					  )
+			   values(
+						HEARTTEMP_SEQ.nextVal, 
+						#{memId}
+						,#{tempCode}
+						,#{tempChange}
+					 )
+	</insert>
+	
+	
+</mapper>

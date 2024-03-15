@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모임 등록 페이지</title>
+<link rel="stylesheet" th:href="@{/donation/form/bootstrap.min.css}">
+<!-- TUI 에디터 CSS CDN -->
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<style>
+.form-select{
+width: 20%;
+}
+.write-1 {
+    height: 30px;
+    width:25%;
+    border : none;
+    font-size: 18px;
+    color:balck;
+    outline: none;
+}
+#content{
+	height:1000px;
+}
+.form-control-sm {
+    width: 50%; /* 현재 크기의 1/3로 조정 */
+}
+
+.form-control[type="file"] {
+    width: 33.33%; /* Set to one-third of the current size */
+}
+.modal-dialog{
+	float:left;
+	left : 38%;
+	width: 30%
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div class="container" style="margin:130px 200px 0px 320px;">
+<form name="insertMeeting" style="width:70%;margin:auto">
+  <fieldset>
+    <legend style="font-weight:bold;"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+  <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+</svg> <strong>모임 등록</strong> </legend>
+	<div class="form-check form-check-inline">
+	  <input class="form-check-input" type="radio" name="meetType" id="inlineRadio2" value="e02" style="border:1px solid black" checked>
+	  <label class="form-check-label" for="inlineRadio2">동아리모임</label>
+	</div>
+	<div class="form-check form-check-inline">
+	  <input class="form-check-input" type="radio" name="meetType" id="inlineRadio1" value="e01" style="border:1px solid black">
+	  <label class="form-check-label" for="inlineRadio1">일일봉사모임</label>
+	</div>
+	
+	<div style="border:1px solid;padding:30px;width:70%;margin:auto;display:none;" id="volAct" class="rounded">
+		<div id="content">
+			<h2 style="text-align: center;">봉사 등록</h2>
+			<br>
+			<label>>봉사 제목</label>
+               <input class='write-1' type="text" name="title" max="30">
+			<hr>
+			<label>> 봉사 일시</label>
+               <input class='write-1' type="date" name="volDate" max="30">
+			<hr>
+			<label>> 봉사 장소</label>
+			<div class="write_item facility hidden">
+				<input id="facAddr1" style="display: none;" type="text" class="form-control">
+				<div class="error-message" id="facZipCheckError"></div>
+				<input id="facAddr2" onclick="Addr()" readonly style="display: inline; margin-top: 10px" type="text" class="form-control plus-bnt" placeholder="주소">
+				<div class="error-message" id="facAddrCheckError"></div>
+				<input id="facAddr3" style="display: inline; margin-top: 10px" type="text" class="form-control plus-bnt" placeholder="상세주소">
+			</div>
+			<!-- 에디터를 적용할 요소 (컨테이너) -->
+			<hr>
+			<div id="contents"></div>
+			<hr>
+			<button type="button" onClick="modalOpen()" style="float: right;width:80px" class="btn btn-success m-1">등록</button>
+               <a type="button" style="float: right;width:90px" class="btn btn-primary m-1" onclick="cancel()">취소하기</a>
+		</div>
+	</div>
+	
+    <div class="form-group">
+      <label for="category" class="form-label mt-4"> ⦁ <span style="color:red">*</span>봉사 주 분야</label>
+      <select class="form-select" id="category" name="category">
+        <option th:each="category : ${region}" th:value="${category.subCodeId}" th:text="${category.subCodeName}"></option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="region" class="form-label mt-4"> ⦁ <span style="color:red">*</span>지역</label>
+      <select class="form-select" id="region" name="region">
+        <option th:each="category : ${categoryList}" th:value="${category.subCodeId}" th:text="${category.subCodeName}"></option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="title" class="form-label mt-4"> ⦁ <span style="color:red">*</span>모임명</label>
+      <input type="text" name="meetName" class="form-control" id="meetName"  aria-describedby="titleHelp" placeholder="제목을 입력해주세요." style="width: 35%;">
+    </div>
+
+    
+    <div class="form-group">
+    <label for="recPeriod" class="form-label mt-4"> ⦁ <span style="color:red">*</span>모임 모집기간</label>
+    <div class="row">
+        <div class="col-md-3">
+            <input type="date" name="recPeriod" class="form-control" id="recPeriod"  placeholder="모집 시작기간" autocomplete="off">
+        </div>
+        <div class="col-md-3">
+            <input type="date" name="endPeriod" class="form-control" id="endPeriod"  placeholder="모집 종료기간" autocomplete="off">
+        </div>
+    </div>
+</div>
+    <div class="form-group">
+      <label for="formFile" class="form-label mt-4"> ⦁  <span style="color:red">*</span>모임 이미지</label>
+      <input name="file" class="form-control" type="file" id="formFile" ><br>
+      <img id="imagePreview" src="/userresources/image/미리보기.jpg" style="width: 100px; height: 100px;">
+    </div>
+    <div class="form-group">
+      <label for="cap" class="form-label mt-4"> ⦁ <span style="color:red">*</span>정원</label>
+      <input name="cap" type="number" class="form-control" id="cap" autocomplete="off" style="width: 25%;">
+    </div>
+    <div class="form-group">
+      <label for="meetPurp" class="form-label mt-4"> ⦁ <span style="color:red">*</span>모임 목적</label>
+      <textarea type="text" name="meetPurp" class="form-control" id="projTarget" placeholder="50자 이내로 입력하세요" autocomplete="off" style="width: 50%;"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="tag" class="form-label mt-4"> ⦁ <span style="color:red">*</span>해시태그</label>
+      <input name="tag" type="text" class="form-control" id="tag" autocomplete="off" style="width: 66.66%;" placeholder="ex)#강아지 #사탕">
+      <small id="titleHelp" class="form-text text-muted">#을 기준으로 해시태그를 작성해보세요!최대 3개까지 작성가능합니다.</small>
+    </div>
+    <div class="form-group">
+      <label for="meetDesc" class="form-label mt-4"> ⦁ <span style="color:red">*</span>모임 설명</label>
+      <textarea name="meetDesc" class="form-control" id="expEffect"  rows="3" placeholder="모임에 대한 상세설명을 입력하세요." style="width: 66.66%;" maxlength="600"></textarea>
+    </div>
+	<div class="form-group">
+	    <label for="oneLiner" class="form-label mt-4">한줄소개</label>
+	    <div id="relatedLinkContainer" class="mb-3" style="width: 60%;">
+	        <div class="input-group">
+	            <input type="text" class="form-control" id="link" name="oneLiner" placeholder="모임을 대표하는 한줄을 적어주세요." autocomplete="off">
+	        </div>
+	    </div>
+	</div>
+    <button type="button" class="btn btn-primary" onclick="showCheckModal()">등록하기 </button>
+  </fieldset>
+</form>
+<!-- 다시확인 모달 -->
+<div class="modal fade" id="CheckModal" tabindex="-1" role="dialog" aria-labelledby="donationConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="donationConfirmationModalLabel">모임등록 확인</h5>
+            </div>
+            <div class="modal-body">
+                <p>모임을 등록하시겠습니까?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="okBtn" data-dismiss="modal">확인</button>
+                <button type="button" class="btn btn-primary" id="noBtn" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 일일봉사 모달 -->
+<div class="modal fade" id="dailyModal" tabindex="-1" role="dialog" aria-labelledby="donationConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="donationConfirmationModalLabel">일일봉사 신청</h4>
+            </div>
+            <div class="modal-body">
+                <h6>일일봉사로 등록하시겠습니까?<br>일일봉사의 경우 봉사 등록을 바로 하며 봉사 날짜 이후에는 자동으로 방이 삭제됩니다.</h6>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="dailyOk" data-dismiss="modal">신청하기</button>
+                <button type="button" class="btn btn-primary" id="dailyNo" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script th:inline="javascript">
+	$(function() {
+		$('html').scrollTop(0);
+	});
+	
+	var checking = false;
+	
+	document.getElementById('formFile').addEventListener('change', function (event) {
+		var image = document.getElementById('imagePreview');
+		var file = event.target.files[0];
+		var reader = new FileReader();
+	
+		reader.onloadend = function () {
+			image.src = reader.result;
+		}
+	
+		if (file) {
+			reader.readAsDataURL(file);
+		} else {
+			image.src = "";
+		}
+	});
+	
+	$(document).ready(function() {
+	    // 오늘 날짜를 시작일 최소값으로 설정
+	    let todayDate = new Date().toISOString().substring(0, 10);
+	    $('input[name=recPeriod]').prop("min", todayDate);
+	    $('input[name=startDate]').prop("min", todayDate);
+	    
+	    // 시작일이 변경될 때 이벤트 처리
+	    $('input[name=recPeriod]').on("change", function() {
+	        let minExpire = $(this).val(); 
+	        $('input[name=endPeriod]').prop("min", minExpire); 
+	    });
+	    
+	    $('input[name=startDate]').on("change", function() {
+	        let minExpire = $(this).val(); 
+	        $('input[name=expireDate]').prop("min", minExpire); 
+	    });
+	});
+
+	function showCheckModal(){
+		let meetName = $('[name="meetName"]');
+		let meetPurp = $('[name="meetPurp"]');
+		let meetDesc = $('[name="meetDesc"]');
+		let recPeriod = $('[name="recPeriod"]');
+		let endPeriod = $('[name="endPeriod"]');
+		let cap = $('[name="cap"]');
+		
+		if(meetName.val()==''){
+			alert('모임명이 입력되지 않았습니다.');
+			meetName.focus();
+			return;
+		};
+		if(meetPurp.val()==''){
+			alert('모임목적이 입력되지 않았습니다.');
+			meetPurp.focus();
+			return;
+		};
+		if(recPeriod.val()==''){
+			alert('모집시작일이 입력되지 않았습니다.');
+			return;
+		};
+		if(endPeriod.val()==''){
+			alert('모집마감일이 입력되지 않았습니다.');
+			return;
+		};
+		if(meetDesc.val()==''){
+			alert('모임설명이 입력되지 않았습니다.');
+			meetDesc.focus();
+			return;
+		};
+		if(cap.val()==''){
+			alert('정원이 입력되지 않았습니다.');
+			cap.focus();
+			return;
+		};
+		
+		$("#CheckModal").modal("show");
+		
+		$("#noBtn").on('click',function () {
+		    $("#CheckModal").modal("hide");
+		});
+		
+		$("#okBtn").on('click',function () {
+			meetInsert();
+		});
+	};
+	
+	function meetInsert(){
+		var formData = new FormData(document.querySelector('form[name="insertMeeting"]'));
+		formData.append("memId",[[${session.userId}]]);
+		let fileInputs = document.querySelectorAll('input[type="file"]');
+	    fileInputs.forEach(function(fileInput) {
+	        for (let i = 0; i < fileInput.files.length; i++) {
+	            formData.append('uploadfiles', fileInput.files[i]);
+	        }
+	    });
+		$.ajax({
+			url: '/regMeeting',
+			type: 'POST',
+			data: formData,
+			contentType: false,
+	        processData: false,
+			success: function (result) {
+				insertTag(result);
+			},
+			error: function (reject) {
+				console.log(reject);
+			}
+		})
+	};
+	
+	function insertTag(volId){
+		let meetName = $('[name="tag"]').val();
+		
+		let str = meetName.split("#");
+		console.log(str.length);
+		for(let i = 1; i<str.length; i++){
+			console.log("여기 들어는 오나22")
+			var formD = new FormData();
+			formD.append("tagContent",str[i])
+			formD.append("volId",volId)
+			
+			$.ajax({
+				url: '/insertTag',
+				type: 'POST',
+				data: formD,
+				contentType: false,
+		        processData: false,
+				success: function (result) {
+					console.log("성공",result);
+					src_width = screen.availWidth*0.1;
+		   			src_height = screen.availHeight*0.1;
+		   			window.open("meetings?volId="+volId, "pop", "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1400, height=800, top="+src_height+",left="+src_width+",location=no");
+		   			location.href="/";
+				},
+				error: function (reject) {
+					console.log(reject);
+				}
+			})
+		}
+		if(checking==true){
+			handleSave(volId);
+			return;
+		}else{
+			src_width = screen.availWidth*0.1;
+   			src_height = screen.availHeight*0.1;
+   			window.open("meetings?volId="+volId, "pop", "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1400, height=800, top="+src_height+",left="+src_width+",location=no");
+   			location.href="/";
+		}
+	};
+	
+	function cancel(){
+		$('#volAct').css('display','none');
+		$("#inlineRadio2").prop("checked", true);
+		checking = false;
+		$('html').scrollTop(0);
+	};
+	
+	document.getElementById('inlineRadio2').addEventListener('click', function (event) {
+		$('#volAct').css('display','none');
+		checking = false;
+		$('html').scrollTop(0);
+	});
+	
+	var cateNo = 0;
+	document.getElementById('inlineRadio1').addEventListener('click', function (event) {
+		$("#dailyModal").modal("show");
+		$("#dailyOk").on('click',function () {
+			$('#volAct').css('display','block');
+		});
+		$.ajax({
+			url: '/findVolActNo',
+			type: 'GET',
+			processData: false,
+			contentType: false,
+			success: function(data) {
+				cateNo = data;
+				console.log('첫번째 번호 받기 : '+data)
+			},
+			error: function(e) {
+				console.log('실패');
+			}
+		});
+	});
+	
+	const editor = new toastui.Editor({
+		el : document.querySelector('#contents'), // 에디터를 적용할 요소 (컨테이너)
+		height : '500px', // 에디터 영역의 높이 값 (OOOpx || auto)
+		initialEditType : 'wysiwyg', // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+		previewStyle : 'vertical', // 마크다운 프리뷰 스타일 (tab || vertical)
+		hooks: {
+	    	addImageBlobHook: (blob, callback) => {
+	    		const formData = new FormData();
+	        	formData.append('uploadFiles', blob);
+	        	formData.append("code", "p11")
+       			formData.append("codeNo", cateNo);
+	        	formData.append("codeUser", '[[${session.userId}]]');
+	           	formData.append("type", 0);
+       			$.ajax({
+	           		url: '/uploadsAjax',
+	           		type: 'POST',
+	           		processData: false,
+	           		contentType: false,
+	           		data: formData,
+	           		success: function(datas) {
+	           			datas = (""+datas).replace(/\\/g, '/');
+	           			callback(datas);
+	           		},
+	           		error: function(e) {
+	           			callback('image_load_fail', '사진을 읽어들일 수가 없습니다.');
+	           		}
+	           	});	
+	        	
+	        }
+	    }
+	});
+	
+	function modalOpen(){
+		const startDate = $("input[name='recPeriod']")
+		const expireDate = $("input[name='endPeriod']")
+		const volDate = $("input[name='volDate']")
+		const title = $("input[name='title']")
+		const content = editor.getMarkdown();
+		const addr = $('#facAddr2');
+		
+		if(startDate.val()==''){
+			alert('날짜를 입력하세요!');
+			return;
+		}else if(expireDate.val()==''){
+			alert('내용을 입력하세요!');
+			return;
+		}else if(volDate.val()==''){
+			alert('내용을 입력하세요!');
+			return;
+		}else if(title.val()==''){
+			alert('내용을 입력하세요!');
+			return;
+		}else if(content==''){
+			alert('내용을 입력하세요!');
+			return;
+		}else if(addr.val()==''){
+			alert('내용을 입력하세요!');
+			return;
+		}
+		
+		checking = true;
+		$('#volAct').css('display','none');
+		
+	};
+	
+	function handleSave(volId){
+		const startDate = $("input[name='recPeriod']").val();
+		const expireDate = $("input[name='endPeriod']").val();
+		const volDate = $("input[name='volDate']").val();
+		const category = $("select[name='category'] option:selected").val();
+		const cap = $("input[name='cap']").val();
+		const title = $("input[name='title']").val();
+		const content = editor.getMarkdown();
+		const addr = $('#facAddr2').val();
+		const detail = $('#facAddr3').val();
+		const volZip = $('#facAddr1').val();;
+		
+		var formData = new FormData();
+		formData.append("volActId",cateNo);
+		formData.append("volId",volId);
+		formData.append("category",category);
+		formData.append("title",title);
+		formData.append("content",content);
+		formData.append("location",addr+' '+detail);
+		formData.append("cap",cap);
+		formData.append("volZip",volZip);
+		formData.append("volDate",volDate);
+		formData.append("startDate",startDate);
+		formData.append("expireDate",expireDate);
+		$.ajax({
+       		url: '/insertVolAct',
+       		type: 'POST',
+       		processData: false,
+       		contentType: false,
+       		data: formData,
+       		success: function(data) {
+       			src_width = screen.availWidth*0.1;
+       			src_height = screen.availHeight*0.1;
+       			window.open("meetings?volId="+volId, "pop", "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1400, height=800, top="+src_height+",left="+src_width+",location=no");
+       			location.href="/";
+       		},
+       		error: function(e) {
+       			console.log('실패');
+       		}
+       	});
+	};
+	
+	$("#ConfirmModal").modal("hide");
+	
+	function Addr() {
+		new daum.Postcode({
+			oncomplete: function (data) {
+				// 팝업에서 검색결과 항목을 클릭했을 때 실행할 코드를 작성하는 부분.
+
+				// 도로명 주소 변수
+				var roadAddr = data.roadAddress;
+				var extraRoadAddr = ''; // 참고 항목 변수
+
+				// 법정동명이 있고, "동/로/가"로 끝난다면 추가
+				if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+					extraRoadAddr += data.bname;
+				}
+				// 건물명이 있고, 공동주택일 경우 추가
+				if (data.buildingName !== '' && data.apartment === 'Y') {
+					extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+				}
+				// 표시할 참고항목이 있으면, 괄호까지 추가한 최종 문자열을 만듦
+				if (extraRoadAddr !== '') {
+					extraRoadAddr = ' (' + extraRoadAddr + ')';
+				}
+
+				// 우편번호와 주소 정보를 해당 필드에 넣는다.
+				document.getElementById('facAddr1').value = data.zonecode;
+				document.getElementById("facAddr2").value = roadAddr;
+				// 커서를 상세주소 필드로 이동한다.
+				document.getElementById("facAddr3").focus();
+			}
+		}).open(); // 여기에 닫는 괄호를 추가함
+	};
+</script>
+
+
+</section>
+</body>

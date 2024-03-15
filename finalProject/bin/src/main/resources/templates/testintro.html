@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+
+* { list-style: none; }
+
+.service_section1 .tab_line_area {
+    margin-bottom: 30px;
+}
+
+.tab_line_area ul li {
+    position: relative;
+    padding: 20px;
+    color: #6a6a6a;
+    font-size: 1.125rem;
+}
+
+.tab_line_area ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+a {
+	font-weight: bold;
+    color: #000;
+    font-size: 17px;
+    font-family: 'Orbit', sans-serif;
+}
+
+.tab_line_area ul li + li:before {
+    content: '';
+    display: block;
+    position: absolute;
+    margin-top: -7px;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 14px;
+    background-color: #d5d5d5;
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+	<div class="container">
+		<div class="tab_line_area">
+			<ul>
+				<li><a href="/intro">행복마루 소개</a></li>
+				<li><a href="/intro2">센터 소개</a></li>
+			</ul>
+		</div>
+	</div>
+	<script>
+	</script>
+</section>
+</body>
+</html>

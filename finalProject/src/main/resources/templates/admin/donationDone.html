@@ -1,0 +1,64 @@
+	<div id="donationDone">
+		<h2>기부 프로젝트</h2>
+		<div style="float:left;padding:10px">
+			<input class="form-control-sm me-2" onkeypress="handleKeyPress2(event)" id="search" type="search" placeholder="프로젝트를 검색하세요" aria-label="Search" th:value="${vo.searchKeyword}">
+			<button class="btn btn-outline-success" onclick="search2()" type="button">검색</button>
+			<button class="btn btn-outline-primary" type="button" onclick="show2()">초기화</button>
+		</div>
+		<br>
+		<div style="float:right;color:black" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">진행 중인 프로젝트 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 종료된 프로젝트</a>
+		</div>
+		<br><hr>
+        <div class="row">
+        <th:block th:if=${dona.size}==0 style="text-align:center">
+			<h3>데이터가 존재하지 않습니다</h3>
+        </th:block>
+          <div class="col-sm-6 col-xl-3" style="color:black;width:25%" th:each="dona : ${dona}">
+            <div class="card overflow-hidden rounded-2">
+              <div class="position-relative">
+                <a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}"><img src="../admin/images/products/s4.jpg" class="card-img-top rounded-0" alt="..." style="height:200px"></a>
+              </div>
+              <div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+			    <span>모금완료</span><br>
+				</div>
+               <div class="d-flex align-items-center justify-content-between">
+	            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+	                <h4><a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" th:text="${dona.title}"> 제목</a></h4>
+	                <a href="#" style="color:gray">
+					   <span th:text="${dona.facilityName}"></span>
+					</a>
+					<br>
+	                <div class="progress">
+	                    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" th:style="'width: ' + ${dona.donationRatio} + '%'" aria-valuenow="${dona.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+	                </div><br>
+	                <h5>
+	                    <span th:text="${dona.donationRatio}"></span> %
+	                    
+	                    <span style="float:right" data-th-text="${#numbers.formatInteger(dona.total, 1, 'COMMA') + '원'}"></span>
+	                </h5>
+					 <br>
+	            </div>
+               </div>
+            </div>
+          </div>
+        </div>
+        <nav aria-label="Page navigation example">
+		    <ul class="pagination justify-content-center">
+		        <!-- 이전 버튼 -->
+		        <li class="page-item" th:if="${vo.prev}">
+		            <a class="page-link"th:onclick="prev([[${vo}]])">이전</a>
+		        </li>
+		        <!-- 페이지 번호 출력 -->
+		        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+		            <a class="page-link" th:onclick="current([[${vo}]],[[${pageNum}]])"
+		               th:text="${pageNum}"></a>
+		        </li>
+		        <!-- 다음 버튼 -->
+		        <li class="page-item" th:if="${vo.next}">
+		            <a class="page-link" th:onclick="next([[${vo}]])">다음</a>
+		        </li>
+		    </ul>
+			</nav>
+	</div>

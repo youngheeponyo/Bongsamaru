@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 등록폼 </title>
+    <link rel="stylesheet" th:href="@{/donation/form/bootstrap.min.css}">
+    <!-- 다른 필요한 CSS 파일들을 여기에 추가 -->
+</head>
+<body>
+<form>
+  <fieldset>
+    <legend> Donation Regit Form </legend>
+
+    <div class="form-group">
+      <label for="inputFacName" class="form-label mt-4">시설단체명</label>
+      <input type="email" class="form-control" id="inputFacName" aria-describedby="emailHelp" placeholder="call session value">
+      <small id="emailHelp" class="form-text text-muted">회원 가입시 등록한 시설의 이름</small>
+    </div>
+    
+    <div class="form-group">
+      <label for="categories" class="form-label mt-4"> 유형</label>
+      <select class="form-select" id="categories" >
+        <option th:each="category : ${categoryList}" th:text="${category.subCodeName}">1</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="sPeriod" class="form-label mt-4">기부모금기간 (DATE)</label>
+      <input type="date" class="form-control" id="sPeriod" placeholder="기부모금시작 " autocomplete="off">
+      <input type="date" class="form-control" id="ePeriod" placeholder="기부모금종료기간 " autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="formFile" class="form-label mt-4">이미지 첨부파일</label>
+      <input class="form-control" type="file" id="formFile">
+    </div>
+    
+    <div class="form-group">
+      <label for="goalAmt" class="form-label mt-4">목표모금액</label>
+      <input type="text" class="form-control" id="goalAmt" placeholder="(원)" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="detailBiz" class="form-label mt-4">기부금사용계획(+)</label>
+      <div id = "dynamicFields" class="mb-3">
+      	<div class="input-group">
+	      <input type="text" class="form-control" id="detailBiz" placeholder="구체적사업내용" autocomplete="off"> 
+	      <input type="text" class="form-control" id="detailAmt" placeholder="구체적사업비" autocomplete="off">
+	      <button type="button" class="btn btn-outline-secondary" onclick="addInputs('dynamicFields')">+</button>
+      	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="bTarget" class="form-label mt-4">사업대상</label>
+      <input type="text" class="form-control" id="bTarget" placeholder="기부금 사업대상 입력" autocomplete="off">
+    </div>
+
+
+    <div class="form-group">
+      <label for="expEffect" class="form-label mt-4">기대효과</label>
+      <textarea class="form-control" id="expEffect" rows="3" placeholder="varchar2(2000)이니까 제한하는거 처리해라 현아야."></textarea>
+    </div>
+    
+
+    <div class="form-group">
+	  <label for="article" class="form-label mt-4">소개글</label>
+	    <div id="articleContainer" class="mb-3">
+	        <div class="input-group">
+	        	<input type="text" class="form-control" id="articleTitle" placeholder="제목" autocomplete="off">
+	        </div>
+	        <div class="input-group">
+	            <textarea class="form-control" id="article" rows="3"></textarea>
+	        </div>
+	        <button type="button" class="btn btn-outline-secondary" onclick="addInputs('articleContainer')">+</button>
+	    </div>
+	</div>
+    
+<div class="form-group">
+    <label for="relatedLink" class="form-label mt-4">관련링크(+)</label>
+    <div id="relatedLinkContainer" class="mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" id="relatedLink" placeholder="null 가능" autocomplete="off">
+            <button type="button" class="btn btn-outline-secondary" onclick="addInputs('relatedLinkContainer')">+</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label for="formFile2" class="form-label mt-4">추가 이미지 첨부파일(+)</label>
+    <div id="formFile2Container" class="mb-3">
+        <div class="input-group">
+            <input class="form-control" type="file" id="formFile2">
+            <button type="button" class="btn btn-outline-secondary" onclick="addInputs('formFile2Container')">+</button>
+        </div>
+    </div>
+</div>
+    
+    
+    <fieldset class="form-group">
+      <legend class="mt-4">필수 동의 </legend>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+        <label class="form-check-label" for="flexCheckDefault">
+          유의사항을 읽었습니다.
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked="">
+        <label class="form-check-label" for="flexCheckChecked">
+         약관동의합니다.
+        </label>
+      </div>
+    </fieldset>
+
+    
+    <button type="submit" class="btn btn-primary">등록하기 </button>
+    
+  </fieldset>
+</form>
+
+
+<script>
+	let dynamicFieldsCount = 1;
+	let articleContainerCount = 1;
+	let relatedLinkContainerCount = 1;
+	let formFile2ContainerCount = 1;
+	let count;
+	
+    function addInputs(type) {
+        
+        let container = document.getElementById(type);
+        if (!container) {
+            console.error("찾을 수 없는 CONTAINER: " + type);
+            return;
+        }
+
+        switch (type) {
+        case "dynamicFields":
+            count = dynamicFieldsCount++;
+            break;
+        case "articleContainer":
+            count = articleContainerCount++;
+            break;
+        case "relatedLinkContainer":
+            count = relatedLinkContainerCount++;
+            break;
+        case "formFile2Container":
+            count = formFile2ContainerCount++;
+            break;
+        default:
+            console.error("Invalid type: " + type);
+            return;
+    }
+
+        
+        let newFields = document.createElement("div");
+        newFields.className = "mb-3";
+
+        if (type === "dynamicFields") {
+            newFields.innerHTML =
+                `<div class="input-group">` +
+                `<input type="text" class="form-control" id="detailBiz${count}" placeholder="구체적사업내용" autocomplete="off">` +
+                `<input type="text" class="form-control" id="detailAmt${count}" placeholder="구체적사업비" autocomplete="off">` +
+                `<button type="button" class="btn btn-outline-secondary" onclick="removeInputs(this, '${type}')">-</button>` +
+                `</div>`;
+        } else if (type === "articleContainer") {
+            newFields.innerHTML =
+                `<div class="input-group">` +
+                `<input type="text" class="form-control" id="articleTitle${count}" placeholder="제목" autocomplete="off">` +
+                `</div>` +
+                `<div class="input-group">` +
+                `<textarea class="form-control" id="article${count}" rows="3"></textarea>` +
+                `<button type="button" class="btn btn-outline-secondary" onclick="removeInputs(this, '${type}')">-</button>` +
+                `</div>`;
+        } else if (type === "relatedLinkContainer") {
+            newFields.innerHTML =
+                `<div class="input-group">` +
+                `<input type="text" class="form-control" id="relatedLink${count}" placeholder="null 가능" autocomplete="off">` +
+                `<button type="button" class="btn btn-outline-secondary" onclick="removeInputs(this, '${type}')">-</button>` +
+                `</div>`;
+        } else if (type === "formFile2Container") {
+            newFields.innerHTML =
+                `<div class="input-group">` +
+                `<input class="form-control" type="file" id="formFile2${count}">` +
+                `<button type="button" class="btn btn-outline-secondary" onclick="removeInputs(this, '${type}')">-</button>` +
+                `</div>`;
+        }
+
+        container.appendChild(newFields);
+    }
+
+    function removeInputs(button, type) {
+        button.parentNode.remove();
+    }
+</script>
+
+
+
+</body>

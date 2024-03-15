@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout}"
+	 xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+	
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+.page-item.active .page-link {
+    z-index: 2;
+    color: #fff;
+    background-color: #689f38;
+    border-color: #689f38;
+}
+.page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: black;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+.search-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.search-input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+}
+.search-button, .reset-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: white;
+    background-color: #ffb524;
+    border: none;
+    cursor: pointer;
+}
+.reset-button {
+    background-color: #6c757d;
+}
+
+
+/* 검색 및 필터 컨테이너 스타일 */
+.search-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* 날짜 입력 필드 스타일 */
+.date-input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+}
+
+/* 검색 및 초기화 버튼 호버 효과 */
+.search-button:hover, .reset-button:hover {
+    opacity: 0.8;
+}
+
+.date-input {
+    margin-right: 10px; /* 날짜 입력 필드 간 간격 */
+}
+</style>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+
+<body>
+  <section layout:fragment="content">
+	<div th:insert="~{banner/daily::banner}"></div>
+  	<div  th:insert="~{bongsa/sidebar::side}"></div>
+	  <div class="container">
+  <div>
+  <div class="search-container">
+	    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+	        <input type="text" id="searchKeyword" class="search-input" placeholder="검색어 입력...">
+	        <button onclick="search()" class="btn btn-outline-secondary m-1">검색</button>
+	        <button onclick="resetSearch()" class="btn btn-outline-dark m-1">초기화</button>
+	    </div>
+	    <!-- 드롭다운 및 날짜 입력 -->
+	    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+	        <div style="display: flex; gap:10px; ">
+	            <select  class="date-input" id="location" onchange="search()" style="text-align: center" >
+	                <option value="">==지역==</option>
+	                <option th:each="location:${location}" th:text="${location.value}"th:value="${location.subCode}"> </option>
+	            </select>
+	            <select class="date-input" id="cate" onchange="search()" style="text-align: center">
+	                <option value="">==봉사유형==</option>
+	                <option th:each="cate:${cate}" th:text="${cate.value}" th:value="${cate.subCode}"> </option>
+	            </select>
+	        </div>
+	        <div>
+	            <span class="date-label">시작 날짜:</span>
+	            <input type="date" id="startDate" class="date-input" onchange="search()">
+	            <span class="date-label">종료 날짜:</span>
+	            <input type="date" id="endDate" class="date-input" onchange="search()">
+<!-- <input id="userData" type="hidden"  th:value="|${#authentication.principal.userVO.id}"> -->
+	        </div>
+	    </div>
+	</div>
+ 
+    </div>
+	<div id="tableData">
+				<div class="content" th:if="${fac.size} == 0" style="text-align:center;margin-top:200px;">
+				<span>검색결과가 존재하지 않습니다</span>
+			</div>
+		<div id="meetVolList">
+		<br>
+	        <div class="row">
+	          <div class="col-sm-6 col-xl-3" style="color:black; width:25%;" th:each="fac ,stat : ${fac}">
+	            <div class="card overflow-hidden rounded-2" style=" margin-bottom: 20px;">
+
+	              <div class="position-relative">
+	                <a><img th:src="@{${fac.path}}"  th:data-vol-act-id="${fac.volActId}" data-toggle="modal" data-target="#myModal2"
+	                class="card-img-top rounded-0"onerror="this.onerror=null; this.src='/userresources/image/nonono.png';"style="height:200px;"></a>
+
+	              </div>
+	              <div class="text-white px-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+				    <span>모집중</span>
+				    </div>
+	              <div class="text-white px-1 rounded position-absolute" style="top: 10px; right: 10px;background-color:#28a745;">
+					<span th:text="|${fac.category}|">관심분야할거임 </span>
+					</div>
+	               <div class="d-flex align-items-center justify-content-between">
+		            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+		                <h4><a th:text="${fac.title}">동아리명</a></h4>
+		                <a href="#" style="color:gray">
+						   <span th:text="|#${fac.volZip2}|">지역할거임</span>
+						</a>
+						<br>
+						 <span th:text="'주최시설 : ' +${fac.facName}">주최시설</span>
+						<br>
+	                    <span th:text="${#dates.format(fac.startDate, 'yy.MM.dd')}+' ~ '+${#dates.format(fac.expireDate, 'yy.MM.dd')}">2024-02-04 ~ 2024-09-04</span>
+	                    <br>
+	                    <span th:text="'정원 : ' +${fac.capCount} +' / '+  ${fac.cap}">정원 : 해야함</span>
+						 <br>
+						 
+		            </div>
+	               </div>
+	            </div>
+	          </div>
+	        </div>
+        </div>
+      </div>
+      </div>
+      <!-- 봉사정보 모달 -->
+      <div class="modal" tabindex="-1" id="myModal2">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+    
+      <div class="modal-header" style="background-color: #689f38">
+        <h5 class="modal-title">봉사정보조회</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+	    <div class="form-group">
+			<div class="write_item user">
+				<table class="table" id="showTable">
+				
+				
+				</table>
+					
+				</div>
+				</div>
+	    </div>
+      
+      <div class="modal-footer">
+     
+        <button type="button" id="joinVolBtn" class="btn btn-outline-warning btn-sm " style="color:black;" data-toggle="modal" data-target="#myModal"  >봉사신청하기</button>
+ 
+      
+      </div>
+      </div>
+    </div>
+  </div>
+
+     
+      
+      <!-- 봉사신청 모달 -->
+          <div class="modal" tabindex="-1" id="myModal">
+			<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
+			<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">봉사신청하기</h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+
+
+				<div class="form-group">
+					<div class="write_item user">
+					<div class="subheading">
+					<textarea class="form-control plus-bnt" id="content" name="content" maxlength="500" placeholder="신청이유를 작성해 주세요"></textarea>
+					<br>
+				</div>
+				</div>
+				</div>
+			</div> <!-- class="modal-body" -->
+			<div class="modal-footer">
+				
+				<button type="submit" class="btn btn-outline-warning btn-sm uploadBtn" style="color:black;" >신청!
+					</button>
+			</div>
+		</div>
+
+	</div>
+</div> 
+
+      <!-- 봉사신청 모달 -->
+          <div class="modal" tabindex="-1" id="myModal3">
+			<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title"></h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+
+
+				<div class="form-group">
+					<div class="write_item user">
+					 <h4>해당 봉사신청을 이미 진행하였습니다 ^^</h4>
+					</div>
+			</div> <!-- class="modal-body" -->
+			<div class="modal-footer">
+			
+			</div>
+		</div>
+
+	</div>
+</div> 
+ </div>     
+      
+      <nav style="margin-top:50px;" aria-label="Page navigation example" th:if="${fac.size} != 0">
+    <ul class="pagination justify-content-center">
+        <!-- 이전 버튼 -->
+        <li class="page-item" th:if="${vo.prev}">
+            <a class="page-link" th:href="@{/FacilityVol(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1}, category=${category}, zip=${zip})}">이전</a>
+        </li>
+        <!-- 페이지 번호 출력 -->
+        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+            <a class="page-link" th:href="@{/FacilityVol(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage}, category=${category}, zip=${zip})}"
+               th:text="${pageNum}"></a>
+        </li>
+        <!-- 다음 버튼 -->
+        <li class="page-item" th:if="${vo.next}">
+            <a class="page-link" th:href="@{/FacilityVol(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage}, category=${category}, zip=${zip})}">다음</a>
+        </li>
+    </ul>
+</nav>
+
+
+<script th:inline="javascript">
+
+ 
+	
+$(document).ready(function() {
+	 $('#searchKeyword').keypress(function(event) {
+	        // 엔터 키 코드는 13입니다.
+	        if (event.which == 13) {
+	            event.preventDefault(); // 폼 제출에 의한 페이지 리로드 방지
+	            search(); // 검색 함수 호출
+	        }
+	    });
+	
+	
+    // 페이지 로드 시 실행: URL 쿼리 파라미터 기반으로 드롭다운 설정
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    const location = urlParams.get('location');
+    const searchKeyword = urlParams.get('searchKeyword');
+    const startDateParam = urlParams.get('startDate');
+    const endDateParam = urlParams.get('endDate');
+    
+    // 드롭다운 값 설정
+    if (category) $('#cate').val(category);
+    if (location) $('#location').val(location);
+    if (searchKeyword) $('#searchKeyword').val(searchKeyword);
+    if (startDateParam) $('#startDate').val(startDateParam);
+    if (endDateParam) $('#endDate').val(endDateParam);
+
+    // 페이지네이션 링크 업데이트 함수 호출 수정
+    updatePaginationLinks();
+});
+
+function updatePaginationLinks() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    const location = urlParams.get('location');
+    const searchKeyword = urlParams.get('searchKeyword'); // 검색어 변수 추가
+
+    document.querySelectorAll('.page-link').forEach(link => {
+        let href = link.getAttribute('href');
+        let newHref = new URL(href, window.location.origin);
+
+        // URL에 카테고리, 위치, 검색어 추가
+        if (category) newHref.searchParams.set('category', category);
+        if (location) newHref.searchParams.set('location', location);
+        if (searchKeyword) newHref.searchParams.set('searchKeyword', searchKeyword); // 링크에 검색어 추가
+
+        link.setAttribute('href', newHref.toString());
+    });
+}
+
+function search() {
+    let baseUrl = '/FacilityVol?start=1&end=8';
+    const cate = $('#cate').val();
+    const location = $('#location').val();
+    const searchKeyword = $('#searchKeyword').val();
+    const startDate = $('#startDate').val();
+    const endDate = $('#endDate').val();
+
+    if (cate) baseUrl += `&category=${encodeURIComponent(cate)}`;
+    if (location) baseUrl += `&location=${encodeURIComponent(location)}`;
+    if (searchKeyword) baseUrl += `&searchKeyword=${encodeURIComponent(searchKeyword)}`;
+    if (startDate) baseUrl += `&startDate=${encodeURIComponent(startDate)}`;
+    if (endDate) baseUrl += `&endDate=${encodeURIComponent(endDate)}`;
+
+    window.location.href = baseUrl;
+}
+
+function resetSearch() {
+    window.location.href = '/FacilityVol';
+}
+
+var volActId ='';
+var facId = '';
+function formatDate(date) {
+    var year = date.getFullYear();
+    var month = ("0" + (date.getMonth() + 1)).slice(-2); // 월은 0부터 시작하므로 1을 더하고 두 자리로 변환
+    var day = ("0" + date.getDate()).slice(-2); // 날짜를 두 자리로 변환
+    return year + "-" + month + "-" + day;
+}
+
+
+    $(document).ready(function() {
+        // 이미지 클릭 이벤트 처리
+        $('img.card-img-top').on('click', function() {
+        	$("#showTable").empty();
+             volActId = $(this).data('vol-act-id'); // 클릭된 이미지의 volActId 값을 가져옴
+            console.log(volActId);
+           
+
+            // 모달에 Ajax 요청 보내기
+            $.ajax({
+                url: '/facilityVolInfo?volActId='+volActId,
+                type: 'GET',
+                success: function(result) {
+                	
+                	facId=result.facId
+                	var formattedDate = formatDate(result.volDate);
+                	$("#showTable").append( 
+  		                   `<tr><th>시설정보</th><td>${result.facId}</td></tr>
+  		                   <tr><th>카테고리</th><td>${result.category}</td></tr>
+  		                   <tr><th>제목</th><td>${result.title}</td></tr>
+  		                   <tr><th>내용</th><td>${result.content}</td></tr>
+  		                   <tr><th>봉사일시</th><td>${formattedDate}</td></tr>
+  		                   <tr><th>정원</th><td>${result.cap}</td></tr>`
+  		                   
+  		    		);
+                },
+                error: function(err) {
+                    // Ajax 요청이 실패했을 때의 처리
+                    console.log(err);
+                }
+            });
+           
+        });
+        var memId = '[[${session.userId}]]';
+        console.log(memId);
+        $('#joinVolBtn').on('click', function() {
+        	 $('#myModal2').modal('hide');
+				if(memId!=null || '[[${session.Role}]]'=='m02'){
+       		    $.ajax({
+       		        url: '/getJoinAppCheck',
+       		        type: 'GET',
+       		        data: {
+       		            memId: memId,
+       		            volActId: volActId
+       		        },
+       		        success: function(response) {
+       		            if(response > 0) {
+       		               
+       		             $('#myModal').modal('hide');
+       		            
+       		            } else {
+       		                // 봉사 등록 가능
+       		                // 추가적인 봉사 등록 처리 로직을 구현
+       		                // 예: 봉사 등록 폼 제출 등
+       		            }
+       		        },
+       		        error: function(xhr, status, error) {
+       		            // 오류 처리
+       		        }
+       		    });
+       	    } else {
+       	      window.location.href='/login';
+       	    }
+       	       
+            // 모달 닫기
+            $('#myModal2').modal('hide');
+            
+        });
+    });
+   
+   
+$('.uploadBtn').click(function (){
+	console.log(facId);
+   // var userId = $('#userData').val();
+
+	let appReason = $('[name="content"]').val();
+	console.log(appReason);
+	var formData= new FormData();
+	formData.append('appReason',appReason);
+	formData.append('facId',facId);
+	//formData.append('memId', userId );
+	formData.append('volActId',volActId);
+	console.log(formData);
+	$.ajax({
+	    url: '/joinVol',
+	    type: 'POST',
+	    data:formData,
+	    processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+		contentType: false,
+	    success: function(response) {
+        	swalWithBootstrapButtons.fire({
+				  title: "봉사",
+				  text: "봉사신청이 완료되었습니다. 승인을 기다려주세요",
+				  icon: "success",
+				  showCancelButton: false,
+				  confirmButtonText: "확인",
+				  //cancelButtonText: "취소",
+				  reverseButtons: true
+				})
+				
+				 $('#myModal').modal('hide');
+       		location.href = `/FacilityVol`;
+				
+	        
+	    },
+	    error: function(err) {
+	        console.log(err);
+	    }
+	}); 
+});
+
+const swalWithBootstrapButtons = Swal.mixin({
+	  customClass: {
+	    confirmButton: "btn btn-success",
+	    cancelButton: "btn btn-danger"
+	  },
+	  buttonsStyling: false
+	});
+</script>
+  </section>
+</body>
+</html>

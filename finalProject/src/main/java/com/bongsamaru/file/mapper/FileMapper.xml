@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.bongsamaru.file.mapper.FileMapper">
+  	<insert id="insertFile" parameterType="FilesVO">
+  	insert into files(
+        FILE_ID
+        ,FILE_PATH
+        ,FILE_ORDER
+        ,FILE_NAME
+        ,EXTENSION
+        ,FILE_SIZE
+        ,CODE
+        ,CODE_NO
+        ,CODE_user
+    ) values (
+        FILES_SEQ.nextval
+        ,#{filePath}
+
+        ,(SELECT NVL(MAX(FILE_ORDER), 0) + 1 FROM files WHERE code=#{code} and CODE_NO = #{codeNo})
+        ,#{fileName}
+        ,#{extension}
+        ,#{fileSize}
+        ,#{code}
+        ,#{codeNo}
+        ,#{codeUser}
+    )
+  	</insert>
+  	<update id="updateFile" parameterType="FilesVO">
+	  	UPDATE
+	  			files 
+	  	SET		
+	  			file_name = #{fileName},
+	  			file_path = #{filePath},
+	  	 		extension = #{extension},
+	  	 		file_size = #{fileSize},
+	  	 		code = #{code}
+	  	WHERE 	code_user = #{codeUser} 
+	  	AND code = #{code} 	
+  	</update>
+  	<select id="getFileCheck" resultType="FilesVO">
+  	        SELECT
+  	                 FILE_ID
+			        ,FILE_PATH
+			        ,FILE_ORDER
+			        ,FILE_NAME
+			        ,EXTENSION
+			        ,FILE_SIZE
+			        ,CODE
+			        ,CODE_NO
+			        ,CODE_USER
+        	FROM files
+        	WHERE code = #{code}
+        	AND code_user = #{codeUser}
+        	and rownum = 1
+  	</select>
+  </mapper>

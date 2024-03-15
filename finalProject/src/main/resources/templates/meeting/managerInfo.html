@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}">
+<head>
+<style>
+.cur{
+	cursor:pointer;
+}
+</style>
+<meta charset="utf-8">
+<title>방장 마이페이지</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="" name="keywords">
+<meta content="" name="description">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/jquery.fancybox.min.css">
+	<link rel="stylesheet" href="css/daterangepicker.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+		<div id="volShow" class="container py-5" style="width:30%;margin:auto;display:none">
+		<div class="row g-4">
+            <div class="h-100 rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4" style="text-align:center">
+                    <h5 class="mb-0">봉사 목록</h5>
+                   <a th:href="@{../insertVolActPage(volId=${session.id})}"><button type="button" class="btn btn-secondary" style="float:right">추가하기</button></a>
+                </div>
+                <div th:if="${volAct.size}==0" class="d-flex align-items-center border-bottom py-2" style="text-align:center">현재 등록된 봉사가 없습니다.</div>
+                <th:block th:each="volAct : ${after}">
+                <div class="d-flex align-items-center border-bottom py-2">
+                    <div class="w-100 ms-3">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
+                            <span th:text="${volAct.title}"></span>
+                            <button class="btn btn-sm" th:onclick="delActModal([[${volAct.volActId}]])"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>
+                </div>
+                </th:block>
+                <th:block th:each="volAct : ${before}">
+                <div class="d-flex align-items-center border-bottom py-2">
+                    <div class="w-100 ms-3">
+                        <div class="d-flex w-100 align-items-center justify-content-between" style="text-decoration-line: line-through;">
+                            <span th:text="${volAct.title}"></span>
+                            <button class="btn btn-sm" th:onclick="delActModal([[${volAct.volActId}]])"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>
+                </div>
+                </th:block>
+            </div>
+            <div class="container"><button onclick="closing()" style="float:right">닫기</button></div>
+        </div>
+		</div>
+		<div class="container" id="showBtn"><button onclick="showing()" style="float:right">봉사활동 관리</button></div>
+		<div class="container py-5" style="width:100%;margin:auto">
+			<div class="row g-4">
+				<div class="col-sm-12 col-xl-6">
+		             <div class="bg-light rounded h-100 p-4">
+		                 <h6 class="mb-4" style="text-align:center">모임가입 회원목록</h6>
+		                 <table class="table table-hover" style="text-align:center">
+		                     <thead>
+		                         <tr>
+		                             <th scope="col">No.</th>
+		                             <th scope="col">회원 아이디</th>
+		                             <th scope="col">가입날짜</th>
+		                             <th scope="col">쪽지보내기</th>
+		                             <th scope="col">탈퇴시키기</th>
+		                         </tr>
+		                     </thead>
+		                     <tbody>
+		                         <tr th:each="mem,st : ${member}">
+		                             <th th:text="${st.count}">1</th>
+		                             <td th:text="${mem.memId}">John</td>
+		                             <td th:text="${#dates.format(mem.appDate, 'yyyy년 MM월 dd일')}">Doe</td>
+		                             <td th:if="${st.count}>1"><i class="fa fa-envelope me-lg-2"></i></td>
+		                             <td th:onclick=out([[${mem.memId}]]) class="cur" th:if="${st.count}>1">
+										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-in">
+										<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+										<polyline points="10 17 15 12 10 7"></polyline>
+										<line x1="15" y1="12" x2="3" y2="12"></line>
+										</svg>
+									</td>
+		                         </tr>
+		                     </tbody>
+		                 </table>
+		             </div>
+		        </div>
+				<div class="col-sm-12 col-xl-6">
+		             <div class="bg-light rounded h-100 p-4">
+		                 <h6 class="mb-4" style="text-align:center">모임 가입신청 회원 목록</h6>
+		                 <table class="table table-hover" style="text-align:center">
+		                     <thead>
+		                         <tr>
+		                             <th scope="col">No.</th>
+		                             <th scope="col">회원 아이디</th>
+		                             <th scope="col">신청사유</th>
+		                             <th scope="col">처리</th>
+		                         </tr>
+		                     </thead>
+		                     <tbody>
+		                         <tr th:each="mem,st : ${whobo}">
+		                             <th th:text="${st.count}">1</th>
+		                             <td th:text="${mem.memId}">John</td>
+		                             <td th:text="${#strings.substring(mem.appReason, 0, 10)}+'...'" th:if="${mem.appReason.length}>10">Doe</td>
+		                             <td th:text="${mem.appReason}" th:if="${mem.appReason.length}<=10">Doe</td>
+		                             <td><button th:onclick="outMeeting([[${mem.memId}]])">승인하기</button></td>
+		                         </tr>
+		                     </tbody>
+		                 </table>
+		             </div>
+		        </div>
+		    </div>
+		</div>
+	</div>
+	 <div class="container"><button class="btn" onclick="delMeetModal()" style="float:right;margin:10px">모임 삭제</button></div>
+	 <div class="container"><button class="btn" onclick="updateMeeting()" style="float:right;margin:10px">모임 수정</button></div>
+	 <!-- 모달창 -->
+	<div class="modal fade" id="delVolAct" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="deleteConfirmationModalLabel">삭제 확인</h5>
+	            </div>
+	            <div class="modal-body">
+	                <p>정말 삭제 하시겠습니까?<br>삭제 후에는 다시 되돌릴 수 없습니다.</p>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-danger" id="noBtn3" data-dismiss="modal" aria-hidden="false">아니오</button>
+	                <button type="button" class="btn btn-secondary" id="yesBtn3" data-dismiss="modal" aria-hidden="false">네</button>
+	            </div>
+	        </div>
+	    </div>
+	 </div>
+	 <!-- 모달창 -->
+	<div class="modal fade" id="delMeet" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="deleteConfirmationModalLabel">모임 삭제</h5>
+	            </div>
+	            <div class="modal-body">
+	                <p>정말 삭제 하시겠습니까?<br>모임 삭제 시 다시 복구할 수 없습니다.</p>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-danger" id="delMeetNo" data-dismiss="modal" aria-hidden="false">아니오</button>
+	                <button type="button" class="btn btn-secondary" id="delMeetYes" data-dismiss="modal" aria-hidden="false">네</button>
+	            </div>
+	        </div>
+	    </div>
+	 </div>
+	<script>
+		const swalWithBootstrapButtons = Swal.mixin({
+		  customClass: {
+		    confirmButton: "btn btn-success",
+		    cancelButton: "btn btn-danger"
+		  },
+		  buttonsStyling: false
+		});
+		//회원 승인해주는 모달
+		function okMem(seq){
+		    const Toast = Swal.mixin({
+		      toast: true,
+		      position: 'top-top',
+		      showConfirmButton: false,
+		      timer: 1000,
+		      timerProgressBar: true,
+		      didOpen: (toast) => {
+		        toast.addEventListener('mouseenter', Swal.stopTimer)
+		        toast.addEventListener('mouseleave', Swal.resumeTimer)
+		      }
+		    })
+		    Toast.fire({
+		      icon: 'success',
+		      title: '승인이 정상적으로 완료되었습니다.'
+		    })
+		    location.href="managerPage?volId="+[[${session.id}]];
+		}
+		
+		function showing(){
+			$("#volShow").css('display','block');
+			$("#showBtn").css('display','none');
+		};
+		
+		function closing(){
+			$("#volShow").css('display','none');
+			$("#showBtn").css('display','block');
+		};
+		
+		var userId = '';
+		var volActId = '';
+		function out(id){
+			userId = id;
+			//회원 탈퇴 모달
+			swalWithBootstrapButtons.fire({
+				  title: "정말 탈퇴시키시겠습니까?",
+				  text: "정당하지 않은 사유로 강제 탈퇴 시 불이익을 받을 수 있습니다.",
+				  icon: "question",
+				  showCancelButton: true,
+				  confirmButtonText: "확인",
+				  cancelButtonText: "취소",
+				  reverseButtons: true
+				}).then((result) => {
+				  if (result.isConfirmed) {
+					  delUser();
+					  const Toast = Swal.mixin({
+					      toast: true,
+					      position: 'top-top',
+					      showConfirmButton: false,
+					      timer: 1000,
+					      timerProgressBar: true,
+					      didOpen: (toast) => {
+					        toast.addEventListener('mouseenter', Swal.stopTimer)
+					        toast.addEventListener('mouseleave', Swal.resumeTimer)
+					      }
+					    })
+					    Toast.fire({
+					      icon: 'success',
+					      title: '탈퇴처리가 정상적으로 완료되었습니다.'
+					    })
+					    location.href="managerPage?volId="+[[${session.id}]];
+				  } else if (
+				    /* Read more about handling dismissals below */
+				    result.dismiss === Swal.DismissReason.cancel
+				  ) {
+				    swalWithBootstrapButtons.fire({
+				      title: "취소되었습니다.",
+				      text: "탈퇴처리를 취소하였습니다.",
+				      icon: "error"
+				    });
+				  }
+				});
+		}
+		
+       	const volId = [[${session.id}]];
+		function delUser(){
+			$.ajax({
+           		url: "/WithdrawalProcess?volId="+volId+"&memId="+userId,
+           		type: 'GET',
+           		processData: false,
+           		contentType: false,
+           		success: function(data) {
+           			console.log('성공');
+           		},
+           		error: function(e) {
+           			console.log('실패');
+           		}
+           	});
+		}
+		//모임 삭제하기
+		function delMeetModal(){
+			$("#delMeet").modal("show");
+		}
+		
+		$("#delMeetYes").on('click',function () {
+			delMeet();
+		});
+		
+		function delMeet(){
+			$.ajax({
+           		url: "/delMeet?volId="+volId,
+           		type: 'GET',
+           		processData: false,
+           		contentType: false,
+           		success: function(data) {
+           			location.href="/goodbye";
+           		},
+           		error: function(e) {
+           			console.log('실패');
+           		}
+           	});
+		}
+		
+		
+		$("#delMeetNo").on('click',function () {
+		    $("#delMeet").modal("hide");
+		});
+
+		function delActModal(id){
+			volActId = id;
+			$("#delVolAct").modal("show");
+			
+			$("#yesBtn3").on('click',function () {
+				delAct();
+			});
+		};
+		
+		$("#noBtn3").on('click',function () {
+		    $("#delVolAct").modal("hide");
+		});
+		
+		function delAct(){
+			$.ajax({
+           		url: '/delVolActBoard?volActId='+volActId,
+           		type: 'POST',
+           		processData: false,
+           		contentType: false,
+           		success: function(data) {
+           			location.href="volBoardList?volId="+[[${session.id}]]
+           		},
+           		error: function(e) {
+           			console.log('실패');
+           		}
+           	});
+		};
+		function outMeeting(memId){
+    		$.ajax({
+           		url: "/WithdrawalProcess?volId="+volId+"&memId="+memId+"&appCode=h02",
+           		type: 'GET',
+           		processData: false,
+           		contentType: false,
+           		success: function(data) {
+           			okMem();
+           		},
+           		error: function(e) {
+           			console.log('실패');
+           		}
+           	});
+    	}
+		
+		function updateMeeting(){
+			location.href = "updateMeeting?volId="+[[${session.id}]];
+		}
+	</script>
+	<script src="js/jquery-3.4.1.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/owl.carousel.min.js"></script>
+	<script src="js/jquery.animateNumber.min.js"></script>
+	<script src="js/jquery.waypoints.min.js"></script>
+	<script src="js/jquery.fancybox.min.js"></script>
+	<script src="js/aos.js"></script>
+	<script src="js/moment.min.js"></script>
+	<script src="js/daterangepicker.js"></script>
+
+	<script src="js/typed.js"></script>
+
+	<script src="js/custom.js"></script>
+	</section>
+</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+  .a-tag-container {
+    text-align: center;
+    background-color: green;
+    padding: 15px;
+  }
+
+  .a-tag {
+    font-size: 25px;
+    padding: 20px ;
+    color: white;
+    
+  }
+  
+    .a-tag:hover {
+    font-size: 25px;
+    padding: 20px ;
+    color: black;
+    
+  }
+  
+ .contenttext {
+  text-align:right;
+ }
+ 
+ .link_thumb{
+  text-align:right;
+ }
+
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+		<div class="container">
+			<a href="/" style="text-align: right;">피드가기</a>
+			<div class="contenttext" id="temperature" title="">
+				<div style="font-size:14px; font-weight: bold;">[[${heart}]]ºC
+					<img alt="마음 온도" src="/userresources/image/banner/heart.jpg" style="width:30px; height: 30px;">
+				</div>
+			
+			</div>
+			<div class="contenttext">
+				<a data-tiara-layer="profile_img" data-tiara-action-name="프로필수정_클릭" class="link_thumb" href="/pass">
+					<span class="profile_thumb">
+					<img style="border-radius: 50%; width: 100px; height: 100px;" alt="프로필 사진" class="img_thumb" src="https://t1.kakaocdn.net/together_image/common/avatar/avatar04.png">
+					</span>
+				</a>
+			</div>
+			<h1 th:text="${userVO.memName}">이름</h1>
+			<a data-tiara-layer="profile_img" data-tiara-action-name="프로필수정_클릭" class="link_thumb" href="/pass">설정</a>
+		<div>
+				<button>기부하러가기~</button>
+				<div>기부내역</div>
+				<div class="contenttext">
+					<div>기부횟수 <span>[[${gibuCount}]]회</span></div>
+					<div>총 기부금<span>[[${sumAmt}]]원</span></div>
+				</div>
+				<div class="a-tag-container">
+				  <a href="/gibuList" class="a-tag">기부내역</a>
+				  <span>|</span>
+				  <a href="/" class="a-tag">기부영수증</a>
+				  <span>|</span>
+				  <a href="/" class="a-tag">활동증서</a>
+				</div>
+		</div>
+				<div>봉사내역</div>
+				<div class="contenttext">
+					<div>일일모임 <span>참여횟수 회</span></div>
+					<div>정기모임 <span>참여횟수 회</span></div>
+					<div>봉사시설(단체) <span>참여횟수 회</span></div>
+				</div>
+				<div class="a-tag-container">
+				  <a href="/" class="a-tag">일일모임</a>
+				  <span>|</span>
+				  <a href="/" class="a-tag">동아리</a>
+				  <span>|</span>
+				  <a href="/" class="a-tag">봉사시설</a>
+				</div>
+				</div>
+	<script>
+		$("#temperature").attr( 'title', 
+`마음온도란 무엇인가요?
+		
+회원가입 시, 여러분의 마음온도는 기본 36.5도로 시작합니다.
+사이트 내 활동에 따라 마음온도가 오르거나 내려갑니다.
+여러분의 활발한 참여로 마음온도를 따뜻하게 유지해주세요!
+` );
+	</script>
+	</section>
+</body>
+</html>

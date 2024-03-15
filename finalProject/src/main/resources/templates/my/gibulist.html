@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사마루</title>
+<style>
+table {
+  border: 1px #a39485 solid;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,.25);
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+th {
+  text-align: center;
+}
+  
+thead {
+  font-weight: bold;
+  color: #fff;
+  background: #689f38 ;
+}
+  
+ td, th {
+  padding: 1em .5em;
+  vertical-align: middle;
+}
+  
+ td {
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  background: #fff;
+  text-align: center;
+}
+
+a {
+  color: #73685d;
+}
+  
+ @media all and (max-width: 768px) {
+    
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  
+  th {
+    text-align: right;
+  }
+  
+  table {
+    position: relative; 
+    padding-bottom: 0;
+    border: none;
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+  }
+  
+  thead {
+    float: left;
+    white-space: nowrap;
+  }
+  
+  tbody {
+    padding-top: 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    white-space: nowrap;
+  }
+  
+  tr {
+    display: inline-block;
+    vertical-align: top;
+  }
+  
+  th {
+    border-bottom: 1px solid #a39485;
+  }
+  
+  td {
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .hidden {
+  	display: none;
+  }
+  
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+<div class="side" th:insert="~{my/sidebar::side}"></div>
+  	<div class="container" style="min-height: 450px;">
+	  <h2>기부내역</h2>
+	  <div style="padding-bottom: 10px; width:150px;">
+		  <select id="gibuSelect" class="form-control" style="text-align: center;">
+		  	<option value="all">년도선택</option>
+		  	<option value="2024">2024년</option>
+		  	<option value="2023">2023년</option>
+		  	<option value="2022">2022년</option>
+		  </select>	  	
+	  </div>
+	  <table>
+		<thead>
+			<tr>
+				<th style="width:100px;">기부일</th>
+				<th>기부 프로젝트 명</th>
+				<th style="width: 150px;">기부금액</th>
+				<th></th>
+			</tr>
+		</thead>
+		   <tbody>
+		       <tr th:each="item : ${list}">
+		           <td class="yearCheck" th:text="${#dates.format(item.payDate, 'yyyy.MM.dd')}" style="width:100px;"></td>
+		           <td class="yearCheck" th:text="${item.title}">[[${item.title}]]</td>
+		           <td class="yearCheck" style="width:150px;">[[${#numbers.formatInteger(item.donAmt, 3, 'COMMA')}]]원<br>
+				   </td>
+		       </tr>
+			   <tr>
+			   </tr>
+		   </tbody>
+		</table>
+		
+	    <table th:if="${list.size > 0}" style="display:none;" id="noList">
+	    	<tbody>
+	    		<tr>
+					<td style="height: 400px;">내역이 없습니다</td>    		
+	    		</tr>
+	    	</tbody>
+	    </table>
+	    <div style="text-align:center;">
+	    </div>
+		<!-- Modal -->
+		<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="staticBackdropLabel">기부 취소 창</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		        정말로 취소하시겠습니까?
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-danger">취소하기</button>
+		        <button type="button" class="btn btn-dark" data-dismiss="modal">창 닫기</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+</div>
+
+<script  th:inline="javascript">
+	let selectOption = 'all';
+    $('#gibuSelect').on('change', function(e) {
+        selectOption = $(this).val();
+        console.log(selectOption,'벨류')
+
+        let trElements = $("tr:has(td.yearCheck)");
+
+        trElements.each(function() {
+          let year = $(this).find("td.yearCheck").text().substr(0, 4);
+          if (year == selectOption || selectOption == 'all') {
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+
+        if (selectOption == 'all') {
+          $("#noList").hide();
+        } else {
+          let visibleElements = trElements.filter(":visible");
+          if (visibleElements.length == 0) {
+            $("#noList").show();
+          } else {
+            $("#noList").hide();
+          }
+        }
+      });
+			
+        $("#cancelBtn").on('click',function () {
+            $("#staticBackdrop").modal("show");
+        
+        });
+        
+        function redirectToDonationDetail(id,facid){
+        	window.location.href = `donaDetail?id=${id}&facId=${facid}`
+        }
+
+	</script>
+</section>
+</body>
+</html>

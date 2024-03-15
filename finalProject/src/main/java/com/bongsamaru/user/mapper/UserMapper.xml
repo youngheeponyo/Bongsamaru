@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bongsamaru.user.mapper.UserMapper">
+   <insert id="userSignUp" parameterType="UserVO">
+      INSERT INTO member (
+    MEM_ID,
+    MEM_PWD,
+    MEM_NICK,
+    MEM_PHONE,
+    MEM_ZIP,
+    MEM_ADDR,
+    MEM_BDATE,
+    MEM_DEPT,
+    MEM_EMAIL,
+    DON_RECEIPT,
+    MEM_SSN,
+    EMAIL_AGREE,
+    SMS_AGREE,
+    MEM_STAT,
+    MEM_NAME
+) VALUES (
+    #{memId},
+    #{memPwd},
+    #{memNick},
+    #{memPhone},
+    #{memZip},
+    #{memAddr},
+    #{memBdate},
+    #{memDept},
+    #{memEmail},
+    #{donReceipt},
+    #{memSsn},
+    #{emailAgree},
+    #{smsAgree},
+    #{memStat},
+    #{memName}
+)
+   </insert>
+	
+	
+
+   <select id="userList" resultType="UserVO">
+      select MEM_ID,
+            MEM_PWD,
+            MEM_NICK,
+            MEM_PHONE,
+            MEM_ZIP,
+            MEM_ADDR,
+            MEM_BDATE,
+            MEM_DEPT,
+            MEM_EMAIL,
+            DON_RECEIPT,
+            MEM_SSN,
+            EMAIL_AGREE,
+            SMS_AGREE,
+            ACCT_NUM,
+            BANK_NAME,
+            upper(MEM_STAT) as MEM_STAT,
+            MEM_NAME
+      from member where MEM_ID = #{memId}
+   </select>
+
+
+   <select id="countMemId" resultType="int">
+       SELECT COUNT(*)
+       FROM UserFacilityView
+       WHERE id = #{id}
+   </select>
+   
+   <select id="countMemNick" resultType="int">
+       SELECT COUNT(*)
+       FROM member
+       WHERE mem_nick = #{memNick}
+   </select>
+
+	<select id="categoryList" resultType="UserCategoryVO">
+		select sub_code_id as id , sub_code_name as name from sub_code
+		where main_code_id = 'd'
+		or main_code_id = 'f'
+
+	</select>
+	
+	<select id="findId" resultType="UserFacilityVO">
+		select id,usertype from userfacilityview where phone = #{phone}
+	</select>
+	<select id="findInfo" resultType="String">
+		select usertype from userfacilityview where id = #{id}
+	</select>
+	<select id="findProfile" resultType="String">
+		select profile from userfacilityview where id = #{id}
+	</select>
+	
+	
+	<update id="updatePwd" parameterType="String">
+        <choose>
+            <when test="type == 'Member'">
+                UPDATE Member
+                SET mem_pwd = #{pass}
+                WHERE mem_id = #{id}
+            </when>
+            <when test="type == 'Facility'">
+                UPDATE Facility
+                SET fac_pwd = #{pass}
+                WHERE fac_id = #{id}
+            </when>
+            <otherwise>
+                -- Optionally handle unexpected types
+            </otherwise>
+        </choose>
+	</update>
+	
+	<insert id="insertCate" parameterType="String">
+		insert into interest (interest_id,interest_code, mem_id) values
+		(interest_seq.nextVal,#{name},#{id})
+	</insert>	
+	
+	<select id="login" resultType="UserFacilityVO">
+		select * from userfacilityView where id = #{id}
+	</select>
+	
+	<select id="checkBizNum" resultType="int">
+		select count(*) from facility where biz_num = #{biz_num}
+	</select>
+	
+	<insert id="facilitySignUp" parameterType="FacilityVO">
+	insert into facility(
+						fac_id
+						,fac_pwd 
+						,biz_num
+						,fac_name
+						,fac_zip
+						,fac_addr 
+						,fac_addr_detail 
+						,fac_est_date 
+						,fac_email 
+						,fac_web 
+						,fac_intro 
+						,rep_name 
+						,rep_phone
+						,fac_type
+						,fac_zip2
+				)values(
+						#{facId}
+					   ,#{facPwd}
+					   ,#{bizNum}
+					   ,#{facName}
+					   ,#{facZip}
+					   ,#{facAddr}
+					   ,#{facAddrDetail}
+					   ,#{facEstDate}
+					   ,#{facEmail}
+					   ,#{facWeb}
+					   ,#{facIntro}
+					   ,#{repName}
+					   ,#{repPhone}
+					   ,#{facType}
+					   ,FIND_ZIP(#{facZip})
+									)
+	</insert>
+	
+	<select id="listAlert" resultType="AlertVO">
+		select alert_id,
+			   category,
+			   content
+			   ,alert_date
+			   ,read_flag 
+		from alert 
+		where (read_flag = 1 and alert_date + 3 > SYSDATE) 
+		or read_flag = 0
+		and receive_id = #{memId}
+		order by alert_id
+	</select>
+	
+	<select id="volKing" resultType="CountVO">
+		SELECT 
+		    COUNT(act.vol_act_mem_id) AS count,
+		    m.mem_nick AS mNick,
+		    act.mem_id
+		FROM 
+		    vol_act_mem act
+		JOIN 
+		    vol_act va ON act.vol_act_id = va.vol_act_id
+		JOIN 
+		    member m ON act.mem_id = m.mem_id
+		WHERE 
+		    va.vol_date BETWEEN TRUNC(SYSDATE, 'MM') AND LAST_DAY(SYSDATE)
+		GROUP BY 
+		    act.mem_id, m.mem_nick
+		ORDER BY count desc
+			
+	</select>
+	
+	<select id="CountAlarm" resultType="int">
+		select count(*) 
+		from alert 
+		where read_flag = 0
+		and receive_id = #{memId}
+	</select>
+	
+	<update id="updateAlarm" parameterType="AlertVO">
+		update alert set read_flag = 1 where alert_id = #{alertId} and receive_id = #{receiveId}
+	</update>
+</mapper>

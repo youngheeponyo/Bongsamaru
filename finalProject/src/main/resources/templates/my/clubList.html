@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사마루</title>
+<style>
+table {
+  border: 1px #a39485 solid;
+  font-size: .9em;
+  box-shadow: 0 2px 5px rgba(0,0,0,.25);
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+th {
+  text-align: center;
+}
+  
+thead {
+  font-weight: bold;
+  color: #fff;
+  background: #689f38 ;
+}
+  
+ td, th {
+  padding: 1em .5em;
+  vertical-align: middle;
+}
+  
+ td {
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  background: #fff;
+  text-align: center;
+}
+
+a {
+  color: #73685d;
+}
+  
+ @media all and (max-width: 768px) {
+    
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  
+  th {
+    text-align: right;
+  }
+  
+  table {
+    position: relative; 
+    padding-bottom: 0;
+    border: none;
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+  }
+  
+  thead {
+    float: left;
+    white-space: nowrap;
+  }
+  
+  tbody {
+    padding-top: 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    white-space: nowrap;
+  }
+  
+  tr {
+    display: inline-block;
+    vertical-align: top;
+  }
+  
+  th {
+    border-bottom: 1px solid #a39485;
+  }
+  
+  td {
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .hidden {
+  	display: none;
+  }
+  .notList {
+  	font-size: 40px;
+  }
+  
+
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+<div class="side" th:insert="~{my/sidebar::side}"></div>
+  		<div class="container">
+				<div>
+				    <h4>참여중</h4>
+				    <table style="height : 150px;" class="text">
+				        <thead>
+				            <tr>
+				                <th style="width: 70%;">제목</th>
+				                <th style="width: 30%;">날짜</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				            <tr th:each="item,index : ${list}" th:if="${item.appCode == 'h02'}">
+				                <td><a th:onclick="meeting('[[${item.volId}]]')"> [[${item.meetName}]]</a></td>
+				                <td th:text="${#dates.format(item.appDate, 'yyyy.MM.dd')}"></td>
+				            </tr>
+				            <tr th:if="${#lists.isEmpty(list.?[appCode=='h02'])}">
+				                <td colspan="3"><span class="notList">내역이 없습니다.</span></td>
+				            </tr>
+				        </tbody>
+				    </table>
+				</div>
+				<div>
+				    <h4>신청내역</h4>
+				    <table style="height : 150px;">
+				        <thead>
+				            <tr>
+				                <th style="width: 70%;">제목</th>
+				                <th style="width: 30%;">날짜</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				            <tr th:each="item,index : ${list}" th:if="${item.appCode == 'h01'}">
+				                <td th:text="${item.meetName}"></td>
+				                <td th:text="${#dates.format(item.appDate, 'yyyy.MM.dd')}"></td>
+				            </tr>
+				            <tr th:if="${#lists.isEmpty(list.?[appCode=='h01'])}">
+				                <td colspan="3"><span class="notList">내역이 없습니다.</span></td>
+				            </tr>
+				        </tbody>
+				    </table>
+				</div>
+				<div>
+				    <h4>거절내역</h4>
+				    <table style="height : 150px;">
+				        <thead>
+				            <tr>
+				                <th style="width: 70%;">제목</th>
+				                <th style="width: 30%;">날짜</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				            <tr th:each="item,index : ${list}" th:if="${item.appCode == 'h03'}">
+				                <td th:text="${item.meetName}"></td>
+				                <td th:text="${#dates.format(item.appDate, 'yyyy.MM.dd')}"></td>
+				            </tr>
+				            <tr th:if="${#lists.isEmpty(list.?[appCode=='h03'])}">
+				                <td colspan="3"><span class="notList">내역이 없습니다.</span></td>
+				            </tr>
+				        </tbody>
+				    </table>
+				</div>
+				<div>
+				    <h4>탈퇴내역</h4>
+				    <table style="height : 150px;">
+				        <thead>
+				            <tr>
+				                <th style="width: 70%;">제목</th>
+				                <th style="width: 30%;">날짜</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				            <tr th:each="item,index : ${list}" th:if="${item.appCode == 'h04'}">
+				                <td th:text="${item.meetName}"></td>
+				                <td th:text="${#dates.format(item.appDate, 'yyyy.MM.dd')}"></td>
+				            </tr>
+				            <tr th:if="${#lists.isEmpty(list.?[appCode=='h03'])}">
+				                <td colspan="3"><span class="notList">내역이 없습니다.</span></td>
+				            </tr>
+				        </tbody>
+				    </table>
+				</div>
+	</div>
+	<script  th:inline="javascript">
+		function meeting(volId){
+			src_width = screen.availWidth*0.1;
+			src_height = screen.availHeight*0.1;
+			window.open("meetings?volId="+volId, "pop", "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1400, height=800, top="+src_height+",left="+src_width+",location=no");
+		}
+	</script>
+</section>
+</body>
+</html>

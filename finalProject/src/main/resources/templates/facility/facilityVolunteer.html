@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+ layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>시설봉사</title>
+</head>
+<body>
+<section layout:fragment="content">
+<div class="container">
+<div th:insert="~{banner/empty::banner}"></div>
+<div th:insert="~{facility/facilityNav::nav}"></div>
+<div class="facilities_item ">
+<h3 class="title_color section_title text-center">해왔던 봉사들..</h3>
+<div class="row mb_30">
+<th:block th:each="volunteerF:${volFList}">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="accomodation_item text-center facilityIntro">
+                            <div class="hotel_img">
+                                <img  th:src="${volunteerF.filePath}" onError="this.src='../image/기본이미지.jpg'" alt="post">
+
+                            </div>
+                            <div class="details">
+                                <div class="tags">
+                                    
+                                </div>
+                                <h4 class="sec_h3" th:text="${volunteerF.title}" style="color:black;"></h4>
+                                 <p th:text="${#dates.format(volunteerF.volDate,'yyyy-MM-dd')}" style="color:black;"></p>
+                                <h6 class="date title_color" th:text="${volunteerF.location}"></h6>
+                            </div>	
+                        </div>
+                    </div>
+                </div> 
+</th:block>
+
+
+<th:block th:if="${volunteerF != null and #lists.size(volunteerF) != 0}">
+<nav class="blog-pagination justify-content-center d-flex">
+    <ul class="pagination">
+        <li class="page-item">
+            <a th:href="@{/fInfo/volunteerList(facId=${session.facilityInfo.facId}, start=${vo.start - vo.cntPerPage}, end=${vo.start - 1})}" class="page-link" aria-label="Previous">
+                <span aria-hidden="true">
+                    <span class="lnr lnr-chevron-left"></span>
+                </span>
+            </a>
+        </li>
+        <li class="page-item" th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+            <a class="page-link" th:href="@{/fInfo/volunteerList(facId=${session.facilityInfo.facId}, start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage})}" th:text="${pageNum}"></a>
+        </li>
+        <li class="page-item">
+            <a th:href="@{/fInfo/volunteerList(facId=${session.facilityInfo.facId}, start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}" class="page-link" aria-label="Next">
+                <span aria-hidden="true">
+                    <span class="lnr lnr-chevron-right"></span>
+                </span>
+            </a>
+        </li>
+    </ul>
+</nav>
+</th:block>
+</div>
+
+<div class="facilities_item">
+<h3 class="title_color section_title text-center">앞으로 해나갈 봉사들!!</h3>
+<div class="row mb_30">
+<th:block th:each="volunteerI:${volIList}">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="accomodation_item text-center facilityIntro">
+                            <div class="hotel_img">
+                                <img  th:src="${volunteerI.filePath}" onError="this.src='../image/기본이미지.jpg'" alt="post">
+                               
+                            </div>
+                            <div class="details">
+                                <div class="tags">
+                                   
+                                </div>
+                                <h4 class="sec_h3" th:text="${volunteerI.title}" style="color:black;"></h4>
+                                 <p th:text="${#dates.format(volunteerI.volDate,'yyyy-MM-dd')}" style="color:black;"></p>
+                                <h6 class="date title_color" th:text="${volunteerI.location}"></h6>
+                            </div>	
+                        </div>
+                    </div>
+                </div> 
+</th:block>
+  <th:block th:if="${ volunteerI != null and #lists.size(volunteerI)}!=0">
+<nav class="blog-pagination justify-content-center d-flex">
+    <ul class="pagination">
+        <li class="page-item">
+            <a th:href="@{/fInfo/volunteerList(facId=${session.facilityInfo.facId}, start=${vo2.start - vo2.cntPerPage}, end=${vo2.start - 1})}" class="page-link" aria-label="Previous">
+                <span aria-hidden="true">
+                    <span class="lnr lnr-chevron-left"></span>
+                </span>
+            </a>
+        </li>
+        <li class="page-item" th:each="pageNum : ${#numbers.sequence(vo2.startPage, vo2.endPage)}" th:class="${pageNum == vo2.currentPage ? 'page-item active' : 'page-item'}">
+            <a class="page-link" th:href="@{/fInfo/volunteerList(facId=${session.facilityInfo.facId}, start=${(pageNum - 1) * vo2.cntPerPage + 1}, end=${pageNum * vo2.cntPerPage})}" th:text="${pageNum}"></a>
+        </li>
+        <li class="page-item">
+            <a th:href="@{/fInfo/volunteerList(facId=${session.facilityInfo.facId}, start=${vo2.end + 1}, end=${vo2.end + vo2.cntPerPage})}" class="page-link" aria-label="Next">
+                <span aria-hidden="true">
+                    <span class="lnr lnr-chevron-right"></span>
+                </span>
+            </a>
+        </li>
+    </ul>
+</nav>
+</th:block>
+</div>
+</div>
+</section>
+</body>
+</html>

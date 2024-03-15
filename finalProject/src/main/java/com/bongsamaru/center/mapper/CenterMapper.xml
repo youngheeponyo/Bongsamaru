@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.bongsamaru.center.mapper.CenterMapper">
+   	<!-- Notice -->
+    <select id="getNoticeList" resultType="BoardVO">
+        SELECT *
+        FROM (
+        	SELECT ROWNUM RN, A.*
+        	FROM (
+        	SELECT        	
+	        	board_id,
+	        	category,
+	        	title,
+	        	content,
+	        	write_date,
+	        	views,
+	        	priority,
+	        	mem_id,
+	        	mod_date,
+	        	detail_cate
+	        FROM board
+	        WHERE category = 'b01'
+	        <if test="searchKeyword != null and searchKeyword != ''">
+	        AND (title LIKE '%' || #{searchKeyword} || '%') 
+	        </if>
+	        ORDER BY priority DESC, write_date DESC) A
+	    )
+	  	WHERE RN BETWEEN #{start} AND #{end}
+    </select>
+    <!-- 공지사항 상세 페이지 -->
+    <select id="getNoticeDetail" resultType="BoardVO">
+        	SELECT        	
+	        	board_id,
+	        	category,
+	        	title,
+	        	content,
+	        	write_date,
+	        	views,
+	        	priority,
+	        	mem_id,
+	        	mod_date,
+	        	detail_cate
+	        FROM board
+	        WHERE category = 'b01'
+            AND board_id = #{boardId}
+    </select>
+    <select id="getNoticeCount" resultType="int">
+		SELECT count(*) 
+		FROM board 
+		WHERE category = 'b01'
+		<if test="searchKeyword != null and searchKeyword != ''">
+		AND (title LIKE '%' || #{searchKeyword} || '%') 
+		</if>
+	</select>
+   	<!-- FAQList -->
+    <select id="getFaqList" resultType="FaqVO">
+        SELECT *  
+        FROM (   
+        		SELECT ROWNUM RN, A.*    
+        		FROM (
+	                SELECT
+	                    faq_id,
+	                    category,
+	                    title,
+	                    content 
+	                FROM faq
+	                WHERE category = #{category} <!-- 카테고리 값 적용 -->
+	                ORDER BY faq_id DESC
+                
+                
+              ) A   )  WHERE RN BETWEEN #{start} AND #{end}
+    </select>
+	<select id="getFaqCategoryCount" resultType="int">
+	SELECT count(*) 
+	FROM faq 
+	WHERE category = #{category}
+	</select>
+	<!-- 회원별 문의 접수내역 갯수조회 -->
+	<select id="getInquiryCount" resultType="int">
+	SELECT count(*) 
+	FROM board
+	WHERE category = 'b02'
+	AND mem_id = #{memId}
+	</select>
+	<!-- 1:1 문의 접수내역보기 -->
+    <select id="getInquiryDetail" resultType="BoardVO">
+    		SELECT	
+					board_id,
+					category,
+					title,
+					a.content as content,
+					write_date,
+					a.mem_id,
+					detail_cate,
+		            comm_id,
+		            b.content as comm_content,
+		            comm_date
+			 FROM 	board a LEFT JOIN comments b
+	         ON 	a.detail_cate = b.detail_code
+             WHERE 	category = 'b02'
+             AND board_id = #{boardId}
+    </select>
+    <!-- 1:1 문의 접수내역보기 -->
+	<select id="getInquiryList" resultType="BoardVO">
+   	    SELECT *  
+        FROM (   
+               SELECT ROWNUM RN, A.* 
+               FROM (
+               		SELECT
+							board_id,
+							category,
+							title,
+							a.content as content,
+							write_date,
+							a.mem_id,
+							detail_cate,
+		                    comm_id,
+		                    b.content as comm_content,
+		                    comm_date
+					FROM 	board a LEFT JOIN comments b
+	                ON 	a.detail_cate = b.detail_code
+                    WHERE 	category = 'b02'
+                    AND a.mem_id = #{memId}
+	                ORDER BY write_date DESC
+              ) A   ) WHERE RN BETWEEN #{start} AND #{end}
+	</select>
+	<!-- 문의 접수 -->
+	<insert id="insertInquiry" parameterType="BoardVO">
+	INSERT INTO board
+		( board_id
+		  ,category
+		  ,title
+		  ,content
+		  ,write_date
+		  ,mem_id
+		  ,detail_cate
+		)
+	VALUES
+		(board_ID.NEXTVAL
+		  ,'b02'
+		  ,#{title}
+		  ,#{content}
+		  ,sysdate
+		  ,#{memId}
+		  ,INQUIRE_SEQ.NEXTVAL
+		)
+	</insert>
+	
+	<update id="updateViews" parameterType="BoardVO">
+	  UPDATE board
+	  SET views = views + 1
+	  WHERE board_id = #{boardId}
+	</update>
+  </mapper>

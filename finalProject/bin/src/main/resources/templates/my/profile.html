@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+.hidden {
+	display: none;
+}
+* {
+	list-style: none;
+}
+.div-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.select {
+    padding: 15px 10px;
+}
+.select input[type=radio]{
+    display: none;
+}
+.select input[type=radio]+label{
+    display: inline-block;
+    cursor: pointer;
+    height: 30px;
+    width: 100px;
+    border: 1px solid #333;
+    line-height: 30px;
+    text-align: center;
+    font-weight:bold;
+    font-size:17px;
+}
+.select input[type=radio]+label{
+    background-color: transparent; 
+    color: #000; 
+    transition: all 0.25s ease;
+}
+.select input[type=radio]:checked+label{
+     border: 1px solid #000; 
+     background-color: #fbb200;
+     color: #fff;
+}
+
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="div-centered">
+		<th:block th:each="item : ${list}">
+			<ul id="contents">
+				<li>
+					<div class="area_thumb">
+						<h1>프로필</h1>
+						  <span class="profile_thumb">
+						    <img id="profileImage" style="border-radius: 50%; width: 100px; height: 100px;" alt="프로필 사진" class="img_thumb" src="https://t1.kakaocdn.net/together_image/common/avatar/avatar04.png">
+						  	<input class="form-control" id="imageInput" name="uploadFiles" type="file" multiple>
+							<button class="uploadBtn">Upload</button>
+						  </span>
+					</div>
+				</li>
+				<li class="hidden">
+					<div> 아이디</div>
+					<input type="text" id="id" th:value="${item.memId}">
+				</li>
+				<li>
+					<div> 닉네임</div>
+					<input type="text" th:value="${item.memNick}">
+				</li>
+				<li id="to1">
+					<div>전화번호</div>
+					<input type="text" id="to" name="to" th:value="${item.memPhone}" readonly/> <!-- 인증번호 받을사람 휴대폰 번호 -->
+					<button type="button" id="send">인증번호 전송</button><br> <!-- 문자보내는 전송버튼 -->
+				</li>
+				<li id="to2" class="hidden">
+					<div>전화번호</div>
+					<input type="text" id="userTel" placeholder="인증번호 4자리를 입력하세요">   <!-- 인증번호 입력창 -->
+					<button type="button" id="enterBtn">인증번호 확인</button>  <!-- 인증번호와 내가 입력창에 입력한 인증번호 비교하는 창 -->		
+				</li>
+				<li id="to3" class="hidden">
+					<div>전화번호</div>
+					<input type="text" id="changeNum" placeholder="변경하실 전화번호를 입력하세요">   <!-- 인증번호 입력창 -->
+					<button type="button" id="changeBtn">변경</button>  <!-- 인증번호와 내가 입력창에 입력한 인증번호 비교하는 창 -->	
+				</li>
+				<li id="email1">
+				  <div>이메일</div>
+				  <input type="email" id="recipientEmail" placeholder="변경하실 이메일 주소를 입력하세요" >
+				  <button type="button" id="sendButton">인증번호 전송</button>
+				  <button id="ChangeEmailBtn" class="hidden">변경하기</button>
+				</li>
+				<li id="email2" class="hidden">
+				  <div id="name">이메일</div>
+				  <input type="text" id="verificationCode" placeholder="인증번호 4자리를 입력하세요" >
+				  <button type="button" id="verifyButton">인증번호 확인</button>
+				  <div id="message"></div>
+				</li>			
+				<li>
+					<input type="text" id="zip" th:value="${item.memZip} " class="hidden">
+					<div>주소</div>
+					<input type="text" id="addr" th:value="${item.memAddr} ">
+				</li>
+				<li>
+					<div>이메일수신동의</div>
+					<div class="select">
+						<span>
+							<input type="radio" id="emailAgreeYes" name="emailAgree" value="예" th:checked="${item.emailAgree} == 1 ">
+							<label for="emailAgreeYes">예</label>
+						</span>
+						<span>
+							<input type="radio" id="emailAgreeNo" name="emailAgree" value="아니오" th:checked="${item.emailAgree} == 0">
+							<label for="emailAgreeNo">아니오</label>
+						</span>
+					</div>
+				</li>
+				<li>
+					<div>문자수신동의</div>
+					<div class="select">
+						<span>
+							<input type="radio" id="smsAgreeYes" name="smsAgree" value="예" th:checked="${item.smsAgree} == 1 ">
+							<label for="smsAgreeYes">예</label>
+						</span>
+						<span>
+							<input type="radio" id="smsAgreeNo" name="smsAgree" value="아니오" th:checked="${item.smsAgree} == 0">
+							<label for="smsAgreeNo">아니오</label>
+						</span>
+					</div>
+				</li>
+				<li>
+					<button>저장하기</button>
+				</li>
+			</ul>
+		<th:block th:each="item : ${list}">
+	</div>
+	<script th:inline="javascript">
+    let memId = $("#id").val();
+    console.log(memId,'아이디');
+	
+	let checkNum = 0;
+	
+	
+	$('#send').on('click',function() {
+		const to = $('#to').val();
+			alert('메세지를 전송하였습니다. 메세지를 확인해주세요.');
+	    	$("#to1").addClass('hidden');
+	        $("#to2").removeClass('hidden');
+			
+			$.ajax ({
+				url: '/sendSMS',
+				type: 'GET',
+				data: {
+					"to" : to
+				},
+				success: function(data) {
+					checkNum = data;
+					console.log('번호',checkNum)
+					
+				}
+			});
+	});
+	
+	$('#enterBtn').on('click',function() {	
+		const userNum = $('#userTel').val();
+		
+		if(checkNum == userNum) {
+			alert('인증되었습니다');
+			$("#to2").addClass('hidden');
+			$("#to3").removeClass('hidden');
+	     	
+	     	$("#changeBtn").on('click', function(){
+	        	alert('변경이 완료되었습니다.');
+	        	$("input").remove("#changeNum");
+			 	$("button").remove("#changeBtn");
+			 	$("button").removeClass("#changeTel");
+	        })
+	        
+		}
+		else {
+			alert('인증번호가 일치하지 않습니다. 다시 확인해주세요.');
+		}
+	});
+// 인증번호 전송
+$('#sendButton').on('click',function() {
+  let recipientEmail = $("#recipientEmail").val();
+  
+  if (recipientEmail == "") {
+    alert("이메일 주소를 입력하세요.");
+    return;
+  }
+
+  alert("인증번호가 발송되었습니다.");
+  $("#email1").hide();
+  $("#email2").show();
+  $.ajax({
+    type: "POST",
+    url: "/email/send",
+    data: { recipientEmail: recipientEmail },
+    success: function (response) {
+      // 이메일 전송 성공 시 처리3
+      /* document.getElementById("message").innerText = "이메일이 성공적으로 전송되었습니다.";
+      document.getElementById("message").style.color = "green"; // 성공 메시지를 초록색으로 표시 */
+    },
+    error: function (xhr, status, error) {
+      // 이메일 전송 실패 시 처리
+      alert("인증번호 전송 중 오류가 발생했습니다.");
+     /*  document.getElementById("message").innerText = "이메일 전송 중 오류가 발생했습니다.";
+      document.getElementById("message").style.color = "red"; // 실패 메시지를 빨간색으로 표시 */
+    },
+  });
+});
+
+// 인증번호 확인
+$('#verifyButton').on('click',function() {
+  let verificationCode = $("#verificationCode").val();
+  let recipientEmail = $("#recipientEmail").val();
+  
+  
+  if (verificationCode == "") {
+    alert("인증번호를 입력하세요.");
+    return;
+  }
+  
+	$.ajax({
+	  type: "POST",
+	  url: "/email/verify",
+	  data: {
+	    recipientEmail: recipientEmail,
+	    verificationCode: verificationCode,
+	  },
+	  success: function (response) {
+	    // 인증 성공 시 처리
+	    if (response == "success") {
+	      alert("인증되었습니다.");
+	      $("#email1").show();
+	      $("#sendButton").hide();
+	      $("#ChangeEmailBtn").show();
+	      $("#verificationCode").hide();
+	      $("#verifyButton").hide();
+	      $("#name").hide();
+	    } else {
+	      alert("인증번호가 일치하지 않습니다. 다시 확인해주세요.");
+/* 	      $("#message").text("인증번호가 일치하지 않습니다. 다시 확인해주세요.");
+	      $("#message").css("color", "red"); // 실패 메시지를 빨간색으로 표시 */
+	    }
+	  },
+	});
+});
+
+// 이메일 변경
+$('#ChangeEmailBtn').on('click',function() {
+	let recipientEmail = $("#recipientEmail").val();
+	
+	$.ajax({
+		  type: "POST",
+		  url: "/profile",
+		  data: JSON.stringify({
+			  	memId: memId,
+			    memEmail: recipientEmail
+		  }),
+		  contentType: "application/json",
+		  success: function (response) {
+		    alert("이메일 변경 성공");
+		    $("#ChangeEmailBtn").hide();
+		    $("#email1").show();
+		  },
+		  error: function (xhr, status, error) {
+		    alert("이메일 변경 실패");
+		  }
+		});
+});
+
+// 이미지 파일 변경
+$('#imageInput').on('change', function (event) {
+    var image = $('#profileImage')[0];
+    var file = event.target.files[0];
+    var reader = new FileReader();
+
+    reader.onloadend = function () {
+        image.src = reader.result;
+    }
+
+    if (file) {
+        reader.readAsDataURL(file);
+    } else {
+        image.src = "";
+    }
+});
+
+// 이미지 파일 업로드
+$('.uploadBtn').click(function () {
+	var formData = new FormData(); //FormData 객체 생성
+	var inputFile = $("input[type='file']");
+	//input 태그의 type이 file인것을 찾아서 inputFile이라는 변수로 지정
+	var files = inputFile[0].files;
+	//files : 선택한 모든 파일을 나열하는 FileList 객체입니다.
+	//multiple 특성을 지정하지 않닸다면 두 개 이상의 파일을 포함하지 않습니다.
+	for (var i = 0; i < files.length; i++) {
+		console.log(files[i]);
+		formData.append("uploadFiles", files[i]); //키,값으로 append 
+	}
+	formData.append("code", "p01")
+	formData.append("codeNo", $('#userId').val());
+
+	//jQuery.ajax
+	$.ajax({
+		url: '/uploadsAjax',
+		type: 'POST',
+		processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+		contentType: false, // multipart/form-data타입을 사용하기위해 false 로 지정합니다.
+		data: formData,
+		success: function (result) {
+			console.log(result)
+			alert('성공!')
+
+		},
+		error: function (reject) {
+			alert('실풰!')
+			console.log(reject);
+		}
+	});
+});
+</script>
+</section>
+	
+</body>
+</html>

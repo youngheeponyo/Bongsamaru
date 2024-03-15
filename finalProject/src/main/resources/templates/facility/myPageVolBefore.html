@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+ layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>시설 마이페이지 - 봉사리스트</title>
+ <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+<style>
+#showTable {
+  
+  cursor : pointer;
+  color: #689f38;
+  font-weight:bold;
+}
+
+.content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 텍스트가 넘칠 때 생략 부분을 표시 */
+}
+
+.more-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: blue;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.show {
+  white-space: normal;
+  max-width: none;
+}
+p{
+	font-weight:bold;
+	font-size:15px;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+<section layout:fragment="content">
+ <div class="container">
+ 	<div th:insert="~{banner/empty::banner}"></div>
+ 	<div th:insert="~{facility/sidebar::side}"></div>
+<div class="container" >
+<div class="row justify-content-center hotel_booking_table">
+<div class="row" style="text-align:center;">
+<div class="col-md-3" style="margin-bottom:30px;"> </div>
+
+<div class="col-md-9" style="margin-bottom:30px;">
+<button class="btn btn-outline-warning float-right" type="button" data-toggle="modal" data-target="#myModal">시설봉사 등록</button>
+</div>
+            <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+                <div class="book_tabel_item">
+                    <p style="color:white;  font-size:20px">봉사제목</p>
+                </div>
+            </div>
+            
+        <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+            <div class="book_tabel_item">
+                <p style="color:white; font-size:20px">봉사내용</p>
+            </div>
+          </div>
+           
+        <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+            <div class="book_tabel_item">
+                <p style="color:white;  font-size:20px">봉사일시</p>
+              
+            </div>
+        </div>
+          
+       <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+           <div class="book_tabel_item">
+              <p style="color:white;  font-size:20px" >신청자보기</p>
+              
+           </div>
+       </div>
+  
+       <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+           <div class="book_tabel_item">
+              <p style="color:white;  font-size:20px" >모집인원</p>
+              
+           </div>
+       </div>
+       
+       <div class="col-md-1" style="background-color:#689f38; text-align:center;">
+           <div class="book_tabel_item">
+              <p style="color:white; font-size:20px" >현황</p>
+              
+           </div>
+       </div>
+       
+   <th:block th:each="list: ${volList}">
+       <div class="col-md-2">
+           <div class="book_tabel_item">
+            <p style="color:black; font-size:15px" th:text="${list.title}"></p>
+           </div>
+       </div>
+         <hr>
+       <div class="col-md-3">
+           <div class="book_tabel_item box">
+             <p class="content" style="color:black; font-size:15px"th:text="${list.content}"></p><a class="more-btn">더 보기</a>
+           </div>
+       </div>
+         <hr>
+       <div class="col-md-2">
+           <div class="book_tabel_item">
+              <p style="color:black; font-size:15px"th:text="${#dates.format(list.volDate, 'yyyy-MM-dd')}"></p>
+              
+           </div>
+       </div>
+         <hr>
+       <div class="col-md-2">
+           <div class="book_tabel_item">
+             <!-- 클릭할 링크 -->
+<p style="color:black; font-size:15px">
+    <a id="showTable" th:onclick="showList([[${list.volActId}]])">신청자목록</a></p>
+          </div>
+      </div>
+      <hr>
+      <div class="col-md-2">
+         <div class="book_tabel_item">
+              <p style="color:black; font-size:15px"th:text="${list.count}+'명/'+${list.cap}+'명'"></p>
+         </div>
+      </div>  
+      <hr>    
+      <div class="col-md-1">
+           <div class="book_tabel_item">
+              
+              <p style="color:black; font-size:15px" th:text="${list.cap > list.count ? '진행중' : '모집마감'}"></p>
+          </div>
+       </div>  
+       <hr>      
+   </th:block>
+            </div>
+            
+       <div class="col-12">   
+	<nav class="blog-pagination justify-content-center d-flex">
+		<ul class="pagination">
+			<li class="page-item"><a th:href="@{/fac/volJoin(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1})}" class="page-link"
+				aria-label="Previous"> <span aria-hidden="true"> <span
+						class="lnr lnr-chevron-left"></span>
+				</span>
+			</a></li>
+			
+			<li class="page-item" th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+	            <a class="page-link" th:href="@{/fac/volJoin(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage})}"
+	               th:text="${pageNum}"></a>
+	        </li>
+			
+			<li class="page-item"><a th:href="@{/fac/volJoin(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}" class="page-link"
+				aria-label="Next"> <span aria-hidden="true"> <span
+						class="lnr lnr-chevron-right"></span>
+				</span>
+			</a></li>
+		</ul>
+	</nav>     
+ </div>  
+  
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+                    
+<div class="row hotel_booking_table" id="hiddenTable" style="display:none;">
+				
+<table class="table"  style="text-align:center; ">
+    <thead >
+     <tr>
+     <th style="background-color:#689f38;  color:white;">신청자</th>
+     <th style="background-color:#689f38;  color:white;">신청날짜</th>
+     <th style="background-color:#689f38;  color:white;">신청서보기</th>
+     <th style="background-color:#689f38;  color:white;">수락버튼</th>
+     <th style="background-color:#689f38;  color:white;">수락상태</th>
+     </tr>
+    </thead>
+   
+    <tbody id="showTableBody">
+    </tbody>
+   
+</table>
+             
+</div>
+                    
+
+                       
+                    
+ <!-- 시설이 봉사 신청하는 모달 -->                   
+    <div class="modal" tabindex="-1" id="myModal">
+	<div
+		class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">봉사등록하기</h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+
+
+				<div class="form-group">
+					<div class="write_item user">
+					<div class="subheading">
+					<input class="form-control plus-bnt" type="text" name="title" placeholder="제목을 작성해 주세요">
+					<br>
+					<textarea class="form-control plus-bnt" id="content" name="content" maxlength="500" placeholder="내용을 작성해 주세요"></textarea>
+					<br>
+					<select id= "selFacType" style="width: 200px; height: 40px; bolder-radious:20px; text-align:center; background-color:rgba(104, 159, 56, 0.3)">
+					<option value="">===봉사유형===</option>
+					<option th:each="subf : ${subF}" th:value="${subf.subCode}" th:text="${subf.value}" th:selected="${#strings.equals(subf.subCode, param.facType)}"></option>
+					</select>
+					
+					<em class="highlight">*</em>주소
+					
+					<input id="zipCheck" readonly style="display: inline;" type="text" class="form-control" placeholder="우편번호">
+					<input id="addrBnt" type="button" class="btn btncolor" value="검색">
+					<div class="error-message" id="zipCheckError"></div>
+					<input id="addrCheck" readonly style="display: inline; margin-top: 10px" type="text"
+						class="form-control plus-bnt" placeholder="주소">
+					<input id="detailAddrCheck"  style="display: inline; margin-top: 10px" type="text"
+					class="form-control plus-bnt" placeholder="상세주소">
+					<div class="error-message" id="addrCheckError"></div>
+					정원<input class="form-control plus-bnt" type="number" name="cap">
+					
+					<br>
+					모집일시<input type="date" id="startDate" name="startDate"> ~ <input type="date" id="expireDate" name="expireDate">
+					<br>
+					<br>
+					봉사일시<input type="date" id="volDate" name="volDate">
+					<br>
+					<br>
+					<br>
+					<label for="file-image" class="input-file-button">이미지첨부
+										<input type="file" name="uploadFiles" id="file-image"
+										style="display: none">
+									</label>
+				</div>
+				</div>
+				</div>
+			</div> <!-- class="modal-body" -->
+			<div class="modal-footer">
+				
+				<button type="submit" class="btn btn-outline-warning btn-sm uploadBtn">등록하기
+					</button>
+			</div>
+		</div>
+
+	</div>
+</div> 
+<!-- 시설이 신청자의 등록내용을 보기위한 모달 -->			
+	
+    <div class="modal" tabindex="-1" id="myModal2">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">신청내용보기</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span></button>
+			    </div>
+			<div class="modal-body">
+				<div class="form-group">
+				
+				</div>
+			</div>
+			<div class="modal-footer">
+			</div>
+		    </div>
+	  </div>
+  </div>        
+ </div>
+
+      
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+
+$(document).ready(function() {
+    // 오늘 날짜를 시작일 최소값으로 설정
+    let todayDate = new Date().toISOString().substring(0, 10);
+    $('input[name=startDate]').prop("min", todayDate);
+    
+    // 시작일이 변경될 때 이벤트 처리
+    $('input[name=startDate]').on("change", function() {
+        let minExpire = $(this).val(); 
+        $('input[name=expireDate]').prop("min", minExpire); 
+    });
+
+    // 만료일이 변경될 때 이벤트 처리
+    $('input[name=expireDate]').on("change", function() {
+        let expireDate = $(this).val(); 
+        $('input[name=volDate]').prop("min", expireDate); 
+    });
+});
+	
+
+
+			// 본 예제에서는 도로명 주소 표기 방식에 대한 법령에 따라, 내려오는 데이터를 조합하여 올바른 주소를 구성하는 방법을 설명합니다.
+			function addr() {
+				new daum.Postcode({
+					oncomplete: function (data) {
+						// 팝업에서 검색결과 항목을 클릭했을 때 실행할 코드를 작성하는 부분.
+
+						// 도로명 주소 변수
+						var roadAddr = data.roadAddress;
+						var extraRoadAddr = ''; // 참고 항목 변수
+
+						// 법정동명이 있고, "동/로/가"로 끝난다면 추가
+						if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+							extraRoadAddr += data.bname;
+						}
+						// 건물명이 있고, 공동주택일 경우 추가
+						if (data.buildingName !== '' && data.apartment === 'Y') {
+							extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+						}
+						// 표시할 참고항목이 있으면, 괄호까지 추가한 최종 문자열을 만듦
+						if (extraRoadAddr !== '') {
+							extraRoadAddr = ' (' + extraRoadAddr + ')';
+						}
+
+						// 우편번호와 주소 정보를 해당 필드에 넣음
+						document.getElementById('zipCheck').value = data.zonecode;
+						document.getElementById("addrCheck").value = roadAddr;
+					}
+				}).open(); // 여기에 닫는 괄호를 추가함
+			}
+
+			// 주소 검색 버튼 클릭 이벤트에 addr 함수 연결
+			$('#addrBnt').on('click', addr);
+			            
+
+//봉사에대해 신청자 내역보기 클릭시 show할 부분
+function showList(id) {
+	$("#showTableBody").empty();
+    // 이벤트의 기본 동작을 막음
+    // 숨겨진 테이블 요소를 가져와서 보여줌
+    var hiddenTable = document.getElementById("hiddenTable");
+    hiddenTable.style.display = "block"; // display 속성을 변경하여 보임
+    
+	$.ajax({
+		 url: '/VolAppList?volActId='+id,
+		 type: 'GET',
+		 success: function(result) {
+			 
+		       for(let i=0; i<result.length; i++){
+		    	   var date = new Date(result[i].appDate);
+		    	   console.log(result[i]);
+		    	   var appCodeText = result[i].appCode == 'h01' ? '승인 전' : '승인완료';
+				    var formattedDate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+		    	   $("#showTableBody").append( 
+		                   `<tr id="${result[i].memId}"><td>${result[i].memId}</td>
+		                   <td>${formattedDate}</td>
+		                   <td><button type="button" data-toggle="modal" data-target="#myModal2">신청서보기</button></td>
+						   <td><button onclick="clickApp(${result[i].volActId},'${result[i].memId}')">수락</button></td>
+						   <td class="app-code-cell"> ${appCodeText}</td></tr>`
+		    		);
+		    		    
+		       }
+		 },
+		 error: function(err) {
+		        console.log(err);
+		 }
+	});
+};
+function clickApp(volActId, memId) {
+    // 봉사 승인 AJAX 요청
+    $.ajax({
+        url: '/volAppUpdate',
+        type: 'POST',
+        data: {
+            volActId: volActId,
+            memId: memId
+        },
+        success: function(result) {
+            var approvalStatus = '승인완료'; // 승인완료로 변경
+
+            // HTML 업데이트
+            var row = document.getElementById(memId);
+            if (row) {
+                var statusCell = row.querySelector('.app-code-cell');
+                if (statusCell) {
+                    statusCell.innerText = approvalStatus;
+                }
+            }
+
+            // 봉사 신청 AJAX 요청
+            var info = {
+                volActId: volActId,
+                memId: memId
+            };
+
+            $.ajax({
+                url: '/volAppInsert',
+                type: 'POST',
+                data: info,
+                success: function(result) {
+                    // 봉사 신청 성공 시 처리
+                    Swal.fire({
+                        title: "봉사승인",
+                        text: "승인되었습니다",
+                        icon: "success"
+                    });
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+}
+
+
+		
+     
+
+
+
+		$(document).ready(function() {
+			// 모달이 표시될 때 이벤트 처리
+			$('#myModal').on('show.bs.modal', function(e) {
+			
+				/* document.getElementById('file-image').addEventListener('change', function (event) {
+					var image = document.getElementById('imagePreview');
+					var file = event.target.files[0];
+					var reader = new FileReader();
+
+					reader.onloadend = function () {
+						image.src = reader.result;
+					}
+
+					if (file) {
+						reader.readAsDataURL(file);
+					} else {
+						image.src = "";
+					}
+				}); */
+
+
+				$('.uploadBtn').click(function () {
+					
+				console.log( $("select#selFacType option:selected").val());
+					
+					 var formData = new FormData(); //FormData 객체 생성
+					formData.append("title", $("input[name=title]").val());
+    				formData.append("content", $("textarea[name=content]").val());
+				    formData.append("location", $("input[id=addrCheck]").val() + ' '+ $("input[id=detailAddrCheck]").val());
+				    formData.append("category", $("select#selFacType option:selected").val());
+				    formData.append("cap", $("input[name=cap]").val());
+				    formData.append("volZip", $("input[id=zipCheck]").val());
+				   
+				    formData.append("volDate", $("input[name=volDate]").val());
+				    formData.append("startDate", $("input[name=startDate]").val());
+				    formData.append("expireDate", $("input[name=expireDate]").val());
+				    
+					var inputFile = $("input[type='file']");
+					var files = inputFile[0].files;
+					for (var i = 0; i < files.length; i++) {
+						formData.append("files", files[i]);
+					}
+				     
+				
+					
+					//jQuery.ajax
+					$.ajax({
+						url: '/InvolJoin',
+						type: 'POST',
+						processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+						contentType: false, // multipart/form-data타입을 사용하기위해 false 로 지정합니다.
+						data: formData,
+						success: function (result) {
+							console.log(result)
+							 $('#myModal').modal('hide');
+							location.href=`/fac/volJoin`
+
+						},
+						error: function (reject) {
+							alert('실패!')
+							console.log(reject);
+						}
+					});
+				});
+			
+			});
+		});
+		
+		//내용이 길어서 ...더보기로 처리함
+		
+		$(document).ready(function() {
+		  $('.more-btn').click(function() {
+		    var $content = $(this).prev('.content');
+		    if ($content.hasClass('show')) {
+		      $content.removeClass('show');
+		      $(this).text('더 보기');
+		    } else {
+		      $content.addClass('show');
+		      $(this).text('접기');
+		    }
+  });
+});
+		
+		
+                    
+</script>
+
+</div>
+</section>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>챌린지 참여 리스트</title>
+
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js"
+  integrity="sha384-6MFdIr0zOira1CHQkedUqJVql0YtcZA1P0nbPrQYJXVJZUkTk/oX4U9GhUIs3/z8" crossorigin="anonymous">
+  </script>
+<script>
+  Kakao.init('67b63dfc4457584184ee614818f5a9c7'); // 사용하려는 앱의 JavaScript 키 입력
+</script>
+
+
+<style>
+.input-file-button {
+	padding: 6px 25px;
+	background-color: yellowgreen;
+	border-radius: 4px;
+	color: white;
+	cursor: pointer;
+}
+
+img{
+	border-radius:20px;
+}
+p{
+	font-size:20px
+}
+
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+
+<div class="comment-form">
+<section class="blog_area single-post-area">	
+<div class="hotel" >
+	<a style="font-size:25px;color:#689f38;font-weight:bold " th:href="@{/challenge/challengeInfo(chalId=${session.challengeInfo.chalId})}" >챌린지소개</a> <span style="margin-right: 25px;"></span>|<span style="margin-left: 25px;"></span>
+	<a style="font-size:25px;color:#689f38; font-weight:bold" th:href="@{/challenge/challengesList(chalId=${session.challengeInfo.chalId})}" >챌린지참여 </a>
+	<br><br><br>
+	</div>
+	<section class="blog_area">
+		<div class="container justify-content-center" style=" max-width: 1300px; ">
+			<div class="row">
+				<div class="col-lg-8">
+					<div class="blog_left_sidebar">
+					<div class="row" id="challengeListContainer">
+					 <th:block th:each="list: ${challengesList}"> 
+					<!--  <th:block th:each="list, stat: ${challengesList}" th:if="${stat.index < 6}"> -->
+					<div th:if="list.length ==0">
+					 <p>참여내역이 아직 없습니다..</p>
+					</div>
+					<div class="col-4"	>
+					
+<!-- 이미지 파일일 경우 -->
+<div th:if="${list.file!=null and list.file.extension.startsWith('image')}">
+    <img th:each="file : ${list.file}" th:src="${file.filePath}" onError="this.src='../image/기본이미지.jpg'" width="200" height="200">
+</div>
+
+<!-- 비디오 파일일 경우 -->
+<div th:if="${list.file!=null and list.file.extension.startsWith('video')}">
+    <video controls th:each="video : ${list.file}" th:src="${video.filePath}" width="200" height="200"></video>
+</div>
+									
+								<div class="text-center">
+  
+</div>
+
+								<svg  th:onclick="openModal([[${list.chalDetId}]])" data-toggle="modal" data-target="#myModal3" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-emoji-frown" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.498 3.498 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.498 4.498 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/></svg>	
+							
+							    <p id="chalDet" class="getChalId" th:data-boardId="${list.chalDetId}">
+								<p th:text="${list.memId}"></p>
+								<p id="partDate" th:text="${#dates.format(list.partDate,'yyyy-MM-dd')}" th:data-part-date="${list.partDate}"></p>
+				</div>	
+				</th:block>
+				</div>
+				</div>
+					</div>
+			
+<!-- 여기 세션 만들어서 주기 Info에서 넘어온다-->
+	           <div class="col-lg-4">
+			<div class="blog_right_sidebar">
+				<aside class="single_sidebar_widget popular_post_widget" style="border:2px solid #689f38">
+					<h3 class="widget_title"
+						th:text="${session.challengeInfo.title}"></h3>
+					
+						<img th:if="${session.FileList != null and !session.FileList.isEmpty()}"  width="300" height="400" th:src="${session.FileList[0].filePath}" alt="post">		
+
+						<div class="media-body">
+							<h3>How to</h3>
+							<p th:text="${session.challengeInfo.partMethod1}"></p>
+							<p th:text="${session.challengeInfo.partMethod2}"></p>
+							
+						</div>
+						<h3>챌린지일시</h3>
+						<div class="form-group">
+							<div class="row">
+								<div class="col">
+								<small class="text-muted">챌린지 시작일</small>
+								<h4 th:text="${#dates.format(session.challengeInfo.regDate,'yyyy-MM-dd') }"></h4>
+								</div>
+								<div class="col">
+								<small class="text-muted">챌린지 마감일</small>
+								<h4 id="endChall" th:text="${#dates.format(session.challengeInfo.endDate,'yyyy-MM-dd' )}"></h4>
+								</div>
+							</div>
+						</div>
+						<button type="button" id="challengeButton" class="btn btn-warning" data-toggle="modal"
+								data-target="#myModal">챌린지 참여하기</button><br>
+								<a id="kakaotalk-sharing-btn" href="javascript:;">
+  								<img src="https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png" alt="카카오톡 공유 보내기 버튼" /></a>
+								<br><br>
+				</aside>
+			</div>
+		</div>
+</div>
+  <button id="loadMoreBtn" class="btn btn-primary mt-3">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>
+</button></div>
+
+<!-- 신고사유받기 모달-->
+<div class="modal" tabindex="-1" id="myModal3">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">신고하기</h5>
+        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          	<span aria-hidden="true">&times;</span>
+        	</button>
+      </div>
+      <div class="modal-body">
+	<div class="form-group">
+    <label class="form-check-label d-block" for="s01">
+        <input class="form-check-input" id="s01" type="radio" name="reason" value="s01">스팸홍보/도배글
+    </label>
+    <label class="form-check-label d-block" for="s02">
+        <input class="form-check-input" id="s02" type="radio" name="reason" value="s02">음란물       
+    </label>
+    <label class="form-check-label d-block" for="s03">
+        <input class="form-check-input" id="s03" type="radio" name="reason" value="s03">불법정보 포함
+    </label>
+    <label class="form-check-label d-block" for="s04">
+        <input class="form-check-input" id="s04" type="radio" name="reason" value="s04">혐오/차별적 표현
+    </label>
+    <label class="form-check-label d-block" for="s05">
+        <input class="form-check-input" id="s05" type="radio" name="reason" value="s05" checked>주제와 상관이 없음
+    </label>
+</div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary reportBtn">신고</button>
+      </div>
+      
+	    </div>
+	  </div>
+	</div>						
+<!--  -->
+<div class="modal" tabindex="-1" id="myModal">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title">챌린지 참여하기</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+     
+      
+							<div class="form-group">
+								<img id="imagePreview" src="/image/no이미지.png" style="border-radius: 100%; width: 100px; height: 100px;">
+					               
+								<label for="file-image" class="input-file-button" >이미지첨부 
+								<input type="file" name="uploadFiles" id="file-image" style="display: none">
+								</label> 
+								<br> 
+								
+								<textarea id="content" name="content" maxlength="500"></textarea>
+							</div>
+						
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary uploadBtn">Save changes</button>
+      </div>
+
+    </div>
+  </div>
+</div>		
+<script>
+
+window.onload = function() {
+	// 현재 날짜를 가져오는 함수
+	function getCurrentDate() {
+	    let now = new Date();
+	    // 월과 일이 한 자리 수인 경우 앞에 0을 붙여줌
+	    let month = (now.getMonth() + 1).toString().padStart(2, '0');
+	    let day = now.getDate().toString().padStart(2, '0');
+	    let currentDate = `${now.getFullYear()}-${month}-${day}`;
+	    console.log(currentDate);
+	    return currentDate;
+	}
+
+	// 버튼을 비활성화하는 함수
+	function disableButton() {
+	    let challengeButton = document.getElementById('challengeButton');
+	    challengeButton.disabled = true;
+	    challengeButton.innerHTML = '챌린지 마감';
+	    challengeButton.classList.add('btn-secondary');
+	}
+
+	// 챌린지 마감일을 가져오는 함수
+	function getChallengeEndDate() {
+	    let endDateElement = document.getElementById('endChall');
+	    let endDateString = endDateElement.textContent.trim(); // 텍스트에서 앞뒤 공백 제거
+	    console.log(endDateString);
+	    return endDateString;
+	}
+
+	// 챌린지 마감일을 가져옵니다
+	let challengeEndDate = getChallengeEndDate();
+
+	// 현재 날짜를 가져옵니다
+	let currentDate = getCurrentDate();
+
+	// 챌린지 마감일과 현재 날짜를 비교하여 버튼을 비활성화합니다
+	if (challengeEndDate < currentDate) {
+	    disableButton();
+	}
+
+	}
+
+
+var memId = '[[${session.userId}]]';
+var chalDet = $('#chalDet').data('boardId');	
+var partDate = $('#partDate').data('part-date');	
+console.log(chalDet);
+console.log(partDate);
+	
+		$(document).ready(function() {
+			// 모달이 표시될 때 이벤트 처리
+			$('#myModal').on('show.bs.modal', function(e) {
+			
+				document.getElementById('file-image').addEventListener('change', function (event) {
+					var image = document.getElementById('imagePreview');
+					var file = event.target.files[0];
+					var reader = new FileReader();
+
+					reader.onloadend = function () {
+						image.src = reader.result;
+					}
+
+					if (file) {
+						reader.readAsDataURL(file);
+					} else {
+						image.src = "";
+					}
+				});
+
+
+			
+				
+				
+				$('.uploadBtn').click(function () {
+					
+					$.ajax({
+	       		        url: '/getChallCheck',
+	       		        type: 'GET',
+	       		        data: {
+	       		            memId: memId,
+	       		            chalId: chalId,
+	       		            partDate: partDate
+	       		        },
+	       		        success: function(response) {
+	       		            if(response > 0) {
+	       		               alert('오늘 이미 챌린지 참여했음')
+	       		             
+	       		            } else {
+	       		           		
+	       		 			var formData = new FormData(); //FormData 객체 생성
+	    					var inputFile = $("input[type='file']");
+	    					//input 태그의 type이 file인것을 찾아서 inputFile이라는 변수로 지정
+	    					var files = inputFile[0].files;
+	    					//files : 선택한 모든 파일을 나열하는 FileList 객체입니다.
+	    					//multiple 특성을 지정하지 않닸다면 두 개 이상의 파일을 포함하지 않습니다.
+	    					for (var i = 0; i < files.length; i++) {
+	    						console.log(files[i]);
+	    						formData.append("uploadFiles", files[i]); //키,값으로 append 
+	    					}
+	    					
+	    					formData.append("chalId", [[${session.challengeInfo.chalId}]]);
+	    					formData.append("dContent", $('#content').val());
+	    			
+
+	    					//jQuery.ajax
+	    					$.ajax({
+	    						url: '/challenge/challengeDeInsert',
+	    						type: 'POST',
+	    						processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+	    						contentType: false, // multipart/form-data타입을 사용하기위해 false 로 지정합니다.
+	    						data: formData,
+	    						success: function (result) {
+	    							console.log(result)
+	    							
+	    							$('#myModal').modal('hide');
+	    							location.href='/challenge/challengesList?chalId=[[${session.challengeInfo.chalId}]]'
+	    						},
+	    						error: function (reject) {
+	    							alert('실풰!')
+	    							console.log(reject);
+	    						}
+	    					});
+	    					
+	       		            }
+	       		        },
+	       		        error: function(xhr, status, error) {
+	       		          
+	       		        }
+	       		    });
+		
+				
+				});
+			
+			});
+
+		});
+
+	
+			
+function openModal(chalDetId) {
+	var reason = $('input[name="reason"]:checked').val();
+ 	console.log(reason); 
+ 	var boardId = document.querySelector('.getChalId').getAttribute('data-boardId');
+ 	console.log(boardId);
+	    $('.reportBtn').click(function () {
+	    	let info = {
+	    			categoryNo:boardId, 
+	    			repReason:reason	
+	    			
+	    	}
+	    	console.log(info);
+	    	$.ajax({
+	    		   url: '/reportInsert', // 실제 서버의 URL로 수정해야 함
+	    		   type: 'POST',
+	    		   contentType: 'application/json', // 컨텐츠 타입을 JSON으로 지정
+	    		   data: JSON.stringify(info), // JavaScript 객체를 JSON 문자열로 변환
+	    		   success: function (result) {
+	    			   $('#myModal3').modal('hide');
+	    		       
+	    		   },
+	    		   error: function (reject) {
+	    		       alert('실패!');
+	    		       console.log(reject);
+	    		   }
+	    		}); 
+ 
+	});
+} 
+
+
+
+
+	</script>
+
+	<script>
+  Kakao.Share.createCustomButton({
+    container: '#kakaotalk-sharing-btn',
+    templateId: 103903,
+   /*  templateArgs: {
+      title: '라이언이 즐겨먹던 바로 그 틴케이스 치즈볼',
+      description: '바라만 봐도 즐거워지는 힐링 패키지에는 시크릿 스토리가 숨어있어요.',
+    }, */
+  });
+</script>
+	
+</section>
+</section>
+</div>
+</section>
+
+
+
+</body>
+</html>

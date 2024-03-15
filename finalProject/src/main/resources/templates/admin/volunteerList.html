@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}"
+>
+<head>
+<meta charset="UTF-8">
+<title>봉사 프로젝트</title>
+<style>
+.cur{
+	cursor:pointer;
+}
+</style>
+<script>
+function show1(){
+	$('#tableData').load("../volunteerList #meetVolList");
+};
+function show2(){
+	$('#tableData').load("../facVolList #facVolList");
+};
+
+function prev(start,cnt,word){
+	if(word!=null){
+		$('#tableData').load("../facVolList?start="+(start-cnt)+"&end="+(start-1)+"&searchKeyword="+word+" #facVolList");
+	}else{
+		$('#tableData').load("../facVolList?start="+(start-cnt)+"&end="+(start-1)+" #facVolList");
+	}
+};
+
+function current(page, cnt, word) {
+    var start = (page - 1) * cnt + 1; // 현재 페이지의 첫 번째 게시글 번호
+    var end = page * cnt; // 현재 페이지의 마지막 게시글 번호
+
+    var url = "../facVolList?start=" + start + "&end=" + end;
+
+    if (word != null) {
+        url += "&searchKeyword=" + encodeURIComponent(word); // 검색어 추가
+    }
+
+    $('#tableData').load(url + " #facVolList");
+}
+
+function next(end,cnt,word){
+	if(word!=null){
+		$('#tableData').load("../facVolList?start="+(end + 1)+"&end="+(end+cnt)+"&searchKeyword="+word+" #facVolList");
+	}else{
+		$('#tableData').load("../facVolList?start="+(end + 1)+"&end="+(end+cnt)+" #facVolList");
+	}
+	
+};
+
+function handleKeyPress(event) {
+    if (event.keyCode === 13) {
+        search();
+    }
+}
+
+function search(){
+	let keyword = $('#search').val();
+	if(keyword == '') {
+		alert('검색하실 내용을 입력하세요');
+		return;
+	}
+	$('#tableData').load("../volunteerList?searchKeyword="+keyword+" #meetVolList");
+}
+
+function handleKeyPress2(event) {
+    if (event.keyCode === 13) {
+        search2();
+    }
+}
+
+function search2(key){
+	let keyword = $('#search2').val();
+	if(keyword == '') {
+		alert('검색하실 내용을 입력하세요');
+		return;
+	}
+	$('#tableData').load("../facVolList?searchKeyword="+keyword+" #facVolList");
+}
+</script>
+</head>
+<body>
+<section layout:fragment="content">
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<h2>봉사 프로젝트</h2>
+		<div id="tableData">
+		<div id="meetVolList">
+		<div style="float:left;padding:10px">
+			<input class="form-control-sm me-2" onkeypress="handleKeyPress(event)" id="search" type="search" placeholder="모임을 검색하세요" aria-label="Search" th:value="${vo.searchKeyword}">
+			<button class="btn btn-outline-success" onclick="search()" type="button">검색</button>
+			<button class="btn btn-outline-primary" type="button" onclick="show1()">초기화</button>
+		</div>
+		<br>
+		<div style="float:right;color:black" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">모임 봉사 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 시설 봉사</a>
+		</div>
+		<br><hr>
+		<th:block th:if=${meet.size}!=0>
+	        <div class="row">
+	          <div class="col-sm-6 col-xl-3" style="color:black;width:25%" th:each="meet : ${meet}">
+	            <div class="card overflow-hidden rounded-2">
+	              <div class="position-relative">
+	              <a th:href="@{meetings(volId=${meet.volId})}" target='_blank'>
+	                <img th:if="${meet.filePath}!=null" th:src="@{${meet.filePath}}" onError="this.src='../donation/board/img/fruite-item-5.jpg'" class="card-img-top rounded-0" alt="..." style="height:200px">
+					<img th:if="${meet.filePath}==null" src="../donation/board/img/fruite-item-5.jpg"class="card-img-top rounded-0" alt="..." style="height:200px">
+	              </a>
+	              </div>
+	              <div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+				    <span>모집중</span><br>
+					</div>
+	               <div class="d-flex align-items-center justify-content-between">
+		            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+		                <h4><a th:text="${meet.meetName}">동아리명</a></h4>
+		                <a href="#" style="color:gray">
+						   <span th:if="${meet.region}=='z01'">#서울특별시</span>
+						   <span th:if="${meet.region}=='z02'">#부산광역시</span>
+						   <span th:if="${meet.region}=='z03'">#대구광역시</span>
+						   <span th:if="${meet.region}=='z04'">#인천광역시</span>
+						   <span th:if="${meet.region}=='z05'">#광주광역시</span>
+						   <span th:if="${meet.region}=='z06'">#대전광역시</span>
+						   <span th:if="${meet.region}=='z07'">#울산광역시</span>
+						   <span th:if="${meet.region}=='z08'">#세종특별자치시</span>
+						   <span th:if="${meet.region}=='z09'">#경기도</span>
+						   <span th:if="${meet.region}=='z10'">#강원도</span>
+						   <span th:if="${meet.region}=='z11'">#충청북도</span>
+						   <span th:if="${meet.region}=='z12'">#충청남도</span>
+						   <span th:if="${meet.region}=='z13'">#전라북도</span>
+						   <span th:if="${meet.region}=='z14'">#전라남도</span>
+						   <span th:if="${meet.region}=='z15'">#경상북도</span>
+						   <span th:if="${meet.region}=='z16'">#경상남도</span>
+						   <span th:if="${meet.region}=='z17'">#제주특별자치도</span>
+						   <span th:each="tag : ${tag}" th:if="${tag.volId}==${meet.volId}">#[[${tag.tagContent}]] </span>
+						</a>
+						<br>
+						<Strong><span>모집기간</span></Strong>
+						<br>
+	                    <span th:text="${#dates.format(meet.recPeriod, 'yy.MM.dd')}+' ~ '+${#dates.format(meet.endPeriod, 'yy.MM.dd')}">2024-02-04 ~ 2024-09-04</span>
+	                    <br>
+	                    <span th:text="'정원 : '+${meet.meetingCnt}+'/'+${meet.cap}+'명'">정원 : 3/10명</span>
+						 <br>
+		            </div>
+	               </div>
+	            </div>
+	          </div>
+	        </div>
+	        <nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/volunteerList(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1})}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/volunteerList(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage})}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/volunteerList(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+		</th:block>
+		<th:block th:if="${meet.size}==0">
+			<h3>데이터가 존재하지 않습니다</h3>
+		</th:block>
+        </div>
+      </div>
+      </div>
+    </div>
+</section>
+</body>
+
+</html>

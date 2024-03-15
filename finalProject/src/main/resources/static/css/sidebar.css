@@ -1,0 +1,60 @@
+
+ .body {
+    font-family: 'Arial', sans-serif;
+    background-color: #689f38;
+    margin: 0;
+}
+
+.sidebar {
+    background-color: #689f38;
+    color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    /* position: fixed; */
+    height: 40vh;
+    overflow-y: auto;
+}
+
+.sidebar a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-toggle {
+    width: 100%;
+    text-align: left;
+    padding: 10px 15px;
+}
+
+.btn-toggle:focus {
+    outline: none;
+}
+
+.btn-toggle:hover,
+.btn-toggle:focus {
+    background-color: #689f38;
+}
+
+.btn-toggle.active {
+    background-color: #689f38;
+    color: #fff;
+}
+
+.btn-toggle-nav {
+    padding-left: 20px;
+}
+
+.link-dark {
+    color: #343a40 !important;
+}
+
+.p {
+    text-align: center;
+}
+
+.main-content {
+    /* margin-left: 280px; */
+    padding-left: 50px; /* 사이드바의 너비만큼 패딩 추가 */
+    overflow: hidden; /* 내용이 사이드바 아래로 넘치지 않도록 */
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+.navigation-bar {
+  display: flex;
+}
+
+.nav-item {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+div[th:if] {
+  display: none;
+}
+
+.container {
+	text-align : center;
+	font-family: 'Orbit', sans-serif;
+}
+
+.navigation-bar {
+	text-align : center;
+}
+.title_cont {
+    font-size: 17px;
+    margin: 0 auto;
+    text-align: center;
+    padding-bottom: 10px;
+}
+.wrap_cont {
+	padding-bottom: 30px;
+}
+.accordion {
+	margin-top: 30px;
+	border-top: 0 none;
+}
+.accordion-body {
+	white-space: pre-wrap;
+}
+
+
+.accordion-body p {
+    margin-bottom: 10px;
+}
+
+.title_cont span {
+    cursor: pointer;
+}
+
+.title_cont span.active {
+    color: black;
+    font-weight: bold;
+}
+
+.accordion-button:not(.collapsed) {
+
+    background-color: none;
+}
+</style>
+<!-- Bootstrap JS (Popper.js 포함) -->
+<!-- 부트스트랩 5.3 버전 CSS 링크 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+<div class="container" style="color: black; margin:0 auto;">
+  	<div class="side" th:insert="~{center/sidebar::side}"></div>
+		<div>
+			<div class="title_cont">
+			    <span id="a03" onclick="select('a03')" th:class="${category == 'a03' ? 'active' : ''}">기부</span>
+			    <span id="a02" onclick="select('a02')" th:class="${category == 'a02' ? 'active' : ''}">봉사</span>
+			    <span id="a01" onclick="select('a01')" th:class="${category == 'a01' ? 'active' : ''}">챌린지</span>
+			</div>
+			<div class="accordion" id="accordionPanelsStayOpenExample" style="padding-bottom: 30px;">
+			  <div th:each="item : ${list}" class="accordion-item" th:data-category="${item.category}" style="margin-bottom: 15px; background-color: transparent;">
+			    <div class="accordion-header" th:id="'heading' + ${item.faqId}">
+			      <h2 class="mb-0">
+			        <button style="color:black;" class="accordion-button" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapse' + ${item.faqId}" th:aria-expanded="true" th:aria-controls="'collapse' + ${item.faqId}">
+			          Q. [[${item.title}]]
+			        </button>
+			      </h2>
+			    </div>
+			    <div th:id="'collapse' + ${item.faqId}" class="accordion-collapse collapse" th:aria-labelledby="'heading' + ${item.faqId}" data-bs-parent="#accordionPanelsStayOpenExample">
+			      <div class="accordion-body" th:text="${item.content}"></div>
+			    </div>
+			  </div>
+				<div style="text-align:right;">
+					<span>원하시는 답변을 찾지못하셨다면, 고객센터로 문의해 주세요.</span>
+					<input type="button" class="btn btn-outline-dark m-1 btn-lg" id="receipt" value="문의하기">
+				</div>
+			</div>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/faq(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1}, category=${category})}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/faq(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage}, category=${category})}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/faq(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage}, category=${category})}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+	</div>
+</div>
+<script th:inline="javascript">
+let vo = [[${vo}]];
+
+function select(category) {
+    console.log(category);
+    
+ 
+    $.ajax({
+        url: `/faq?category=${category}`,
+        type: "GET",
+        success: function(result) {
+            window.location.href = `/faq?category=${category}`;
+        }	
+    });
+}
+
+$('#receipt').on('click',function(){
+	window.location.replace("/receipt");
+})
+</script>
+</section>
+
+</body>
+</html>

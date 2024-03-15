@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사마루</title>
+<style>
+  .a-tag-container {
+    text-align: center;
+    background-color: #fbb200;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+    margin-top: 50px;
+  }
+
+  .a-tag {
+    font-size: 20px;
+    padding: 20px;
+    color: white;
+    font-weight: bold;
+    margin: 0 10px;
+    text-decoration: none;
+    transition: font-size 0.3s, color 0.3s;
+  }
+
+  .a-tag:hover {
+    font-size: 25px;
+    color: white; 
+  }
+  
+ .contenttext {
+  text-align:left;
+ }
+ 
+ .link_thumb{
+  text-align:left;
+ }
+.num_title {
+	display: block;
+	font-weight: 400; 
+	font-size: 15px; 
+	color: #666; 
+	text-align: right;
+}
+.num_total {
+    display: block;
+    overflow: hidden;
+    height: 48px;
+    font-size: 32px;
+    font-family: KakaoBig Bold,sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: normal;
+    text-align: right;
+}
+
+.link_setting {
+    font-size: 14px;
+    border-bottom: 1px solid #444;
+    background-color: initial;
+    color: #444;
+}
+.title{
+	text-align:center;
+}
+.contenttext{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+		<div th:insert="~{banner/empty::banner}"></div>
+			<div class="side" th:insert="~{my/sidebar::side}"></div>
+			<div class="container title">
+				<th:block th:each="item : ${list}">
+				<div class="contenttext" id="temperature" title="">
+					<div style="font-size:14px; font-weight: bold;">[[${heart}]]ºC
+						<img alt="마음 온도" src="/userresources/image/banner/heart.jpg" style="width:30px; height: 30px;">
+					</div>
+				
+				</div>
+				<div class="contenttext">
+					<a data-tiara-layer="profile_img" data-tiara-action-name="프로필수정_클릭" class="link_thumb" href="/pass">
+						<span class="profile_thumb">
+						[[${userVO}]]
+						<img th:if="${item.memProfile} == null" alt="프로필 이미지" src="/userresources/image/banner/nullimage.jpg" style="border-radius: 50%; width: 200px; height: 200px;">
+						<img th:if="${item.memProfile} != null"id="profileImage" style="border-radius: 50%; width: 200px; height: 200px;" alt="프로필 이미지" class="img_thumb" th:src="@{${item.memProfile}}">
+						</span>
+					</a>
+				</div>
+				<h1 th:text="${item.memName}">이름</h1>
+				<a data-tiara-layer="profile_img" data-tiara-action-name="프로필 수정_클릭" class="link_setting" href="/pass">설정</a>
+				<a class="link_setting" href="/password">탈퇴</a>
+			<div>					
+					<input id="feedBtn" type="button" class="btn btn-outline-secondary m-1" value="내 피드가기">
+					<input id="gibuBtn" type="button" class="btn btn-outline-secondary m-1" value="기부하러가기">
+					<input id="bongsaBtn" type="button" class="btn btn-outline-secondary m-1" value="봉사하러가기">
+			<div>
+				<span class="num_title">총 기부금</span>
+				<span class="num_total" th:text="${#numbers.formatInteger(sumAmt, 1, 'COMMA') + '원'}"></span>
+			</div>
+			</div>
+			</th:block>
+			</div>
+	<script>
+		$("#temperature").attr( 'title', 
+`마음온도란 무엇인가요?
+		
+회원가입 시, 여러분의 마음온도는 기본 36.5도로 시작합니다.
+사이트 내 활동에 따라 마음온도가 오르거나 내려갑니다.
+여러분의 활발한 참여로 마음온도를 따뜻하게 유지해주세요!
+` );
+
+	$("#gibuBtn").on('click',function(){
+		window.location.href = "/donaMain";
+	});
+	
+	$("#feedBtn").on('click',function(){
+		window.location.href = "/myfeed";
+	});
+	
+	$("#bongsaBtn").on('click',function(){
+		window.location.href = "/FacilityVol";
+	});
+	</script>
+	</section>
+</body>
+</html>

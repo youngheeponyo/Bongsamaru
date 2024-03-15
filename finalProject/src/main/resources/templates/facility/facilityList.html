@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>시설리스트</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+</head>
+<body>
+	<section layout:fragment="content">
+		<section class="breadcrumb_area blog_banner_two">
+			<div class="overlay bg-parallax" data-stellar-ratio="0.8"
+				data-stellar-vertical-offset="0" data-background=""
+				style="transform: translateY(0px);"></div>
+			<div class="container">
+				<div class="page-cover text-center">
+					<h2 class="page-cover-tittle f_48">봉사마루와 함께하는 시설들</h2>
+
+				</div>
+			</div>
+		</section>
+		<div>
+
+
+
+		<div class="container" style="margin: 0 auto;text-align:right;">
+		<br>
+		<br>
+		<select  id="selRegion" style="width: 200px; height: 40px; bolder-radious:20px; text-align:center; background-color:rgba(104, 159, 56, 0.3)" onchange="filterFacilities()">
+			<option value="">===지역===</option>
+		    <option th:each="sub : ${subZ}"  th:value="${sub.subCode}" th:text="${sub.value}" th:selected="${#strings.equals(sub.subCode, param.facZip2)}"></option>
+		</select>
+		
+		<select id= "selFacType" style="width: 200px; height: 40px; bolder-radious:20px; text-align:center; background-color:rgba(104, 159, 56, 0.3)" onchange="filterFacilities()">
+			<option value="">===봉사유형===</option>
+			<option th:each="subf : ${subF}" th:value="${subf.subCode}" th:text="${subf.value}" th:selected="${#strings.equals(subf.subCode, param.facType)}"></option>
+		</select>
+		<br>
+		<br>
+		<br>
+		<br>
+		</div>
+
+			<div class="row mb_30 container" style="margin: 0 auto;"  >
+				<th:block th:each="facility:${facilityList}" id="filteredFacilities">
+					<div class="col-lg-4 col-md-6" style="text-align:center">
+							<div class="thumb" style="position: relative;">
+								<img th:src="${facility.filePath}" onError="this.src='../image/기본이미지.jpg'"alt="" style="width: 60%; ">
+								<div class="text-white px-1 rounded position-absolute" style="top: 10px; right: 80px;background-color:#28a745;">
+					                    <span th:text="${facility.category}">관심분야</span>
+					                </div>
+
+								<br>
+							</div>
+							<div class="details" >
+								<div class="tags">
+								</div>
+								<br>
+								<a class="btn theme_btn button_hover " th:href="@{/fInfo/facilityInfo(facId=${facility.facId})}"
+										th:text="${facility.facName}" style="width: 30%;"></a>
+							</div>
+								<p style=" margin-bottom:50px;" th:text="${facility.facAddr}"></p>
+								<p style="display:none;" th:text="${facility.region}" id="regions"></p>
+					</div>
+				</th:block>
+			</div>
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+ <th:block th:if="${#lists.size(facilityList)}!=0">
+<nav class="blog-pagination justify-content-center d-flex">
+	<ul class="pagination">
+		<li class="page-item">
+			<a th:href="@{/facilityList(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1})}" class="page-link" aria-label="Previous"> <span aria-hidden="true"> <span class="lnr lnr-chevron-left"></span></span></a></li>
+		<li class="page-item" th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			 <a class="page-link" th:href="@{/facilityList(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage})}" th:text="${pageNum}"></a></li>
+		<li class="page-item"><a th:href="@{/facilityList(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}" class="page-link" aria-label="Next"> <span aria-hidden="true"> <span class="lnr lnr-chevron-right"></span></span></a></li>
+	</ul>
+</nav>
+</th:block>
+</div>
+
+<script th:inline="javascript">
+    function filterFacilities() {
+    	
+        let selectedRegion = $('#selRegion').val();
+		let selectedFacType = $('#selFacType').val();
+		location.href=`facilityList?facZip2=${selectedRegion}&facType=${selectedFacType}`
+    }
+
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+	
+    
+    
+    
+    
+</script>
+
+
+
+	</section>
+</body>
+</html>
+

@@ -1,0 +1,33 @@
+.hero-section{
+    .hero-section-wrapper{
+        padding: 28px 0 180px;
+        .hero-section-content{
+            padding-top: 54px;
+            .heading-title{
+                color: $gray-900;
+                font-weight: $font-weight-bolder;
+                line-height: 90px;
+                letter-spacing: 0.01em;
+                margin-bottom: 14px;
+                .primary-text{
+                    color: $primary;
+                }
+            }
+            .text{
+                margin-bottom: 23px;
+            }
+            .hero-btn{
+                .how-it-work{
+                    color: $gray-900;
+                    .border-bottom{
+                        margin-left: 15px;
+                        border-bottom: 1.4px solid $gray-900 !important;
+                    }
+                }
+            }
+        }
+        .hero-img{
+            margin: 0 -100px 0 -150px;
+        }
+    }
+}

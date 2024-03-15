@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모임 수정 페이지</title>
+<link rel="stylesheet" th:href="@{/donation/form/bootstrap.min.css}">
+<style>
+.form-select{
+width: 20%;
+}
+
+.form-control-sm {
+    width: 50%; /* 현재 크기의 1/3로 조정 */
+}
+
+.form-control[type="file"] {
+    width: 33.33%; /* Set to one-third of the current size */
+}
+.modal-dialog{
+	float:left;
+	left : 38%;
+	width: 30%
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div class="container" style="margin:50px 116px 50px 300px;">
+<form name="insertMeeting" style="width:70%;margin:auto">
+  <fieldset>
+    <legend style="font-weight:bold;"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+  <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"></path>
+</svg> <strong>모임 수정</strong> </legend>
+     <div>
+      <img id="imagePreview" th:src="${info.path}" onError="this.src='/userresources/image/미리보기.jpg'" style="width: 150px; height: 150px;"><br>
+		<i class="fas fa-cloud-upload-alt" onclick="fileUpload()"></i>
+		<input name="file" class="form-control" type="file" id="formFile" style="display:none">
+    </div>
+    <div class="form-group">
+      <label for="title" class="form-label mt-4"> ⦁ 모임명</label>
+      <input type="text" name="meetName" class="form-control form-control-sm" id="meetName"  aria-describedby="titleHelp" th:value=${info.meetName}>
+    </div>
+    <div class="form-group">
+    <label for="recPeriod" class="form-label mt-4"> ⦁ 모임 마감기간</label>
+    <div class="row">
+        <div class="col-md-3">
+            <input type="date" name="endPeriod" class="form-control" id="endPeriod"  placeholder="모집 종료기간" autocomplete="off" th:value="${#dates.format(info.endPeriod, 'yyyy-MM-dd')}">
+        </div>
+    </div>
+</div>
+    <div class="form-group">
+      <label for="cap" class="form-label mt-4"> ⦁ 정원</label>
+      <input name="cap" type="number" class="form-control" id="cap" autocomplete="off" style="width: 33.33%;" th:value="${info.cap}">
+    </div>
+
+    <div class="form-group">
+      <label for="meetPurp" class="form-label mt-4"> ⦁ 모임 목적</label>
+      <input type="text" name="meetPurp" class="form-control" id="meetPurp" placeholder="30자 이내로 입력하세요" autocomplete="off" style="width: 50%;" th:value="${info.meetPurp}">
+    </div>
+
+
+    <div class="form-group">
+      <label for="meetDesc" class="form-label mt-4"> ⦁ 모임 설명</label>
+      <textarea name="meetDesc" class="form-control" id="expEffect" rows="3" placeholder="모임에 대한 상세설명을 입력하세요." style="width: 66.66%;" maxlength="600">[[${info.meetDesc}]]</textarea>
+    </div>
+	<div class="form-group">
+	    <label for="oneLiner" class="form-label mt-4"> ⦁ 한줄소개</label>
+	    <div id="relatedLinkContainer" class="mb-3" style="width: 60%;">
+	        <div class="input-group">
+	            <input type="text" class="form-control" id="link" name="oneLiner" placeholder="모임을 대표하는 한줄을 적어주세요." autocomplete="off" th:value="${info.oneLiner}">
+	        </div>
+	    </div>
+	</div>
+    <button type="button" class="btn btn-primary" onclick="updateMeeting()">수정하기 </button>
+  </fieldset>
+</form>
+
+<!-- 다시확인 모달 -->
+<div class="modal fade" id="CheckModal" tabindex="-1" role="dialog" aria-labelledby="donationConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="donationConfirmationModalLabel">모임수정 확인</h5>
+            </div>
+            <div class="modal-body">
+                <p>모임이 수정되었습니다!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="okBtn" data-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script th:inline="javascript">
+	document.getElementById('formFile').addEventListener('change', function (event) {
+		var image = document.getElementById('imagePreview');
+		var file = event.target.files[0];
+		var reader = new FileReader();
+	
+		reader.onloadend = function () {
+			image.src = reader.result;
+		}
+	
+		if (file) {
+			reader.readAsDataURL(file);
+		} else {
+			image.src = "";
+		}
+	});
+	
+	$(document).ready(function() {
+	    // 오늘 날짜를 시작일 최소값으로 설정
+	    let todayDate = new Date().toISOString().substring(0, 10);
+	    $('input[name=endPeriod]').prop("min", todayDate);
+	});
+	function updateMeeting(){
+		let meetName = $('[name="meetName"]');
+		let meetPurp = $('[name="meetPurp"]');
+		let meetDesc = $('[name="meetDesc"]');
+		let endPeriod = $('[name="endPeriod"]');
+		let cap = $('[name="cap"]');
+
+		if(meetName.val()==''){
+			alert('모임명이 입력되지 않았습니다.');
+			meetName.focus();
+			return;
+		};
+		if(meetPurp.val()==''){
+			alert('모임목적이 입력되지 않았습니다.');
+			meetPurp.focus();
+			return;
+		};
+		if(meetDesc.val()==''){
+			alert('모임설명이 입력되지 않았습니다.');
+			meetDesc.focus();
+			return;
+		};
+		if(cap.val()==''){
+			alert('정원이 입력되지 않았습니다.');
+			cap.focus();
+			return;
+		};
+		
+		if(endPeriod.val()==''){
+			alert('모집마감일이 입력되지 않았습니다.');
+			return;
+		};
+		
+		var formData = new FormData(document.querySelector('form[name="insertMeeting"]'));
+		formData.append("volId",[[${session.id}]]);
+		let fileInputs = document.querySelectorAll('input[type="file"]');
+	    fileInputs.forEach(function(fileInput) {
+	        for (let i = 0; i < fileInput.files.length; i++) {
+	            formData.append('uploadfiles', fileInput.files[i]);
+	        }
+	    });
+	    document.querySelectorAll('form[name="insertMeeting"] input').forEach(function(input) {
+	        console.log(input.name + ': ' + input.value);
+	    });
+	    
+	    $.ajax({
+			url: '/updateMeeting',
+			type: 'POST',
+			data: formData,
+			contentType: false,
+	        processData: false,
+			success: function (result) {
+				console.log(result);
+				$("#CheckModal").modal("show");
+			},
+			error: function (reject) {
+				console.log(reject);
+			}
+		})
+	};
+		
+	$("#okBtn").click(function () {
+	    $("#CheckModal").modal("hide");
+	    location.href="managerPage?volId="+[[${session.id}]];
+	});
+	
+	
+	function fileUpload(){
+		$('#formFile').click();
+	};
+</script>
+
+
+
+
+</section>
+</body>

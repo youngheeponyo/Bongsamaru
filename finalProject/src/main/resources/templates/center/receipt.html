@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+.navigation-bar {
+  display: flex;
+}
+
+.nav-item {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+
+.container {
+	text-align : left;
+	font-family: 'Orbit', sans-serif;
+}
+
+.navigation-bar {
+	text-align : center;
+}
+.title_cont {
+	font-size: 17px;
+	margin: 47px 0 45px;
+}
+.wrap_cont {
+	padding-bottom: 30px;
+}
+.accordion {
+	margin-top: 30px;
+	border-top: 0 none;
+}
+
+ul,li{
+	
+	list-style: none;
+}
+
+.hidden {
+	display:none;
+}
+</style>
+<!-- Bootstrap JS (Popper.js 포함) -->
+<!-- 부트스트랩 5.3 버전 CSS 링크 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<section layout:fragment="content">
+	<div th:insert="~{banner/empty::banner}"></div>
+  	<div class="side" th:insert="~{center/sidebar::side}"></div>
+		<div class="container">
+		  <h2 style="font-family: 'Orbit', sans-serif;">문의하기</h2>
+		  <p style="text-align: right;">* 필수입력사항</p>
+		  <hr>
+		  <ul>
+		    <li>
+		      <label class="hidden">아이디 *</label>
+		      <input type="text" class="hidden" id="id" value="${vo.memId}">
+		    </li>
+		    <li>
+		      <label>이메일 주소 *</label>
+		      <input type="text" class="form-control" id="email" placeholder="exam@bongsamaru.com">
+		    </li>
+		    <li>
+		      <label>휴대폰 번호 *</label>
+		      <input type="text" class="form-control" id="phoneNumber" placeholder="01012345678">				  					
+		    </li>
+		    <li>
+		      <label>문의 제목 *</label>
+		      <input type="text" class="form-control" id="inquiryTitle" placeholder="제목을 입력해주세요(20자 이내)">					
+		    </li>
+		    <li>
+		      <label>문의 내용 *</label>
+		      <textarea type="text" class="form-control" id="inquiryContent" rows="15"></textarea>				
+		    </li>
+		  </ul>
+		  <hr>
+		  <div class="font">
+		    <p>개인정보 수집·이용에 대한 안내</p>
+		    <p style="font-weight: bold;">(필수) 개인정보 수집·이용에 대한 안내</p>
+		    <p>봉사마루는 이용자 문의를 처리하기 위해 다음과 같이 개인정보를 수집 및 이용하며, 이용자의 개인정보를 안전하게 취급하는데 최선을 다하고 있습니다.</p>
+		    <table class="tbl_privacy">
+		      <caption class="ir_caption">개인정보 수집·이용에 대한 안내</caption>
+		      <colgroup>
+		        <col>
+		        <col>
+		        <col>
+		      </colgroup>
+		      <thead>
+		        <tr>
+		          <th scope="col" style="width:270px;">수집항목</th>
+		          <th scope="col" style="width:220px;" class="tbl_border_left">수집목적</th>
+		          <th scope="col" style="width:260px;" class="tbl_border_left">보유기간</th>
+		        </tr>
+		      </thead>
+		      <tbody>
+		        <tr>
+		          <td>이메일 주소, 휴대폰 번호</td>
+		          <td class="tbl_border_left" rowspan="1">문의・요청・불편사항 확인 및 처리결과 회신</td>
+		          <td class="tbl_border_left txt_bold">3년간 보관 후 지체없이 파기</td>
+		        </tr>
+		      </tbody>
+		    </table>
+		    <p>위 동의를 거부 할 권리가 있으며, 동의를 거부하실 경우 문의 처리 및 결과 회신이 제한됩니다.</p>
+		    <input type="checkbox" id="agreementCheckbox">
+		    <label>위 내용에 동의합니다</label>
+		    <div style="text-align: right;">
+		      <input type="button" class="btn btn-outline-success" value="접수하기" onclick="return submitForm();">
+		    </div>
+		  </div>
+	</div>
+</div>
+<script th:inline="javascript">
+	function submitForm() {
+  // 필수 입력 사항을 가져옵니다.
+  let id = [[${memId}]];
+  let email = $("#email").val();
+  let phoneNumber = $("#phoneNumber").val();
+  let inquiryTitle = $("#inquiryTitle").val();
+  let inquiryContent = $("#inquiryContent").val();
+  let agreementCheckbox = $("#agreementCheckbox").prop("checked");
+
+  // 이메일 형식을 확인합니다.
+  let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  let isValidEmail = emailRegex.test(email);
+
+  // 필수 입력 사항과 체크박스 동의 여부를 검사합니다.
+  if (email === "" || phoneNumber === "" || inquiryTitle === "" || inquiryContent === "" || !agreementCheckbox) {
+    // 필수 입력 사항이나 체크박스 동의 여부가 비어있을 경우 경고 메시지를 출력하고 접수를 제한합니다.
+    alert("필수 입력 사항을 모두 입력하고 개인정보 수집 및 이용에 동의해주세요.");
+
+    // 입력되지 않은 항목으로 포커스를 이동시킵니다.
+    if (email === "") {
+      $("#email").focus();
+    } else if (phoneNumber === "") {
+      $("#phoneNumber").focus();
+    } else if (inquiryTitle === "") {
+      $("#inquiryTitle").focus();
+    } else if (inquiryContent === "") {
+      $("#inquiryContent").focus();
+    } else {
+      $("#agreementCheckbox").focus();
+    }
+
+    return false; // 접수 제한
+  } else if (!isValidEmail) {
+    // 이메일이 올바른 형식이 아닌 경우 경고 메시지를 출력합니다.
+    alert("올바른 이메일 주소를 입력해주세요.");
+    $("#email").focus();
+    return false; // 접수 제한
+  } else {
+    // 필수 입력 사항과 체크박스 동의 여부가 모두 충족될 경우 접수를 진행합니다.
+    
+    let vo = {
+    	memId : id,
+    	title : inquiryTitle,
+    	content : inquiryContent
+    }
+    $.ajax({
+    	url: "/insertInquiry",
+    	type: "POST",
+    	data: JSON.stringify(vo),
+    	contentType: "application/json",
+    	 dataType: "text",
+    	  success: function(response) {
+    	    if (response == "1") {
+				window.location.href = "/inquiry";
+    	    } else {
+				alert('오류가 발생했습니다.');
+				window.location.href = "/faq";
+    	    }
+    	  },
+    	  error: function(xhr, status, error) {
+    	    console.error("Ajax 오류:", error);
+    	  }
+    })
+    
+    return true; // 접수 허용
+  }
+}
+</script>
+</section>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bongsamaru.admin.mapper.AdminMapper">
+	<select id="getUserList" resultType="UserVO">
+		select MEM_ID,
+				MEM_PWD,
+				MEM_NICK,
+				MEM_PHONE,
+				MEM_ZIP,
+				MEM_ADDR,
+				MEM_BDATE,
+				MEM_DEPT,
+				MEM_EMAIL,
+				DON_RECEIPT,
+				MEM_SSN,
+				EMAIL_AGREE,
+				SMS_AGREE,
+				ACCT_NUM,
+				BANK_NAME,
+				MEM_STAT,
+				MEM_NAME
+		from member
+		where MEM_STAT = #{memStat}
+		order by MEM_ID
+	</select>
+	<select id="volCount" resultType="VolunteerVO">
+		select (select nvl(sum(count(mem_id)),0) from vol_act_mem where mem_id=#{memId} group by mem_id) as  vol,
+		(select nvl(sum(count(mem_id)),0) from vol_mem where mem_id=#{memId} and mem_code='1' group by mem_id) as fac from dual
+	</select>
+	
+	<select id="donCount" resultType="DonationLedgerVO">
+		select count(mem_id) cnt,sum(don_amt) totals from don_ledger where mem_id=#{memId} group by mem_id
+	</select>
+	<select id="getUserOne" resultType="UserVO">
+		select MEM_ID,
+				MEM_PWD,
+				MEM_NICK,
+				MEM_PHONE,
+				MEM_ZIP,
+				MEM_ADDR,
+				MEM_BDATE,
+				MEM_DEPT,
+				MEM_EMAIL,
+				DON_RECEIPT,
+				MEM_SSN,
+				EMAIL_AGREE,
+				SMS_AGREE,
+				ACCT_NUM,
+				BANK_NAME,
+				MEM_STAT,
+				MEM_NAME
+		from member
+		where MEM_ID = #{memId}
+	</select>
+	<select id="getReportList" resultType="ReportVO">
+		select REP_ID,
+				CATEGORY,
+				MEM_ID,
+				REP_DATE,
+				CATEGORY_NO,
+				REP_REASON,
+				REQ_CODE
+		from report
+		where CATEGORY = #{category}
+		order by rep_id
+	</select>
+	<update id="updateReport" parameterType="ReportVO">
+		update report
+		set REQ_CODE = #{reqCode}
+		where REP_Id = #{repId}
+	</update>
+	<select id="getFacilityList" resultType="FacilityVO">
+		select FAC_ID,
+				BIZ_NUM,
+				FAC_PWD,
+				FAC_NAME,
+				FAC_TYPE,
+				FAC_ZIP,
+				FAC_ADDR,
+				FAC_ADDR_DETAIL,
+				FAC_EST_DATE,
+				FAC_EMAIL,
+				FAC_WEB,
+				FAC_INTRO,
+				REP_NAME,
+				REP_PHONE,
+				FAC_BANK,
+				DON_ACCT,
+				DON_APP,
+				MEM_APP
+		from facility
+		order by FAC_ID
+	</select>
+	<select id="getFacilityInfo" resultType="FacilityVO">
+		select FAC_ID,
+				BIZ_NUM,
+				FAC_PWD,
+				FAC_NAME,
+				FAC_TYPE,
+				FAC_ZIP,
+				FAC_ADDR,
+				FAC_ADDR_DETAIL,
+				FAC_EST_DATE,
+				FAC_EMAIL,
+				FAC_WEB,
+				FAC_INTRO,
+				REP_NAME,
+				REP_PHONE,
+				FAC_BANK,
+				DON_ACCT,
+				DON_APP,
+				MEM_APP
+		from facility
+		where fac_id = #{facId}
+	</select>
+	<select id="getDonationList" resultType="DonationVO">
+		select DON_ID,
+				FAC_ID,
+				TITLE,
+				REC_PERIOD,
+				END_PERIOD,
+				EXT_PERIOD,
+				GOAL_AMT,
+				PROJ_TARGET,
+				INTRO,
+				REC_STAT,
+				DON_REG_APP,
+				EXP_EFFECT
+		from donation
+		order by DON_ID
+	</select>
+	<select id="getDonOne" resultType="DonationVO">
+		select DON_ID,
+				FAC_ID,
+				TITLE,
+				REC_PERIOD,
+				END_PERIOD,
+				EXT_PERIOD,
+				GOAL_AMT,
+				PROJ_TARGET,
+				INTRO,
+				REC_STAT,
+				DON_REG_APP,
+				EXP_EFFECT
+		from donation
+		where DON_ID = #{donId}
+	</select>
+	<select id="getBoardList" resultType="BoardVO">
+		select BOARD_ID,
+			TITLE,
+			category,
+			CONTENT,
+			WRITE_DATE,
+			VIEWS,
+			PRIORITY,
+			MEM_ID,
+			MOD_DATE,
+			DETAIL_CATE
+		from board
+		where CATEGORY = #{category}
+		order by BOARD_ID
+	</select>
+	<select id="getNoticeOne" resultType="BoardVO">
+		select BOARD_ID,
+			TITLE,
+			CONTENT,
+			category,
+			WRITE_DATE,
+			VIEWS,
+			PRIORITY,
+			MEM_ID,
+			MOD_DATE,
+			DETAIL_CATE
+		from board
+		where CATEGORY = #{category}
+		and detail_cate = #{detailCate}
+	</select>
+	<update id="updateNotice" parameterType="BoardVO">
+		update board
+		set
+			PRIORITY=#{priority},
+			TITLE=#{title},
+			CONTENT=#{content},
+			mod_date=sysdate
+		where CATEGORY = #{category}
+		and detail_cate = #{detailCate}
+	</update>
+	<delete id="delNotice" parameterType="String">
+		delete
+		from board
+		where CATEGORY = #{category}
+		and detail_cate = #{detailCate}
+	</delete>
+	<insert id="insertNotice" parameterType="BoardVO">
+		insert into board(
+			board_id,
+			CATEGORY,
+			TITLE,
+			CONTENT,
+			PRIORITY,
+			MEM_ID,
+			DETAIL_CATE)
+		values(board_id.NEXTVAL
+				,#{category}
+				,#{title}
+				,#{content}
+				,#{priority}
+				,'ADMIN'
+				,notice_id.NEXTVAL)
+	</insert>
+	<insert id="faqInsert" parameterType="FaqVO">
+		insert into faq(
+			faq_id,
+			CATEGORY,
+			TITLE,
+			CONTENT)
+		values(FAQ_SEQ.NEXTVAL
+				,#{category}
+				,#{title}
+				,#{content})
+	</insert>
+	<insert id="inquireComments" parameterType="CommentsVO">
+		insert into comments(
+			COMM_ID,
+			MEM_ID,
+			CONTENT,
+			COMM_DATE,
+			CODE)
+		values(COMMENTS_SEQ.NEXTVAL
+				,'ADMIN'
+				,#{content}
+				,sysdate
+				,'c02')
+	</insert>
+	<select id="getFaqList" resultType="FaqVO">
+		select FAQ_ID,
+			CATEGORY,
+			TITLE,
+			CONTENT
+		from FAQ
+		order by FAQ_ID
+	</select>
+	<select id="getFaqOne" resultType="FaqVO">
+		select FAQ_ID,
+			CATEGORY,
+			TITLE,
+			CONTENT
+		from FAQ
+		where FAQ_ID = #{faqId}
+	</select>
+	<delete id="delFaq" parameterType="Integer">
+		delete
+		from FAQ
+		where FAQ_ID = #{faqId}
+	</delete>
+	<update id="updateFacApp" parameterType="FacilityVO">
+		update facility set mem_app=1 where fac_Name=#{facName}
+	</update>
+	<update id="updateDonApp" parameterType="FacilityVO">
+		update facility set don_app=1 where fac_id=#{facId}
+	</update>
+	<update id="updateDonRegApp" parameterType="FacilityVO">
+		update donation set don_reg_app=1 where don_id=#{donId}
+	</update>
+	<update id="updateInquire" parameterType="Integer">
+		update board set PRIORITY=1 where board_id=#{boardId}
+	</update>
+	<select id="inquireCommentOne" resultType="CommentsVO">
+		select COMM_ID,
+				MEM_ID,
+				CONTENT,
+				COMM_DATE,
+				CODE
+		from comments
+		where DETAIL_CODE=#{detailCode}
+		and CODE = 'c02'
+	</select>
+</mapper>

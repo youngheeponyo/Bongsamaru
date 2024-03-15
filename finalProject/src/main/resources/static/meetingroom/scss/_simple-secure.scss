@@ -1,0 +1,26 @@
+.simple-secure{
+    .simple-secure-wrapper{
+        max-width: 1505px;
+        width: 100%;
+        padding: 87px 90px 81px 0px;
+        border-radius: $border-radius-2xl;
+        background: rgba(220, 234, 255, 0.59);
+        .simple-secure-content{
+            .title{
+                color: $gray-900;
+                font-weight: $font-weight-bolder;
+                line-height: 78px;
+                letter-spacing: 0.01em;
+                margin-bottom: 20px;
+                .primary-text{
+                    color: $primary;
+                }
+            }
+            .text{
+                max-width: 560px;
+                width: 100%;
+                margin-bottom: 26px;
+            }
+        }
+    }
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>기부금 영수증</title>
+<style>
+.cur{
+	cursor:pointer;
+}
+#tableData{
+	margin-top : 50px;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>기부금 영수증 제출현황</h2>
+		<div id="tableData">
+			<table class="table" id="classic">
+				<thead>
+					<tr>
+						<th>시설아이디</th>
+						<th>프로젝트명</th>
+						<th>기부금액</th>
+						<th>출금날짜</th>
+						<th>제출기한</th>
+						<th>제출현황</th>
+						<th>요청</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="don : ${remList}" >
+						<tr>
+							 <td th:text="${don.facName}"></td>
+							 <td th:text="${don.title}"></td>
+							 <td data-th-text="${#numbers.formatInteger(don.remTotal, 1, 'COMMA') + '원'}"></td>
+							 <td th:text="${#dates.format(don.remDate, 'yyyy년 MMM dd일')}"></td>
+							 <td th:text="${#dates.format(don.deadlineDate, 'yyyy년 MMM dd일')}"></td>
+							 <td th:if="${don.checking}==null">미제출</td>
+							 <td th:if="${don.checking}!=null">제출완료</td>
+							 <td th:if="${don.checking}==null"><button class="btn btn-outline-secondary btn-sm" th:onclick="emailCheckBtn([[${don.email}]])">요청하기</button></td>
+							 <td th:if="${don.checking}!=null"><button class="btn btn-outline-secondary btn-sm">확인하기</button></td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
+		</div>
+		<script th:inline="javascript">
+			function dateFormat(value, format) {
+			    let date = value == "" ? new Date() : new Date(value);
+			    let year = date.getFullYear();
+			    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+			    let day = ("0" + date.getDate()).slice(-2);
+			    let result = format
+			      .replace("yyyy", year)
+			      .replace("MM", month)
+			      .replace("dd", day);
+			    return result;
+			};
+			
+			function wonComma(number) {
+			    if (number < 1000) {
+			      return number
+			    }
+			    return number.toLocaleString();
+			};
+			
+		    function emailCheckBtn(email){
+		    	okSong();
+				$.ajax({
+					type: "POST",
+					url: "/email/sendAdminMail",
+					data: {
+						"recipientEmail": email
+					},
+					success: function (response) {
+						console.log("전송완료")
+					},
+					error: function (xhr, status, error) {
+						console.log("인증번호 전송 중 오류가 발생했습니다.");
+					},
+				})
+		    }
+		    
+		    const swalWithBootstrapButtons = Swal.mixin({
+				  customClass: {
+				    confirmButton: "btn btn-success",
+				    cancelButton: "btn btn-danger"
+				  },
+				  buttonsStyling: false
+				});
+				function okSong(seq){
+					Swal.fire({
+					  icon: "success",
+					  title: "이메일이 전송되었습니다!",
+					  text: "제출이 완료되지 않으면 자정에 다시 이메일이 전송됩니다.",
+					});
+				}
+		</script>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

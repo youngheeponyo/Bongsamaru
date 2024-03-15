@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>비밀번호 검증</title>
+<style>
+.container {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+	  <div class="container">
+	    <div>현재 비밀번호</div>
+	    <input type="password" id="currentPassword" name="currentPassword">
+	    <button id="submitBtn" type="button">인증</button>
+	  </div>
+
+	<script>
+	// 현재 비밀번호 검증
+		$("#submitBtn").on('click', function() {
+		  let currentPassword = $("#currentPassword").val();
+
+		  $.ajax({
+		    url: "/passwordCheck",
+		    type: "POST",
+		    data: { currentPassword: currentPassword },
+		    success: function(response) {
+		      console.log(response);
+		      alert(response);
+		      window.location.href = "/profile";
+		    },
+		    error: function(xhr, status, error) {
+		      console.log(error);
+		      alert("비밀번호가 일치하지 않습니다.");
+		    }
+		  });
+		});
+	</script>
+</section>
+</body>
+</html>

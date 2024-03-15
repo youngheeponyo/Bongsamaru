@@ -1,0 +1,162 @@
+			<div id="fac">
+			<th:block th:if="${facilityList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${facilityList.size} != 0">
+			<table class="table">
+				<thead class="cent">
+					<tr>
+						<th>시설명</th>
+						<th>시설유형</th>
+						<th>이메일</th>
+						<th>홈페이지 주소</th>
+						<th>대표자명</th>
+						<th>대표번호</th>
+					</tr>
+				</thead>
+				<tbody class="body">
+				 	<th:block th:each="fac,st : ${facilityList}" th:if="${fac.donApp}==0">
+						<tr>
+							<td th:text="${fac.facName}" class="facility" th:onclick="info2([[${fac.facId}]])">시설명</td>
+							<td th:if="${fac.facType}=='f01'" >아동 및 청소년</td>
+							 <td th:if="${fac.facType}=='f02'" >장애인</td>
+							 <td th:if="${fac.facType}=='f03'" >문화,체육</td>
+							 <td th:if="${fac.facType}=='f04'" >캠페인</td>
+							 <td th:if="${fac.facType}=='f05'" >보건의료</td>
+							 <td th:if="${fac.facType}=='f06'" >환경정리</td>
+							 <td th:if="${fac.facType}=='f07'" >기타</td>
+							<td th:text="${fac.facEmail}" >이메일</td>
+							<td><a th:text="${fac.facWeb}" th:href="${fac.facWeb}" target='_blank'>홈페이지</a></td>
+							<td th:text="${fac.repName}" >대표자명</td>
+							<td th:text="${fac.repPhone}">대표번호</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev2([[${vo}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current2([[${vo}]],[[${pageNum}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next2([[${vo}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+			</div>
+			
+			<div id="don">
+			<th:block th:if="${donationList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${donationList.size} != 0">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>시설 아이디</th>
+						<th>제목</th>
+						<th>목표금액</th>
+						<th>사업대상</th>
+						<th>모금 시작일</th>
+						<th>모금 마감일</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="don : ${donationList}">
+						<tr>
+							 <td th:text="${don.facId}" class="cur" th:onclick="dona([[${don.donId}]])">아이디</td>
+							 <td th:text="${don.title}" >제목</td>
+							 <td data-th-text="${#numbers.formatInteger(don.goalAmt, 3, 'COMMA') + '원'}">목표금액</td>
+							 <td th:text="${don.projTarget}">사업대상</td>
+							 <td th:text="${#dates.format(don.recPeriod, 'yyyy년 MMM dd일')}" >모금 시작일</td>
+							 <td th:text="${#dates.format(don.endPeriod, 'yyyy년 MMM dd일')}">모금 마감일</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev3([[${vo}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current3([[${vo}]],[[${pageNum}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next3([[${vo}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+			</div>
+			
+			
+			<div id="review">
+			<th:block th:if="${review.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${review.size} != 0">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th>기부번호</th>
+						<th>제목</th>
+						<th>집행금액</th>
+						<th>모금 시작일</th>
+						<th>모금 마감일</th>
+						<th>영수증</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="don,st : ${review}">
+						<tr>
+							 <td th:text="${st.count}"></td>
+							 <td th:text="${don.donId}">아이디</td>
+							 <td th:text="${#strings.substring(don.title, 0, 6)}+'...'" class="cur" th:onclick="moreDetail([[${don.donRevId}]])">제목</td>
+							 <td data-th-text="${#numbers.formatInteger(don.execAmt, 3, 'COMMA') + '원'}" class="cur" th:onclick="moreDetail([[${don.donRevId}]])">목표금액</td>
+							 <td th:text="${#dates.format(don.startPeriod, 'yyyy년 MMM dd일')}" >모금 시작일</td>
+							 <td th:text="${#dates.format(don.endPeriod, 'yyyy년 MMM dd일')}">모금 마감일</td>
+							 <td style="padding-left:30px" th:if="${don.filePath}!=null and ${don.fileName}!=null" th:onclick="downloadButton([[${don.filePath}]],[[${don.fileName}]])"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-file-arrow-down" viewBox="0 0 16 16">
+  <path d="M8 5a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 9.293V5.5A.5.5 0 0 1 8 5"/>
+  <path d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 1h8a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1"/>
+</svg></td>
+							 <td style="padding-left:30px" th:if="${don.filePath}==null and ${don.fileName}==null" onclick="downloadButton('/image/영수증 첨부파일.png','영수증 첨부파일.png')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-file-arrow-down" viewBox="0 0 16 16">
+  <path d="M8 5a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 9.293V5.5A.5.5 0 0 1 8 5"/>
+  <path d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 1h8a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1"/>
+</svg></td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev4([[${vo}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current4([[${vo}]],[[${pageNum}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next4([[${vo}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+			</div>

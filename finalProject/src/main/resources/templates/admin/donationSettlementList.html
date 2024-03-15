@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>기부금 정산</title>
+<style>
+.cur {
+	cursor: pointer;
+}
+#tableData{
+	margin-top : 50px;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+	<section layout:fragment="content">
+		<div class="body-wrapper">
+			<!--  Header Start -->
+			<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+			<!--  Header End -->
+			<div class="container-fluid">
+				<div class="container">
+					<h2>기부금 정산</h2>
+					<div id="tableData">
+						<th:block th:if="${#lists.size(donSel)} == 0">
+							<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+						</th:block>
+						<th:block th:if="${#lists.size(donSel)} != 0">
+						<table class="table" id="classic">
+							<thead>
+								<tr>
+									<th>시설명</th>
+									<th>프로젝트명</th>
+									<th>마감일</th>
+									<th>목표금액</th>
+									<th>모금된 금액</th>
+									<th>정산처리</th>
+								</tr>
+							</thead>
+							<tbody>
+								<th:block th:each="don : ${donSel}">
+									<tr>
+										<td th:text="${don.facId}" class="btn-deleteAsk"></td>
+										<td th:text="${don.title}" class="btn-deleteAsk"></td>
+										<td th:if="${don.extPeriod}==null"
+											th:text="${#dates.format(don.endPeriod, 'yyyy년 MMM dd일')}"
+											class="btn-deleteAsk"></td>
+										<td th:if="${don.extPeriod}!=null"
+											th:text="${#dates.format(don.extPeriod, 'yyyy년 MMM dd일')}"
+											class="btn-deleteAsk"></td>
+										<td
+											data-th-text="${#numbers.formatInteger(don.goalAmt, 1, 'COMMA') + '원'}"
+											class="btn-deleteAsk"></td>
+										<td
+											data-th-text="${#numbers.formatInteger(don.total, 1, 'COMMA') + '원'}"
+											class="btn-deleteAsk"></td>
+										<td><button class="btn btn-outline-secondary btn-sm"
+												th:onclick="song([[${don.donId}]])">송금</button></td>
+									</tr>
+								</th:block>
+							</tbody>
+						</table>
+						</th:block>
+					</div>
+					<div class="modal fade" id="mymodal" role="dialog"
+						aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content" id="content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+								</div>
+								<div class="modal-body">
+									<div>
+										<table class="table">
+											<thead>
+												<tr>
+													<th>시설명</th>
+													<td id="name"></td>
+												</tr>
+												<tr>
+													<th>프로젝트명</th>
+													<td id="project"></td>
+												</tr>
+												<tr>
+													<th>사업자번호</th>
+													<td id="bizNum"></td>
+												</tr>
+												<tr>
+													<th>은행명</th>
+													<td id="bank"></td>
+												</tr>
+												<tr>
+													<th>계좌번호</th>
+													<td id="acct"></td>
+												</tr>
+												<tr>
+													<th>입금할 금액</th>
+													<td id="total"></td>
+												</tr>
+											</thead>
+										</table>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-outline-secondary"
+										data-dismiss="modal" aria-hidden="false">닫기</button>
+									<button type="button" class="btn btn-outline-success"
+										data-dismiss="modal" aria-hidden="false">송금하기</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script th:inline="javascript">
+				let bankName = "";
+				let bankAcct = "";
+				let total = "";
+				const date = new Date();
+				let today = dateFormat(date,'yyyyMMdd');
+				let ranNo = (Math.floor((Math.random())*100000));
+			    let apiNm = "";
+			    let donIds = "";
+			    let facName = "";
+				
+				function dateFormat(value, format) {
+				    let date = value == "" ? new Date() : new Date(value);
+				    let year = date.getFullYear();
+				    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+				    let day = ("0" + date.getDate()).slice(-2);
+				    let result = format
+				      .replace("yyyy", year)
+				      .replace("MM", month)
+				      .replace("dd", day);
+				    return result;
+				};
+				
+				function wonComma(number) {
+				    if (number < 1000) {
+				      return number
+				    }
+				    return number.toLocaleString();
+				};
+				
+			    function song(id) {
+			    	$("#name").empty();
+			        $("#project").empty();
+			        $("#bizNum").empty();
+			        $("#bank").empty();
+			        $("#acct").empty();
+			        $("#total").empty();
+			           
+			    	$.ajax('../checkFacDonation?donId='+id)
+				    .done(result => {
+				    console.log(result);
+			           bankName = result.facBank;
+			           bankAcct = result.donAcct;
+			           donIds = result.donId;
+			           total = result.total;
+			           facName = result.facName;
+				    	 if(result.facBank==090){
+				    		result.facBank = "카카오뱅크";
+				    		apiNm = "ReceivedTransferOtherBank"
+				    	}else if(result.facBank=='011'){
+				    		result.facBank = "농협";
+				    		apiNm = "ReceivedTransferAccountNumber"
+				    	}
+				    	 
+			           $("#name").append(result.facName)
+			           $("#project").append(result.title)
+			           $("#bizNum").append(result.bizNum)
+			           $("#bank").append(result.facBank)
+			           $("#acct").append(result.donAcct)
+			           $("#total").append(wonComma(result.total)+'원')
+			        })
+			        .fail(err => console.log(err));
+			    	$("#mymodal").modal("show");
+			    	
+			    }
+			    
+			    $(".btn-outline-secondary").click(function () {
+			      $("#mymodal").modal("hide");
+			    });
+			    
+			    $(".btn-outline-success").click(function () {
+				  	let obj = {};
+					obj["Header"] = {
+						ApiNm: apiNm,
+					    Tsymd: today,
+					    Trtm: "112428",
+					    Iscd: "002311",
+					   	FintechApsno: "001",
+					    ApiSvcCd: "ReceivedTransferA",
+					    IsTuno: ranNo,
+					    AccessToken: "8657033c15f7f047b9bb368c7ee96154292def16bf938b310e320ea79df0319a"
+					},
+					obj["Bncd"] = bankName;
+					obj["Acno"] = bankAcct;
+					obj["Tram"] = total;
+					obj["DractOtlt"] = "기부금이 전송되었습니다.";
+					obj["MractOtlt"] = "기부금이 입금되었습니다.";
+					
+					let insertObj = {
+				        "donId" : donIds,
+				        "remTotal" : total,
+				        "remBank" : bankName,
+				        "remAcct" : bankAcct,
+				        "facName" : facName
+			       }
+					
+					$.ajax('https://developers.nonghyup.com/'+apiNm+'.nh', {
+						type:'post',
+						contentType: 'application/json',
+						data : JSON.stringify(obj),
+					})
+					.done(result => {
+					    $.ajax('insertRemittance', {
+							type:'POST',
+							data : insertObj,
+						})
+				    	.done(result => {
+				    		okSong();
+				    	})
+				    	.fail(err => console.log(err));
+			       })
+			       .fail(err => console.log(err));
+				  	
+			       $("#mymodal").modal("hide");
+					
+			    });
+			    
+				const swalWithBootstrapButtons = Swal.mixin({
+				  customClass: {
+				    confirmButton: "btn btn-success",
+				    cancelButton: "btn btn-danger"
+				  },
+				  buttonsStyling: false
+				});
+				function okSong(seq){
+					Swal.fire({
+					  icon: "success",
+					  title: "송금이 완료되었습니다.",
+					  text: "기한 내 영수증을 제출해주세요!",
+					});
+				}
+				</script>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

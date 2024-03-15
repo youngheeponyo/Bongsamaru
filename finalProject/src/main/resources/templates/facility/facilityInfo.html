@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+ layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>시설상세</title>
+ <style>
+.facility{
+display:inline-block;
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div class="container">
+<div th:insert="~{banner/empty::banner}"></div>
+<div th:insert="~{facility/facilityNav::nav}"></div>
+
+<div class="row container">
+<div class="col-3" style="line-height: 300px;">
+<div th:insert="~{facility/facilityInfoSide::side}"></div>
+</div>
+<div class="facility col-9">
+<h3>시설정보</h3>
+<hr>
+<div class="container">
+	<div class="row">
+		<div class="col-2" style="font-size:16px; font-weight: 700">
+			<p>시설명</p>
+			<p>대표자명</p>
+			<p>주소</p>
+		</div>
+		<div class="col">
+			<p th:text="${facilityInfo.facName}"></p>
+			<p th:text="${facilityInfo.repName}"></p>
+			<p th:text="|${facilityInfo.facAddr},${facilityInfo.facAddrDetail}|"></p>
+		</div>
+		<div class="col-2" style="font-size:16px;font-weight: 700">
+			<p>시설유형</p>
+			<p>사업자등록번호</p>
+			<p>대표자연락처</p>
+		</div>
+		<div class="col">
+			<p th:text="${facilityInfo.category}"></p>
+		<!-- bizNum을 3-2-5 구조로 포맷 -->
+<p th:text="${#strings.substring(facilityInfo.bizNum, 0, 3) + '-' + #strings.substring(facilityInfo.bizNum, 3, 5) + '-' + #strings.substring(facilityInfo.bizNum, 5, 10)}"></p>
+
+<!-- repPhone을 3-4-4 구조로 포맷 -->
+<p th:text="${#strings.substring(facilityInfo.repPhone, 0, 3) + '-' + #strings.substring(facilityInfo.repPhone, 3, 7) + '-' + #strings.substring(facilityInfo.repPhone, 7, 11)}"></p>
+
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-3"  style="font-size:16px; font-weight: 700">
+			<p>시설 홈페이지 주소</p>
+		</div>
+		<div class="col-6" th:text="${facilityInfo.facWeb}" th:if="${facilityInfo.facWeb}!=null">
+		<div class="col-6" th:text="-" th:unless="${facilityInfo.facWeb}!=null">
+		
+		
+		</div>
+	</div>
+</div>
+<hr>
+<br>
+<h3>시설설명</h3>
+<hr>
+<p th:text="설명+${facilityInfo.facIntro}"></p>
+<hr>
+
+
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+</section>
+</body>
+</html>

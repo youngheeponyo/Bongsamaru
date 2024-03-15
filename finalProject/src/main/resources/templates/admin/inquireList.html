@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>문의사항</title>
+<style>
+#tableData{
+	margin-top : 50px;
+}
+.cur{
+	cursor:pointer;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>문의사항 관리</h2>
+		<div style="float:right;padding:10px">
+			<input class="form-control-sm me-2" id="search" type="search" placeholder="Search" aria-label="Search" th:value="${vo.searchKeyword}">
+			<button class="btn btn-outline-success" id="searchBtn" type="button">검색</button>
+			<button class="btn btn-outline-primary" id="clean" type="button">초기화</button>
+		</div>
+		<div id=tableData>
+			<th:block th:if="${inquireList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${inquireList.size} != 0">
+			<table class="table" id="notice">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>작성자</th>
+						<th>제목</th>
+						<th>내용</th>
+						<th>답변 상태</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="board,st : ${inquireList}" >
+						<tr>
+							 <td th:text="${st.count}" >번호</td>
+							 <td th:text="${board.memId}" >작성자</td>
+							 <td th:text="${board.title}" >제목</td>
+							 <td class="cur" th:if="${board.content.length}>=20" th:text="${#strings.substring(board.content, 0, 20)}+'...'" th:href="@{inquireInfo(category=${board.category},detailCate=${board.detailCate},boardId=${board.boardId})}"></td>
+							 <td th:if="${board.content.length}<20" th:text="${board.content}"></td>
+							 <td th:if="${board.priority}==0"><a class="cur" th:href="@{inquireComment(category=${board.category},detailCate=${board.detailCate},boardId=${board.boardId})}">답변 대기 중</a></td>
+							 <td th:if="${board.priority}==1" ><a class="cur" th:href="@{inquireInfo(category=${board.category},detailCate=${board.detailCate},boardId=${board.boardId})}">답변 완료</a></td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/inquireList(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1},category='b02')}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/inquireList(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage},category='b02')}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/inquireList(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage},category='b02')}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+		</div>
+		</div>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

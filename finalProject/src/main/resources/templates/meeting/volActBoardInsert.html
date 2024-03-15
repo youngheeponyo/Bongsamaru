@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사등록 페이지</title>
+
+<!-- TUI 에디터 CSS CDN -->
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<style>
+.write-1 {
+    height: 30px;
+    width:25%;
+    border : none;
+    font-size: 18px;
+    color:balck;
+    outline: none;
+}
+#content{
+	height:1200px;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<br>
+		<div class="body-wrapper" style="width:50%;margin:auto">
+			<div class="container-fluid">
+				<div class="container">
+					<div id="content">
+						<h2 style="text-align: center;">봉사 등록</h2>
+						<br>
+						<label>>모집기간</label>
+						<br><br>
+		               	<label>시작일</label><input class='write-1' type="date" name="startDate" max="30"> ~ 
+		                <label>마감일</label><input class='write-1' type="date" name="expireDate" max="30">
+		                <hr>
+						<label>>봉사 제목</label>
+		                <input class='write-1' type="text" name="title" max="30">
+						<hr>
+						<label>>봉사 일시</label>
+		                <input class='write-1' type="date" name="volDate" max="30">
+						<hr>
+						<label>>모집인원</label>
+		                <input class='write-1' type="number" name="cap" max="30">
+						<hr>
+						<label>>카테고리</label>
+						<select name="category">
+							<option value="f01">아동 및 청소년</option>
+							<option value="f02">장애인</option>
+							<option value="f03">문화,체육</option>
+							<option value="f04">캠페인</option>
+							<option value="f05">보건의료</option>
+							<option value="f06">환경정리</option>
+							<option value="f07">동물</option>
+							<option value="f08">기타</option>
+						</select>
+						<hr>
+						<label>>봉사 장소</label>
+						<div class="write_item facility hidden">
+							<input id="facAddr1" style="display: none;" type="text" class="form-control">
+							<div class="error-message" id="facZipCheckError"></div>
+							<input id="facAddr2" onclick="Addr()" readonly style="display: inline; margin-top: 10px" type="text" class="form-control plus-bnt" placeholder="주소">
+							<div class="error-message" id="facAddrCheckError"></div>
+							<input id="facAddr3" style="display: inline; margin-top: 10px" type="text" class="form-control plus-bnt" placeholder="상세주소">
+						</div>
+						<!-- 에디터를 적용할 요소 (컨테이너) -->
+						<hr>
+						<div id="contents"></div>
+						<hr>
+						<button type="button" onClick="modalOpen()" style="float: right;width:80px" class="btn btn-success m-1">등록</button>
+		                <a th:href="@{../freeBoardList(category=b03,volId=${session.id})}" type="button" style="float: right;width:90px" class="btn btn-primary m-1">돌아가기</a>
+					</div>
+					<!-- TUI 에디터 JS CDN -->
+					<!-- 모달창 -->
+					<div class="modal fade" id="confimModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+					    <div class="modal-dialog" role="document">
+					        <div class="modal-content">
+					            <div class="modal-header">
+					                <h5 class="modal-title" id="deleteConfirmationModalLabel">등록 확인</h5>
+					            </div>
+					            <div class="modal-body">
+					                <p>등록 후 수정이 불가능합니다.<br>등록하시겠습니까?</p>
+					            </div>
+					            <div class="modal-footer">
+					                <button type="button" class="btn btn-danger" id="noBtn" data-dismiss="modal" aria-hidden="false">아니오</button>
+					                <button type="button" class="btn btn-secondary" id="yesBtn" data-dismiss="modal" aria-hidden="false">네</button>
+					            </div>
+					        </div>
+					    </div>
+					 </div>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+var cateNo = 0;
+$.ajax({
+	url: '/findVolActNo',
+	type: 'GET',
+	processData: false,
+	contentType: false,
+	success: function(data) {
+		cateNo = data;
+	},
+	error: function(e) {
+		console.log('실패');
+	}
+});
+const editor = new toastui.Editor({
+	el : document.querySelector('#contents'), // 에디터를 적용할 요소 (컨테이너)
+	height : '500px', // 에디터 영역의 높이 값 (OOOpx || auto)
+	initialEditType : 'wysiwyg', // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+	previewStyle : 'vertical', // 마크다운 프리뷰 스타일 (tab || vertical)
+	placeholder : "내용을 입력하세요",
+	hooks: {
+    	addImageBlobHook: (blob, callback) => {
+    		const formData = new FormData();
+        	formData.append('uploadFiles', blob);
+        	formData.append("code", "p11")
+   			formData.append("codeNo", cateNo);
+        	formData.append("codeUser", '[[${session.userId}]]');
+           	formData.append("type", 0);
+	   			$.ajax({
+	       		url: '/uploadsAjax',
+	       		type: 'POST',
+	       		processData: false,
+	       		contentType: false,
+	       		data: formData,
+	       		success: function(datas) {
+	       			datas = (""+datas).replace(/\\/g, '/');
+	       			callback(datas);
+       		},
+       			error: function(e) {
+       				callback('image_load_fail', '사진을 읽어들일 수가 없습니다.');
+       			}
+     		});	
+        	
+        }
+    }
+});
+
+function modalOpen(){
+	const startDate = $("input[name='startDate']")
+	const expireDate = $("input[name='expireDate']")
+	const volDate = $("input[name='volDate']")
+	const title = $("input[name='title']")
+	const content = editor.getMarkdown();
+	const addr = $('#facAddr2');
+	
+	if(startDate.val()>expireDate.val()){
+		alert('날짜가 올바르지 않습니다.\n기간을 다시 확인해주세요!');
+		return;
+	};
+	
+	if(startDate.val()==''){
+		alert('날짜를 입력하세요!');
+		return;
+	}else if(expireDate.val()==''){
+		alert('내용을 입력하세요!');
+		return;
+	}else if(volDate.val()==''){
+		alert('내용을 입력하세요!');
+		return;
+	}else if(title.val()==''){
+		alert('내용을 입력하세요!');
+		return;
+	}else if(content==''){
+		alert('내용을 입력하세요!');
+		return;
+	}else if(addr.val()==''){
+		alert('내용을 입력하세요!');
+		return;
+	}
+	
+	$("#confimModal").modal("show");
+	
+	$("#yesBtn").on('click',function () {
+		handleSave();
+	});
+};
+
+$("#noBtn").on('click',function () {
+    $("#confimModal").modal("hide");
+});
+
+function handleSave(){
+	const startDate = $("input[name='startDate']").val();
+	const expireDate = $("input[name='expireDate']").val();
+	const volDate = $("input[name='volDate']").val();
+	const category = $("select[name='category'] option:selected").val();
+	const cap = $("input[name='cap']").val();
+	const title = $("input[name='title']").val();
+	const content = editor.getMarkdown();
+	const addr = $('#facAddr2').val();
+	const detail = $('#facAddr3').val();
+	const volZip = $('#facAddr1').val();;
+	
+	var formData = new FormData();
+	formData.append("volActId",cateNo);
+	formData.append("volId",[[${session.id}]]);
+	formData.append("category",category);
+	formData.append("title",title);
+	formData.append("content",content);
+	formData.append("location",addr+' '+detail);
+	formData.append("cap",cap);
+	formData.append("volZip",volZip);
+	formData.append("volDate",volDate);
+	formData.append("startDate",startDate);
+	formData.append("expireDate",expireDate);
+	$.ajax({
+   		url: '/insertVolAct',
+   		type: 'POST',
+   		processData: false,
+   		contentType: false,
+   		data: formData,
+   		success: function(data) {
+   			location.href="volBoardList?volId="+[[${session.id}]]
+   		},
+   		error: function(e) {
+   			console.log('실패');
+   		}
+   	});
+}
+
+function Addr() {
+	new daum.Postcode({
+		oncomplete: function (data) {
+			// 팝업에서 검색결과 항목을 클릭했을 때 실행할 코드를 작성하는 부분.
+
+			// 도로명 주소 변수
+			var roadAddr = data.roadAddress;
+			var extraRoadAddr = ''; // 참고 항목 변수
+
+			// 법정동명이 있고, "동/로/가"로 끝난다면 추가
+			if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+				extraRoadAddr += data.bname;
+			}
+			// 건물명이 있고, 공동주택일 경우 추가
+			if (data.buildingName !== '' && data.apartment === 'Y') {
+				extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+			}
+			// 표시할 참고항목이 있으면, 괄호까지 추가한 최종 문자열을 만듦
+			if (extraRoadAddr !== '') {
+				extraRoadAddr = ' (' + extraRoadAddr + ')';
+			}
+
+			// 우편번호와 주소 정보를 해당 필드에 넣는다.
+			document.getElementById('facAddr1').value = data.zonecode;
+			document.getElementById("facAddr2").value = roadAddr;
+			// 커서를 상세주소 필드로 이동한다.
+			document.getElementById("facAddr3").focus();
+		}
+	}).open(); // 여기에 닫는 괄호를 추가함
+}
+</script>
+				</div>
+			</div>
+		</div>
+		<br>
+	</section>
+</body>
+</html>

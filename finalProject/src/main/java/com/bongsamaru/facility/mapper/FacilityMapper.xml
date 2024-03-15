@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.bongsamaru.facility.mapper.FacilityMapper">
+<!-- 시설리스트 -->
+<select id="allFacilityList" resultType="FacilityVO">
+	         select FAC_ID,
+					FAC_NAME,
+					FAC_ADDR,
+					select_sub(FAC_ZIP2) AS region,
+					FAC_ZIP2,
+					FAC_ZIP,
+					FAC_TYPE,
+					select_sub(fac_Type) category,
+					(select file_Path from files where code='p02' and code_user=fac_Id) as filePath
+              from facility
+              where mem_app = 1
+</select>
+<select id="getFacilityList" resultType="FacilityVO">
+	SELECT *    FROM (    	SELECT ROWNUM RN, A.*  FROM (
+	
+    SELECT 			FAC_ID,
+					FAC_NAME,
+					FAC_ADDR,
+					select_sub(FAC_ZIP2) AS region,
+					FAC_ZIP2,
+					FAC_ZIP,
+					FAC_TYPE,
+					select_sub(fac_Type) category,
+					(select file_Path from files where code='p02' and code_user=fac_id) as filePath
+    FROM FACILITY
+
+	    where mem_app = 1   
+
+        <if test="facZip2 != null and facZip2 !=''">
+            AND 	FAC_ZIP2=#{facZip2}
+        </if>
+        <if test="facType != null and facType != ''">
+        	AND 	FAC_TYPE = #{facType}
+        </if>
+	    ) A )
+	  	WHERE RN BETWEEN #{pageVO.start} AND #{pageVO.end}
+	
+</select>
+<!-- 시설리스트 페이지네이션용 -->
+<select id="getCategoryCount" resultType="int">
+	SELECT count(*) 
+	  FROM FACILITY
+	  <where><!-- WHERE을 대문자로 쓰니 인식이 안되더라 where소문자로 쓰기 주의하자 -->
+        <if test="facZip2 != null and facZip2 !=''">
+            AND 	FAC_ZIP2=#{facZip2}
+        </if>
+        <if test="facType != null and facType != ''">
+        	AND 	FAC_TYPE = #{facType}
+        </if>
+    </where>
+</select>
+
+<!-- 시설정보 -->
+<select id="getFacilityInfo" resultType="FacilityVO">
+ Select Fac_ID,
+       Fac_Name,
+       BIZ_NUM,
+       Fac_Type,
+       select_sub(fac_Type) category, 
+       FAC_ADDR,
+       FAC_ADDR_DETAIL,
+       Fac_Web,
+       FAC_INTRO,
+       REP_NAME,
+       REP_PHONE,
+       Select_profile(fac_id),
+      (Select nvl(Sum(T1.Don_Amt),0 )
+         From Don_Ledger T1 
+         right Join Donation T2 
+           On T1.Don_Id= T2.Don_Id 
+        Where T2.Fac_Id=#{facId})          As donaitonAmt,
+      (Select Count(Distinct(T1.Mem_Id)) 
+         From Don_Ledger T1
+         Left Join Donation T2 
+           On T1.Don_Id= T2.Don_Id 
+        Where T2.Fac_Id=#{facId})          As donors
+   From Facility F
+   where fac_id = #{facId}
+</select>
+
+<!-- 시설에서 진행중인 모금정보 List-->
+<select id="getfundingList" resultType="FundingVO">
+   SELECT * FROM (
+    SELECT ROWNUM RN, A.* FROM (
+        SELECT 
+            D1.DON_ID,                     
+            D1.TITLE,                     
+            D1.GOAL_AMT,                    
+            D1.REC_STAT,
+            SUM(NVL(D2.DON_AMT,0)) AS donationAmt, 
+            COUNT(DISTINCT D2.MEM_ID) AS donors,
+            (SUM(D2.don_amt) / D1.goal_amt) * 100 AS donationRatio,
+            F.FILE_PATH AS filePath
+        FROM 
+            DONATION D1 
+            LEFT JOIN DON_LEDGER D2 ON D1.DON_ID=D2.DON_ID
+            LEFT JOIN FILES F ON  F.CODE_NO=D1.DON_ID AND F.CODE_USER=D1.FAC_ID
+        WHERE 
+            D1.REC_STAT ='0' 
+            AND D1.DON_REG_APP='1'
+            AND D1.FAC_ID=#{facId}
+            AND F.CODE='p08'
+        GROUP BY 
+            D1.DON_ID, D1.TITLE, D1.GOAL_AMT, D1.REC_STAT, F.FILE_PATH
+    ) A
+) 	WHERE RN BETWEEN #{pageVO.start} AND #{pageVO.end}	 
+</select>
+
+<select id="getFacDonCount" resultType="int">
+
+ SELECT    COUNT(*)
+  FROM 	   DONATION D1 
+            LEFT JOIN DON_LEDGER D2 ON D1.DON_ID=D2.DON_ID
+            LEFT JOIN FILES F ON  F.CODE_NO=D1.DON_ID AND F.CODE_USER=D1.FAC_ID
+ WHERE 
+            D1.REC_STAT =#{recStat}
+            AND D1.DON_REG_APP='1'
+            AND D1.FAC_ID=#{facId}
+            AND F.CODE='p08'
+</select>
+
+
+
+<!-- 시설에서 진행마감인 모금정보 List-->
+<select id="getfundedList" resultType="FundingVO">
+ SELECT * FROM (
+    SELECT ROWNUM RN, A.* FROM (
+        SELECT 
+            D1.DON_ID,                     
+            D1.TITLE,                     
+            D1.GOAL_AMT,                    
+            D1.REC_STAT,
+            SUM(NVL(D2.DON_AMT,0)) AS donationAmt, 
+            COUNT(DISTINCT D2.MEM_ID) AS donors,
+            (SUM(D2.don_amt) / D1.goal_amt) * 100 AS donationRatio,
+            F.FILE_PATH AS filePath
+        FROM 
+            DONATION D1 
+            LEFT JOIN DON_LEDGER D2 ON D1.DON_ID=D2.DON_ID
+            LEFT JOIN FILES F ON  F.CODE_NO=D1.DON_ID AND F.CODE_USER=D1.FAC_ID
+        WHERE 
+            D1.REC_STAT ='1' 
+            AND D1.DON_REG_APP='1'
+            AND D1.FAC_ID=#{facId}
+            AND F.CODE='p08'
+        GROUP BY 
+            D1.DON_ID, D1.TITLE, D1.GOAL_AMT, D1.REC_STAT, F.FILE_PATH
+    ) A
+) 	WHERE RN BETWEEN #{pageVO.start} AND #{pageVO.end}	
+</select>
+
+
+<!-- 이미 진행한 시설의 봉사리스트  -->
+<select id="getVolFList" resultType="VolunteerVO">
+SELECT *    FROM (    	SELECT ROWNUM RN, A.*  FROM (
+ SELECT    CATEGORY, 
+ 		   TITLE, 
+ 		   CONTENT, 
+ 		   LOCATION,
+ 		   CAP, 
+ 		   VOL_DATE, 
+ 		   EXPIRE_DATE, 
+ 		   VOL_ACT_ID,
+ 		   F.FILE_PATH
+ FROM      VOL_ACT V LEFT JOIN FILES F 
+ ON        V.VOL_ACT_ID = F.CODE_NO 
+ WHERE     V.FAC_ID=#{facId}
+  AND      SYSDATE > VOL_DATE 
+ AND       F.CODE='p14'
+ ) A )
+WHERE RN BETWEEN #{pageVO.start} AND #{pageVO.end}	 
+</select>
+
+
+<select id="getVolFCount" resultType="int">
+SELECT    COUNT(*)
+ FROM      VOL_ACT V LEFT JOIN FILES F 
+ ON        V.VOL_ACT_ID = F.CODE_NO 
+ WHERE     V.FAC_ID=#{facId}
+  AND      SYSDATE > VOL_DATE 
+ AND       F.CODE='p14'
+</select>
+
+<!-- 앞으로 진행한 시설의 봉사리스트  -->
+<select id="getVolIList" resultType="VolunteerVO">
+SELECT *    FROM (    	SELECT ROWNUM RN, A.*  FROM (
+ SELECT    CATEGORY, 
+ 		   TITLE, 
+ 		   CONTENT, 
+ 		   LOCATION,
+ 		   CAP, 
+ 		   VOL_DATE, 
+ 		   EXPIRE_DATE, 
+ 		   VOL_ACT_ID,
+ 		   F.FILE_PATH
+FROM      VOL_ACT V LEFT JOIN FILES F 
+ ON        V.VOL_ACT_ID = F.CODE_NO 
+ WHERE     V.FAC_ID=#{facId}
+  AND      VOL_DATE  > SYSDATE 
+ AND       F.CODE='p14'
+ ) A )
+WHERE RN BETWEEN #{pageVO.start} AND #{pageVO.end}	 
+</select>
+
+<select id="getVolICount" resultType="int">
+SELECT    COUNT(*)
+ FROM      VOL_ACT V LEFT JOIN FILES F 
+ ON        V.VOL_ACT_ID = F.CODE_NO 
+ WHERE     V.FAC_ID=#{facId}
+  AND      VOL_DATE  > SYSDATE
+ AND       F.CODE='p14'
+</select>
+<!-- MyPage쪽 -->
+<!-- dona정보 -->
+<select id="getDonaList" resultType="DonaVO">
+  SELECT *    FROM (    	SELECT ROWNUM RN, A.*  FROM (
+   SELECT D.TITLE,  
+  		  D.REC_PERIOD, 
+  		  D.END_PERIOD, 
+  		  D.EXT_PERIOD,
+  		  D.GOAL_AMT,
+  		  D.DON_REG_APP, 
+  		  NVL(SUM(CASE WHEN DL.PAY_STAT ='g01' THEN DL.DON_AMT ELSE 0 END), 0)     AS TARGETOK,
+  		  NVL((SUM(DL.DON_AMT) / D.GOAL_AMT) * 100, 0)                             AS donationRatio,
+  		  D.DON_ID,
+  		  F.FAC_ID,
+  		  D.HASREVIEW
+     FROM DONATION D
+LEFT JOIN DON_LEDGER DL ON D.DON_ID = DL.DON_ID
+LEFT JOIN FACILITY F ON F.FAC_ID = D.FAC_ID
+  where
+          F.FAC_ID=#{facId}
+        
+      AND D.DON_REG_APP=#{donRegApp}
+     
+    
+      AND REC_STAT=#{recStat}
+
+ GROUP BY D.TITLE, D.REC_PERIOD, D.END_PERIOD, D.GOAL_AMT, D.DON_REG_APP, D.DON_ID, F.FAC_ID, D.EXT_PERIOD, D.HASREVIEW
+
+) A )
+WHERE RN BETWEEN #{pageVO.start} AND #{pageVO.end}	
+</select>
+
+<select id="getVolDonCount" resultType="int">
+SELECT COUNT(*)
+FROM DONATION D
+WHERE FAC_ID=#{facId}
+      AND DON_REG_APP=#{donRegApp}
+      AND REC_STAT=#{recStat} 
+</select>
+<!-- volunteer정보 -->
+<!-- 시설이 봉사 등록 -->
+<insert id="InsertFacVol" parameterType="VolActVO">
+<selectKey keyProperty="volActId" resultType="int"	order="BEFORE">
+			SELECT VOLACT_SEQ.nextval FROM dual
+	</selectKey> 
+ INSERT INTO VOL_ACT 
+                    (VOL_ACT_ID,
+                     FAC_ID,
+                     CATEGORY,
+                     TITLE,
+                     CONTENT,
+                     LOCATION,
+                     CAP,
+                     VOL_ZIP,
+                     VOL_ZIP2,
+                     VOL_DATE,
+                     START_DATE,
+                     EXPIRE_DATE)
+             VALUES (#{volActId},
+             		 #{facId},
+             		 #{category},
+             		 #{title},
+             		 #{content},
+                     #{location},
+                     #{cap},
+                     #{volZip},
+                     FIND_ZIP(#{volZip}),
+                     #{volDate},
+                     #{startDate},
+                     #{expireDate})
+
+</insert>
+<!-- 시설이 봉사 올린 리스트(아직 봉사 안한 상태만) -->
+<select id="getVolunteerJoinList" resultType="VolActVO">
+SELECT *    
+FROM (     
+    SELECT ROWNUM RN, A.*  
+    FROM (
+        SELECT  
+            VOL_ACT_ID,
+            FAC_ID, 
+            CATEGORY,
+            TITLE, 
+            CONTENT, 
+            LOCATION, 
+            CAP, 
+            VOL_ZIP,
+            VOL_DATE,
+            START_DATE,
+            EXPIRE_DATE,
+            (SELECT COUNT(*) FROM VOL_ACT_MEM WHERE VOL_ACT_ID = VOL_ACT.VOL_ACT_ID) AS COUNT 
+        FROM  VOL_ACT
+        WHERE  FAC_ID=#{facId}  
+            AND  VOL_DATE > SYSDATE
+        ORDER BY  EXPIRE_DATE
+    ) A
+)
+WHERE RN BETWEEN #{pageVO.start} AND #{pageVO.end}
+</select>
+<!-- 마이페이지 봉사전 페이지네이션 -->
+<select id="getFVolCategoryCount" resultType="int">
+SELECT    COUNT(*)
+  FROM    VOL_ACT
+ WHERE    FAC_ID=#{facId}
+   AND    VOL_DATE > SYSDATE
+</select>
+<!-- 그 봉사에 관해 신청자들 승인할 리스트 -->
+<select id="getVolunteerAppList" resultType="VolMemVO">
+SELECT   MEM_ID,
+		 VOL_ACT_ID,
+		 APP_DATE, 
+		 APP_CODE, 
+		 APP_REASON
+  FROM   VOL_MEM
+ WHERE   VOL_ACT_ID=#{volActId}
+ AND     VOL_ID IS NULL
+ORDER BY APP_DATE DESC
+</select>
+<insert id="volAppInsert" parameterType="VolMemVO">
+INSERT INTO VOL_ACT_MEM 
+					   (VOL_ACT_MEM_ID, 
+					    VOL_ACT_ID, 
+					    MEM_ID)
+			     VALUES(vol_act_mem_seq.nextval,
+			            #{volActId},
+			            #{memId})
+</insert>
+
+<update id= "volAppUpdate" parameterType="VolMemVO">
+UPDATE VOL_MEM SET APP_CODE='h02' WHERE VOL_ACT_ID=#{volActId} AND MEM_ID=#{memId}
+</update>
+<!-- 회원이 시설봉사 정보조회 -->
+<select id="getFacVolInfo" resultType="VolActVO">
+SELECT   FAC_ID,
+		 SELECT_SUB(category) CATEGORY,
+		 TITLE,
+		 LOCATION,
+		 CAP,
+		 VOL_DATE,
+		 START_DATE,
+		 EXPIRE_DATE,
+		 CONTENT 
+  FROM   VOL_ACT 
+ WHERE   VOL_ACT_ID=#{volActId}
+</select>
+<!-- 회원이 시설봉사 신청 -->
+<insert id="insertJoinVolunteer" parameterType="VolMemVO">
+INSERT INTO VOL_MEM
+		           (VOL_MEM_ID,
+		            FAC_ID,
+		            APP_CODE,
+		            APP_DATE,
+		            APP_REASON,
+		            MEM_ID,
+		            VOL_ACT_ID)
+		   VALUES(VOLMEMBER_SEQ.nextval,
+		   		  #{facId},
+		   		  'h01',
+		   		  sysdate,
+		   		  #{appReason},
+		   		  #{memId},
+		   		  #{volActId})         
+</insert>
+<!-- 신청할 당시 중복체크 -->
+<select id="getJoinAppCheck" parameterType="volMemVO">
+SELECT COUNT(*)
+FROM VOL_MEM
+WHERE VOL_ACT_ID=#{volActId}
+AND MEM_ID=#{memId}
+</select>
+<!-- 시설봉사 후기 여부체크 -->
+<select id="getFacRevCheck" parameterType="BoardVO">
+SELECT  COUNT(*)
+  FROM  BOARD 
+ WHERE  CATEGORY='b03' 
+   AND  DETAIL_CATE=#{detailCate}
+ </select>
+<!-- 시설이 봉사 승인시 확인할 참여자 신청서 -->
+<select id="getJoinApp" parameterType="VolMemVO">
+SELECT  MEM_ID,
+        APP_DATE,
+        APP_REASON,
+        VOL_ACT_ID
+FROM    VOL_MEM
+WHERE   VOL_ACT_ID=#{volActId}
+</select>
+<!-- 시설이 봉사완료 후 -->
+<select id="getVolunFinishList22" resultType="VolMemVO">
+SELECT     VOL_ACT_ID, 
+		   FAC_ID, CATEGORY,
+		   TITLE,
+		   CONTENT, 
+		   LOCATION, 
+		   CAP, 
+		   VOL_DATE
+  FROM     VOL_ACT
+ WHERE     VOL_DATE > SYSDATE
+</select>
+
+<!-- 시설이 봉사 완료한 리스트 -->
+<select id="getVolunteerFinishList" resultType="VolActVO">
+SELECT *    
+FROM (     
+    SELECT ROWNUM RN, A.*  
+    FROM (
+        SELECT  
+            VOL_ACT_ID,
+            FAC_ID, 
+            CATEGORY,
+            TITLE, 
+            CONTENT, 
+            LOCATION, 
+            CAP, 
+            VOL_ZIP,
+            VOL_DATE,
+            START_DATE,
+            EXPIRE_DATE,
+            (SELECT COUNT(*) FROM VOL_ACT_MEM WHERE VOL_ACT_ID = VOL_ACT.VOL_ACT_ID) AS COUNT 
+        FROM  VOL_ACT
+        WHERE  FAC_ID=#{facId}  
+          AND  SYSDATE > VOL_DATE
+        ORDER BY  EXPIRE_DATE
+    ) A
+)
+WHERE RN BETWEEN #{pageVO.start} AND #{pageVO.end}
+</select>
+<!-- 마이페이지 봉사전 페이지네이션 -->
+<select id="getFinishVolCategoryCount" resultType="int">
+SELECT    COUNT(*)
+  FROM    VOL_ACT
+ WHERE    FAC_ID=#{facId}
+   AND    SYSDATE > VOL_DATE
+</select>
+<!-- 시설봉사완료후 참여자 확인해주면 마음온도 변화 -->
+<insert id="insertVolHeart" parameterType="HeartVO">
+INSERT INTO HEART
+                (heart_temp_id,
+                MEM_ID,
+                TEMP_DATE, 
+                TEMP_CODE, 
+                TEMP_CHANGE,
+                HEART_NO)
+      VALUES    
+      			(HEARTTEMP_SEQ.NEXTVAL,
+      			#{memId},
+      			SYSDATE,
+      			'j02',
+      			 #{tempChange},
+      			 #{heartNo})
+</insert>
+
+<!-- 봉사후기 -->
+<select id="findBoardNo" resultType="int">
+	select BOARD_ID.NEXTVAL
+	from dual
+</select>
+<insert id="insertVolReview" parameterType="BoardVO">
+     
+      insert into board(
+         board_id,
+         CATEGORY,
+         TITLE,
+         CONTENT,
+         MEM_ID,
+         DETAIL_CATE)
+      values(board_id.NEXTVAL
+            ,'b03'
+            ,#{title}
+            ,#{content}
+            ,#{memId}
+            ,#{detailCate})
+</insert>
+<select id="getVolReviewList" resultType="BoardVO">
+ SELECT 
+ 		CATEGORY, 
+ 		TITLE, 
+ 		CONTENT, 
+ 		WRITE_DATE, 
+ 		MEM_ID, 
+ 		DETAIL_CATE 
+ 		FROM BOARD 
+ 		WHERE CATEGORY='b03'
+ 		AND MEM_ID=#{memId}
+
+</select>
+ <select id="getVolReviewInfo" resultType="BoardVO">
+  select BOARD_ID,
+         TITLE,
+         CONTENT,
+         category,
+         WRITE_DATE,
+         VIEWS,
+         MEM_ID,
+         MOD_DATE,
+         DETAIL_CATE
+      from board
+      where CATEGORY = 'b03'
+      and detail_cate = #{detailCate}
+   </select>
+   <update id="updateVolReview" parameterType="BoardVO">
+      update board
+      set
+         TITLE=#{title},
+         CONTENT=#{content},
+         mod_date=sysdate
+      where CATEGORY = 'b03'
+      and detail_cate = #{detailCate}
+   </update>
+   
+</mapper>
+
+
+

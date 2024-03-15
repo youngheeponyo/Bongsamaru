@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사후기 작성폼</title>
+
+<!-- TUI 에디터 CSS CDN -->
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<style>
+.write-1 {
+    height: 30px;
+    width:25%;
+    border : none;
+    font-size: 18px;
+    outline: none;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<br>
+		<div class="body-wrapper">
+			<div class="container-fluid">
+				<div class="container">
+					<h2 style="text-align: center;">봉사후기 작성</h2>
+					<label>제목</label>
+	                <input class='write-1' type="text" name="title" max="30" th:value="${volVO.title}">
+					<hr>
+					<label>봉사 일시</label>
+	                <input class='write-1' type="text" name="volDate" max="30" th:value="${#dates.format(volVO.volDate, 'yyyy년 MM월 dd일')}" readonly>
+					<hr>
+					<label>봉사 장소</label>
+	                <input class='write-1' type="text" name="location" max="30" th:value="${volVO.location}" readonly>
+					<!-- 에디터를 적용할 요소 (컨테이너) -->
+					<hr>
+					<div id="contents"></div>
+					<br>
+					<button type="button" onClick="modalOpen()" style="float: right;width:80px" class="btn btn-success m-1">등록</button>
+	                <a th:href="@{../freeBoardList(category=b03,volId=${session.id})}" type="button" style="float: right;width:90px" class="btn btn-primary m-1">돌아가기</a>
+					<!-- TUI 에디터 JS CDN -->
+					<!-- 모달창 -->
+					<div class="modal fade" id="confimModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+					    <div class="modal-dialog" role="document">
+					        <div class="modal-content">
+					            <div class="modal-header">
+					                <h5 class="modal-title" id="deleteConfirmationModalLabel">등록 확인</h5>
+					            </div>
+					            <div class="modal-body">
+					                <p>등록하시겠습니까?</p>
+					            </div>
+					            <div class="modal-footer">
+					                <button type="button" class="btn btn-danger" id="noBtn" data-dismiss="modal" aria-hidden="false">아니오</button>
+					                <button type="button" class="btn btn-secondary" id="yesBtn" data-dismiss="modal" aria-hidden="false">네</button>
+					            </div>
+					        </div>
+					    </div>
+					 </div>
+					<script>
+						var cateNo = 0;
+						$.ajax({
+			           		url: '/findReviewNo',
+			           		type: 'GET',
+			           		processData: false,
+			           		contentType: false,
+			           		success: function(result) {
+			           			cateNo = result;
+			           		},
+			           		error: function(e) {
+			           			console.log('실패');
+			           		}
+			           	});
+						const editor = new toastui.Editor({
+							el : document.querySelector('#contents'), // 에디터를 적용할 요소 (컨테이너)
+							height : '500px', // 에디터 영역의 높이 값 (OOOpx || auto)
+							initialEditType : 'wysiwyg', // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+							//initialValue: '내용을 입력해 주세요.',     // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
+							previewStyle : 'vertical', // 마크다운 프리뷰 스타일 (tab || vertical)
+							placeholder : "내용을 입력하세요",
+							hooks: {
+						    	addImageBlobHook: (blob, callback) => {
+						    		const formData = new FormData();
+						        	formData.append('uploadFiles', blob);
+						        	formData.append("code", "p13")
+						           	formData.append("codeNo", cateNo);
+						           	formData.append("codeUser", '[[${session.userId}]]');
+						           	formData.append("type", 0);
+				           			$.ajax({
+						           		url: '/uploadsAjax',
+						           		type: 'POST',
+						           		processData: false,
+						           		contentType: false,
+						           		data: formData,
+						           		success: function(datas) {
+						           			datas = (""+datas).replace(/\\/g, '/');
+						           			callback(datas);
+						           		},
+						           		error: function(e) {
+						           			callback('image_load_fail', '사진을 읽어들일 수가 없습니다.');
+						           		}
+						           	});	
+						        }
+						    }
+						});
+						
+						function modalOpen(){
+							const title = $("input[name='title']")
+							const content = editor.getMarkdown();
+							console.log('제목',title)
+							console.log('내용',content)
+							if(content==''){
+								alert('내용을 입력하세요!');
+								return;
+							}
+							
+							$("#confimModal").modal("show");
+							
+							$("#yesBtn").on('click',function () {
+								handleSave();
+							});
+						};
+						
+						$("#noBtn").on('click',function () {
+						    $("#confimModal").modal("hide");
+						});
+						function handleSave(){
+							const title = $("input[name='title']")
+							const content = editor.getMarkdown();
+							var formData = new FormData();
+							formData.append("reviewId",cateNo);
+							formData.append("volId",[[${volVO.volId}]]);
+							formData.append("volActId",[[${volVO.volActId}]]);
+							formData.append("title",title.val());
+							formData.append("content",content);
+							formData.append("writer","[[${userId}]]");
+							$.ajax({
+				           		url: '/reviewBoardInsert',
+				           		type: 'POST',
+				           		processData: false,
+				           		contentType: false,
+				           		data: formData,
+				           		success: function(data) {
+				           			location.href="reviewBoardList?volId="+[[${session.id}]]
+				           		},
+				           		error: function(e) {
+				           			console.log('실패');
+				           		}
+				           	});
+						}
+					</script>
+				</div>
+			</div>
+		</div>
+		<br>
+	</section>
+</body>
+</html>

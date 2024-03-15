@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>챌린지 상세정보</title>
+<style>
+img{
+	border-radius:20px;
+}
+p{
+	font-size:23px;
+	color:black;
+	 line-height: 1.5;
+	
+}
+h2{
+color:#689f38;
+}
+ #challengeButton.btn-secondary {
+    background-color: gray !important;
+    border-color: gray !important;
+    color: white !important;
+} 
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+
+<div class="comment-form">
+<section class="blog_area single-post-area">
+	<div class="hotel" >
+	<a style="font-size:25px;color:#689f38;font-weight:bold " th:href="@{/challenge/challengeInfo(chalId=${session.challengeInfo.chalId})}" >챌린지소개</a> <span style="margin-right: 25px;"></span>|<span style="margin-left: 25px;"></span>
+	<a style="font-size:25px;color:#689f38; font-weight:bold" th:href="@{/challenge/challengesList(chalId=${session.challengeInfo.chalId})}" >챌린지참여 </a>
+	<br><br><br>
+	</div>
+	<section class="blog_area">
+		<div class="container justify-content-center" style=" max-width: 1300px; ">
+			<div class="row">
+				<div class="col-lg-8 posts-list">
+					<div class="single-post row">
+					<div class="col-lg-12 col-md-12 blog_details">
+					<div class="form-group">
+					<h1 th:text="${session.challengeInfo.title}" style="background-color:#689f38; color:white;"></h1>
+					</div>
+					</div>
+					<div class="col-lg-12">
+					<div class="feature-img"><br>
+					<img th:if="${FileList != null and not #lists.isEmpty(FileList) and FileList[0] != null}"  th:src="${FileList[0].filePath}" onError="this.src='../image/기본이미지.jpg'"width="400" height="300"alt=""><br>
+					<br><br>
+					</div>
+					</div>
+					
+					<div class="col-lg-12">
+		       			<div class="row">
+                    	<div class="col-lg-12 " style="text-align:left;">
+                    		<h2>챌린지 하는 이유</h2></div>
+								<div class="col-6">
+									<div class="form-group">
+									<img  width="400" height="300" th:if="${FileList != null and not #lists.isEmpty(FileList) and FileList[1] != null}" th:src="${FileList[1].filePath}"onError="this.src='../image/기본이미지.jpg'" alt="">
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group">
+									<img  width="400" height="300" th:if="${FileList != null and not #lists.isEmpty(FileList) and FileList[2] != null}" th:src="${FileList[2].filePath}" onError="this.src='../image/기본이미지.jpg'"alt="">
+								</div>
+								</div>
+						<div class="col-lg-12 mt-25">
+							<div class="form-group">
+								<p style=" white-space: pre-wrap; text-align:left;" th:text="${session.challengeInfo.actionReason}"></p>
+							</div>
+						</div>
+						<div class="col-lg-12  mt-25"  style="text-align:left;">
+							<h2>기대효과</h2></div>
+								<div class="col-6">
+									<div class="form-group">
+										<img  width="400" height="300" th:if="${FileList != null and not #lists.isEmpty(FileList) and FileList[3] != null}" th:src="${FileList[3].filePath}" onError="this.src='../image/기본이미지.jpg'"alt="">
+									</div>
+								</div>
+								<div class="col-6">
+									<img width="400" height="300" th:if="${FileList != null and not #lists.isEmpty(FileList) and FileList[4] != null}" th:src="${FileList[4].filePath}" onError="this.src='../image/기본이미지.jpg'"alt="">
+								</div>
+						<div class="col-lg-12 mt-25">
+							<div class="form-group">
+								<p  style="white-space: pre-wrap;text-align:left;" th:text="${session.challengeInfo.expImpact}"></p>
+							</div>
+						</div>
+						<div class="col-lg-12  mt-25"  style="text-align:left;">
+							<h2>추가 말..</h2></div>	
+						<div class="col-lg-12 mt-25">
+							<div class="form-group">
+								<p  style="white-space: pre-wrap; text-align:left;" th:text="${session.challengeInfo.content}"></p>
+							</div>
+						</div>
+					
+					    </div>
+				     </div>
+			      </div>
+                </div>
+
+		<!-- 여기 세션 만들어서 주기 Info에서 넘어온다-->
+		<div class="col-lg-4">
+			<div class="blog_right_sidebar">
+				<aside class="single_sidebar_widget popular_post_widget" style="border:2px solid #689f38">
+					<h2 class="widget_title"
+						th:text="${session.challengeInfo.title}"></h2>
+					
+						<img th:src="${FileList[0].filePath}" alt="post" width="300" height="400">
+
+						<div class="media-body">
+							<h2>How to</h2>
+							<p th:text="${session.challengeInfo.partMethod1}"></p>
+							<p th:text="${session.challengeInfo.partMethod2}"></p>
+							
+						</div>
+						<h2>챌린지일시</h2>
+						<div class="form-group">
+							<div class="row">
+								<div class="col">
+								<small class="text-muted">챌린지 시작일</small>
+								<h4 th:text="${#dates.format(session.challengeInfo.regDate,'yyyy-MM-dd') }"></h4>
+								</div>
+								<div class="col">
+								<small class="text-muted">챌린지 마감일</small>
+								<h4 id="endChall" th:text="${#dates.format(session.challengeInfo.endDate,'yyyy-MM-dd' )}"></h4>
+								</div>
+							</div>
+						</div>
+						<button type="button" id="challengeButton" class="btn btn-warning" data-toggle="modal"
+								data-target="#myModal">챌린지 참여하기</button><br><br>
+				</aside>
+			</div>
+		</div>
+	</div>
+</div>
+
+			<div class="modal" tabindex="-1" id="myModal">
+				<div
+					class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title">챌린지 참여하기</h5>
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+
+
+							<div class="form-group">
+								<img id="imagePreview" src="/image/no이미지.png"
+									style="border-radius: 100%; width: 100px; height: 100px;">
+
+								<label for="file-image" class="input-file-button">파일첨부하기
+									<input type="file" name="uploadFiles" id="file-image"
+									style="display: none" multiple>
+								</label> <br>
+								<!-- <label for="file-video" class="input-file-button">영상첨부
+								<input type="file" id="file-video" style="display: none">
+								</label> -->
+								<textarea id="content" name="content" maxlength="500"></textarea>
+							</div>
+
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary"
+								data-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-primary uploadBtn">Save
+								changes</button>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			
+			<script>
+			window.onload = function() {
+				// 현재 날짜를 가져오는 함수
+				function getCurrentDate() {
+				    let now = new Date();
+				    // 월과 일이 한 자리 수인 경우 앞에 0을 붙여줌
+				    let month = (now.getMonth() + 1).toString().padStart(2, '0');
+				    let day = now.getDate().toString().padStart(2, '0');
+				    let currentDate = `${now.getFullYear()}-${month}-${day}`;
+				    console.log(currentDate);
+				    return currentDate;
+				}
+
+				// 버튼을 비활성화하는 함수
+				function disableButton() {
+				    let challengeButton = document.getElementById('challengeButton');
+				    challengeButton.disabled = true;
+				    challengeButton.innerHTML = '챌린지 마감';
+				    challengeButton.classList.add('btn-secondary');
+				}
+
+				// 챌린지 마감일을 가져오는 함수
+				function getChallengeEndDate() {
+				    let endDateElement = document.getElementById('endChall');
+				    let endDateString = endDateElement.textContent.trim(); // 텍스트에서 앞뒤 공백 제거
+				    console.log(endDateString);
+				    return endDateString;
+				}
+
+				// 챌린지 마감일을 가져옵니다
+				let challengeEndDate = getChallengeEndDate();
+
+				// 현재 날짜를 가져옵니다
+				let currentDate = getCurrentDate();
+
+				// 챌린지 마감일과 현재 날짜를 비교하여 버튼을 비활성화합니다
+				if (challengeEndDate < currentDate) {
+				    disableButton();
+				}
+
+				}
+
+				
+				
+				
+			
+			
+			
+			
+		$(document).ready(function() {
+			// 모달이 표시될 때 이벤트 처리
+			$('#myModal').on('show.bs.modal', function(e) {
+			
+				document.getElementById('file-image').addEventListener('change', function (event) {
+					var image = document.getElementById('imagePreview');
+					var file = event.target.files[0];
+					var reader = new FileReader();
+
+					reader.onloadend = function () {
+						image.src = reader.result;
+					}
+
+					if (file) {
+						reader.readAsDataURL(file);
+					} else {
+						image.src = "";
+					}
+				});
+
+
+				$('.uploadBtn').click(function () {
+					var formData = new FormData(); //FormData 객체 생성
+					var inputFile = $("input[type='file']");
+					//input 태그의 type이 file인것을 찾아서 inputFile이라는 변수로 지정
+					var files = inputFile[0].files;
+					//files : 선택한 모든 파일을 나열하는 FileList 객체입니다.
+					//multiple 특성을 지정하지 않닸다면 두 개 이상의 파일을 포함하지 않습니다.
+					for (var i = 0; i < files.length; i++) {
+						console.log(files[i]);
+						formData.append("uploadFiles", files[i]); //키,값으로 append 
+					}
+					
+					formData.append("chalId", [[${session.challengeInfo.chalId}]])
+					formData.append("dContent", $('#content').val());
+				
+
+					//jQuery.ajax
+					$.ajax({
+						url: '/challenge/challengeDeInsert',
+						type: 'POST',
+						processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+						contentType: false, // multipart/form-data타입을 사용하기위해 false 로 지정합니다.
+						data: formData,
+						success: function (result) {
+							console.log(result)
+							$('#myModal').modal('hide');
+							location.href='/challenge/challengesList?chalId=[[${session.challengeInfo.chalId}]]'
+
+						},
+						error: function (reject) {
+							alert('실풰!')
+							console.log(reject);
+						}
+					});
+				});
+			
+			});
+
+			// 모달이 숨겨질 때 이벤트 처리
+			$('#myModal').on('hidden.bs.modal', function(e) {
+				// 모달이 숨겨질 때 실행할 코드
+			});
+		});
+	</script>
+			</section>
+		</section>
+		</div>
+	</section>
+	
+	
+</body>
+</html>

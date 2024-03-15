@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{meeting/meetingLayout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사게시판</title>
+<style>
+.cur{
+	cursor:pointer;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <div class="container-fluid">
+		<div class="container">
+		<h2>>봉사게시판</h2>
+		<br>
+		<th:block th:if="${act.size} == 0">
+		<div style="text-align:center;">
+			<h5>현재 등록된 게시글이 없습니다.</h5>
+		</div>
+		</th:block >
+		<th:block th:if="${act.size} != 0">
+			<table class="table" id="classic">
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th>제목</th>
+						<th>위치</th>
+						<th>모집인원</th>
+						<th>봉사날짜</th>
+						<th>모집마감일</th>
+						<th>카테고리</th>
+						<th>현황</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="act,st : ${act}" >
+						<tr>
+							 <td th:text="${st.count}" class="btn-deleteAsk">No.</td>
+							 <td class="cur" th:text="${act.title}" th:onclick="location.href='volActBoardInfo?volId=[[${session.id}]]&volActId=[[${act.volActId}]]'">제목</td>
+							 <td th:text="${act.location}">처리</td>
+							 <td th:text="${act.cap}+'명'">비처리</td>
+							 <td th:text="${#dates.format(act.volDate, 'yyyy/MM/dd')}">봉사날짜</td>
+							 <td th:text="${#dates.format(act.expireDate, 'yyyy/MM/dd')}">마감일</td>
+							 <td th:if="${act.category}=='f01'">아동 및 청소년</td>
+							 <td th:if="${act.category}=='f02'">장애인</td>
+							 <td th:if="${act.category}=='f03'">문화,체육</td>
+							 <td th:if="${act.category}=='f04'">캠페인</td>
+							 <td th:if="${act.category}=='f05'">보건의료</td>
+							 <td th:if="${act.category}=='f06'">환경정리</td>
+							 <td th:if="${act.category}=='f07'">동물</td>
+							 <td th:if="${act.category}=='f08'">기타</td>
+							 <td th:if="${act.state}==0" style="color:red">모집중</td>
+							 <td th:if="${act.state}==1">봉사완료</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/volBoardList(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1}, volId=${session.id})}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/volBoardList(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage}, volId=${session.id})}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/volBoardList(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage}, volId=${session.id})}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block >
+		</div>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

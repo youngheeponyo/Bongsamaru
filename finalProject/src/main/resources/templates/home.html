@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+    <head>
+    <style>
+    	.fund_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+	}
+	.fund_header_text .bt_line_title {
+    margin-bottom: 10px;   
+}
+.owl-prev, .owl-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5); /* 불투명한 배경 */
+    color: white;
+    padding: 10px;
+}
+.section-title {
+    font-size: 24px;
+    color: black; /* 또는 원하는 색상 */
+    margin-bottom: 20px;
+    margin-top: 30px;
+    display: inline-block;
+    padding-bottom: 5px; /* 조정이 필요할 수 있음 */
+    position: relative;
+    font-weight:500;
+}
+
+.bottom-line {
+    border-bottom: 2px solid #689f38;
+    position: absolute;
+    width: 100%;
+    bottom: 0; /* 글씨와 밑줄이 겹치도록 조정 */
+    left: 0;
+}
+.owl-prev {
+    left: 10px;
+}
+
+.owl-next {
+    right: 10px;
+}
+.cur {
+	cursor:pointer;
+}
+
+    </style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <title>홈</title>
+    </head>
+    <body>
+    <section layout:fragment="content">
+        <div th:insert="~{banner/home::banner}"></div>
+        
+       	<div class="container" style="margin-top:30px;">
+       	
+			<div class="row" style="text-align: center;" >       		
+       			<div class="col">
+       				<h1 class="section-title"><span style="font-weight:700;">이달의 봉사왕</span><span class="bottom-line" ></span></h1>
+       				<div class="card">
+       					<table class="table">
+       						<thead>
+       							<tr>       							
+       							<th>순위</th>
+       							<th>닉네임</th>
+       							<th>횟수</th>
+       							</tr>
+       						</thead>
+       						<tbody>
+       							<tr th:each="king,stat : ${vol}" th:if="${stat.count}<=5">
+       							
+       					        <td>
+						            <img th:if="${stat.count} == 1" th:src="@{/image/gold.png}" alt="Gold Medal" style="width: 20px; height: 20px;"/>
+						            <img th:if="${stat.count} == 2" th:src="@{/image/silver.png}" alt="Silver Medal" style="width: 20px; height: 20px;"/>
+						            <img th:if="${stat.count} == 3" th:src="@{/image/bronze.png}" alt="Bronze Medal" style="width: 20px; height: 20px;"/>
+						            <span th:unless="${stat.count} == 1 or ${stat.count} == 2 or ${stat.count} == 3" th:text="${stat.count}"></span>
+						        </td>
+       								<td th:text="${king.mNick}"></td>
+       								<td th:text="${king.count}"></td>
+       							</tr>
+       						</tbody>
+       					</table>
+       				</div>       		
+       			</div>
+				<div class="col">
+       				<h1 class="section-title"><span style="font-weight:700;">이달의 기부왕</span><span class="bottom-line" ></span></h1>
+					<div class="card">
+       					<table class="table">
+       						<thead>
+       							<tr>       							
+       							<th>순위</th>
+       							<th>닉네임</th>
+       							<th>모금액</th>
+       							</tr>
+       						</thead>
+       						<tbody>
+       							<tr th:each="king,stat : ${king}" th:if="${stat.count}<=5">
+       					        <td>
+						            <img th:if="${stat.count} == 1" th:src="@{/image/gold.png}" alt="Gold Medal" style="width: 20px; height: 20px;"/>
+						            <img th:if="${stat.count} == 2" th:src="@{/image/silver.png}" alt="Silver Medal" style="width: 20px; height: 20px;"/>
+						            <img th:if="${stat.count} == 3" th:src="@{/image/bronze.png}" alt="Bronze Medal" style="width: 20px; height: 20px;"/>
+						            <span th:unless="${stat.count} == 1 or ${stat.count} == 2 or ${stat.count} == 3" th:text="${stat.count}"></span>
+						        </td>
+       								<td th:if="${king.mNick} != null" th:text="${king.mNick}"></td>
+       								<td th:unless="${king.mNick} != null" th:text="익명"></td>
+       								<td data-th-text="${#numbers.formatInteger(king.total, 1, 'COMMA') + '원'}"></td>
+       							</tr>
+       						</tbody>
+       					</table>
+       				</div>       		
+					</div>
+				</div>       			
+       			
+       			
+       		<p class="section-title"><span style="font-weight:700;">모금중인</span> 기부 목록<span class="bottom-line" ></span></p>
+       		<div class="vesitable" >
+				    <div class="owl-carousel donation-carousel justify-content-center" >
+                           <div th:each="dona : ${list}" class="item">
+                                <div class="recruit-list"   >
+                                    <!-- 리스트 아이템 표시 -->
+                                    <div class="rounded position-relative fruite-item" style="border: 1px solid #ccc;">
+                                        <div class="fruite-img">
+                                            <a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}"><img th:if="${dona.filePath} != null" th:src="${dona.filePath}" onError="this.src='../image/bonsamaru.png'" class="img-fluid w-100 rounded-top" style="height:250px" alt=""></a>
+                                            <a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}"><img th:if="${dona.filePath} == null" src="../image/bonsamaru.png" class="img-fluid w-100 rounded-top" style="height:250px" alt=""></a>
+                                        </div>
+
+                                        <div class="text-white py-1 rounded position-absolute" style="top: 10px; left: 10px; background-color: #ffb524; filter: grayscale(0%);">
+                                            <span th:text="${dona.recStat} == '1' ? '모금중' : '모금완료'"></span>
+                                        </div>
+
+                                        <!-- 테두리 없애부분 -->
+                                        <div class="p-4 border-top-0 rounded-bottom" style="color: black;">
+                                            <h4><a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" th:text="${dona.title}" style="color: black;"> 제목</a></h4>
+											<div class="info-item" style="color: darkgreen;">
+                                                # <strong><span th:text="${dona.subCodeName}"></span></strong>
+                                            </div>
+                                            <div class="info-item">
+                                                목표금액 :<strong><span th:text="${dona.goalAmt}"></span></strong> 원
+                                            </div>
+                                            <div class="info-item">
+                                                <strong><span th:text="${dona.donationCount}"></span></strong>명 참여
+                                            </div>
+
+                                            <div class="progress">
+											    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" th:style="'width: ' + ${dona.donationRatio} + '%'" aria-valuenow="${dona.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+											</div>
+											<div class="info-item" style="display: flex; justify-content: space-between;">
+											    <div style="text-align: left;">
+											        <strong><span th:text="${dona.donationRatio}"></span></strong> %
+											    </div>
+											    <div style="text-align: right;">
+											        <strong><span th:text="${dona.total}"></span></strong>원
+											    </div>
+											</div>
+
+                                            <div class="d-flex justify-content-center align-items-center flex-lg-wrap" >
+                                                <a th:href="@{/fInfo/facilityInfo(facId=${dona.facId})}" class="btn border border-secondary rounded-pill px-3 text-dark mx-auto"><span th:text="${dona.facilityName}" style="color: black;">명 참여</span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+				    </div>
+				</div> <!-- vesitable end -->
+       		<p class="section-title"><span style="font-weight:700;">일일봉사</span><span class="bottom-line" ></span></p>
+       			<div class="vesitable" >
+					<div class="owl-carousel daily-carousel justify-content-center">
+					    <div th:each="day,index : ${daily}" class="item">
+					        <div class="card overflow-hidden rounded-2" style="margin-bottom: 20px;">
+					            <div class="position-relative">
+					                <a class="cur" th:onclick="newMeet([[${day.vol.volId}]])"><img th:src="@{${day.vol.path}}" class="card-img-top rounded-0" onerror="this.onerror=null; this.src='/userresources/image/nonono.png';" style="height:200px;"></a>
+					                <div class="text-white px-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+					                    <span>모집중</span>
+					                </div>
+					                <div class="text-white px-1 rounded position-absolute" style="top: 10px; right: 10px;background-color:#28a745;">
+					                    <span th:text="${day.vol.mainCategory}">관심분야</span>
+					                </div>
+					            </div>
+					            <div class="d-flex align-items-center justify-content-between">
+					                <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+					                    <h4><a class="cur" th:onclick="newMeet([[${day.vol.volId}]])" th:text="${day.vol.meetName}">프로젝트명</a></h4>
+					                    <a href="#" style="color:gray">
+					                       <span th:text="|#${day.vol.region}|">지역할거임</span>
+											</a>
+											<span th:if="${day.tag.size()}!=0">
+											   <span class="tag-link"style="margin-right:5px; cursor:pointer; color:gray" th:each="tag : ${day.tag}" th:text="|#${tag.tagContent}|"></span>
+											 </span>
+											 <br>			
+					                    <strong>모집기간</strong>
+					                   	<br>
+					                    <span th:text="${#dates.format(day.vol.recPeriod, 'yy.MM.dd')}+' ~ '"></span> 
+					                    <span th:if="${#dates.format(day.vol.endPeriod, 'yy.MM.dd')} != 49.12.30" th:text="${#dates.format(day.vol.endPeriod, 'yy.MM.dd')}">2024-02-04 ~ 2024-09-04</span>
+					                    <br>
+					                    <span th:text="'정원 : '+ ${day.vol.meetingCnt} +' / '+ ${day.vol.cap}+'명'">정원 : 해야함</span>
+										 <br>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+				</div> <!-- vesitable end -->
+       		<p class="section-title"><span style="font-weight:700;">동아리</span><span class="bottom-line" ></span></p>
+       		<div class="vesitable" >
+					<div class="owl-carousel club-carousel justify-content-center">
+					    <div th:each="day : ${group}" class="item">
+					        <div class="card overflow-hidden rounded-2" style="margin-bottom: 20px;">
+					            <div class="position-relative">
+					                <a class="cur" th:onclick="newMeet([[${day.vol.volId}]])"><img th:src="@{${day.vol.path}}" class="card-img-top rounded-0" onerror="this.onerror=null; this.src='/userresources/image/nonono.png';" style="height:200px;"></a>
+					                <div class="text-white px-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+					                    <span>모집중</span>
+					                </div>
+					                <div class="text-white px-1 rounded position-absolute" style="top: 10px; right: 10px;background-color:#28a745;">
+					                    <span th:text="${day.vol.mainCategory}">관심분야</span>
+					                </div>
+					            </div>
+					            <div class="d-flex align-items-center justify-content-between">
+					                <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+					                    <h4><a class="cur" th:onclick="newMeet([[${day.vol.volId}]])" th:text="${day.vol.meetName}">프로젝트명</a></h4>
+					                    <a href="#" style="color:gray">
+					                         <span th:text="|#${day.vol.region}|">지역할거임</span>
+											</a>
+											<span th:if="${day.tag.size()}!=0">
+											   <span class="tag-link"style="margin-right:5px; cursor:pointer; color:gray" th:each="tag : ${day.tag}" th:text="|#${tag.tagContent}|"></span>
+											 </span>
+											 <br>
+					                    <strong>모집기간</strong>
+					                   	<br>
+					                    <span th:text="${#dates.format(day.vol.recPeriod, 'yy.MM.dd')}+' ~ '"></span> 
+					                    <span th:if="${#dates.format(day.vol.endPeriod, 'yy.MM.dd')} != 49.12.30" th:text="${#dates.format(day.vol.endPeriod, 'yy.MM.dd')}">2024-02-04 ~ 2024-09-04</span>
+					                    <br>
+					                    <span th:text="'정원 : '+ ${day.vol.meetingCnt} +' / '+ ${day.vol.cap}+'명'">정원 : 해야함</span>
+										 <br>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					
+
+				</div> <!-- vesitable end -->
+       		<p class="section-title"><span style="font-weight:700;">시설소개</span> <span class="bottom-line" ></span></p>
+	       		<div class="vesitable" >
+					<div class="owl-carousel donation-carousel justify-content-center">
+	       		<div th:each="facility:${facilityList}" class="item" id="filteredFacilities">
+						<div class="card" style="text-align:center">
+								<div class="card-body thumb" style="position: relative;">
+									<img th:src="${facility.filePath}" onError="this.src='../image/기본이미지.jpg'"alt="" style="width: 200px; height:180px; ">
+									<div class="text-white px-1 rounded position-absolute" style="top: 30px; right: 50px;background-color:#28a745;">
+						                    <span th:text="${facility.category}">관심분야</span>
+						                </div>
+									<br>
+								</div>
+								<div class="details">
+									<div class="tags">
+									</div>
+									<br>
+									<a class="btn theme_btn button_hover " th:href="@{/fInfo/facilityInfo(facId=${facility.facId})}"
+											th:text="${facility.facName}" style="width: 150px;"></a>
+								</div>
+									<p th:text="${facility.facAddr}"></p>
+									<p style="display:none" th:text="${facility.region}" id="regions"></p>
+						</div>
+					</div>
+				</div>
+			</div>
+       	</div>
+<script>
+$(document).ready(function(){
+    // 기부 캐러셀 초기화
+    $('.donation-carousel').each(function() {
+        var itemCount = $(this).find('.item').length;
+        
+        $(this).owlCarousel({
+            loop: itemCount > 1,
+            margin: 10,
+            nav: itemCount > 1,
+            navText: ['<i class="fas fa-chevron-left fa-2x"></i>', '<i class="fas fa-chevron-right fa-2x"></i>'],
+            dots: false,
+            autoplay: itemCount > 1,
+            autoplayTimeout: 4000,
+            autoplayHoverPause: true,
+            stagePadding: 50,
+            slideBy: 2,
+            responsive:{
+                0:{
+                    items:1
+                },
+                600:{
+                    items:3
+                },
+                1000:{
+                    items:4
+                }
+            }
+        });
+    });
+    
+    $('.fac-carousel').each(function() {
+        var itemCount = $(this).find('.item').length;
+        
+        $(this).owlCarousel({
+            loop: itemCount > 1,
+            margin: 10,
+            nav: itemCount > 1,
+            navText: ['<i class="fas fa-chevron-left fa-2x"></i>', '<i class="fas fa-chevron-right fa-2x"></i>'],
+            dots: false,
+            autoplay: itemCount > 1,
+            autoplayTimeout: 4000,
+            autoplayHoverPause: true,
+            stagePadding: 50,
+            slideBy: 2,
+            responsive:{
+                0:{
+                    items:1
+                },
+                600:{
+                    items:3
+                },
+                1000:{
+                    items:4
+                }
+            }
+        });
+    });
+
+    // 일일봉사 캐러셀 초기화
+    $('.daily-carousel').each(function() {
+        var itemCount = $(this).find('.item').length;
+        $(this).owlCarousel({
+            loop: itemCount > 1,
+            margin: 10,
+            nav: itemCount > 1,
+            navText: ['<i class="fas fa-chevron-left fa-2x"></i>', '<i class="fas fa-chevron-right fa-2x"></i>'],
+            dots: false,
+            autoplay: itemCount > 1,
+            autoplayTimeout: 4000,
+            autoplayHoverPause: true,
+            stagePadding: 50,
+            slideBy: 2,
+            responsive:{
+                0:{
+                    items:1
+                },
+                600:{
+                    items:3
+                },
+                1000:{
+                    items:4
+                }
+            }
+        });
+    });
+
+    // 동아리 캐러셀 초기화
+    $('.club-carousel').each(function() {
+        var itemCount = $(this).find('.item').length;
+        $(this).owlCarousel({
+            loop: itemCount > 1,
+            margin: 10,
+            nav: itemCount > 1,
+            navText: ['<i class="fas fa-chevron-left fa-2x"></i>', '<i class="fas fa-chevron-right fa-2x"></i>'],
+            dots: false,
+            autoplay: itemCount > 1,
+            autoplayTimeout: 4000,
+            autoplayHoverPause: true,
+            stagePadding: 50,
+            slideBy: 2,
+            responsive:{
+                0:{
+                    items:1
+                },
+                600:{
+                    items:3
+                },
+                1000:{
+                    items:4
+                }
+            }
+        });
+    });
+});
+function newMeet(id){
+	src_width = screen.availWidth*0.1;
+	src_height = screen.availHeight*0.1;
+	window.open("meetings?volId="+id, "pop", "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1400, height=800, top="+src_height+",left="+src_width+",location=no");
+}
+</script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+     </section>
+    </body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<style>
+.content {
+	width: 700px;
+	margin: auto
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+	<section layout:fragment="content">
+		<div class="body-wrapper">
+			<!--  Header Start -->
+			<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+			<!--  Header End -->
+			<div class="container-fluid">
+				<div class="container">
+					<div class="page_tits">
+						<h3>문의내역</h3>
+					</div>
+					<br> <br>
+					<div class="content">
+						<section>
+							<form name="inquireComments" action="inquireComments" method="post">
+								<div class="col-md-12">
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="author"> 작성자 </label> 
+											<input type="text" name="memId" class="form-control" th:value="${info.memId}" readonly>
+											<input type="text" name="detailCode" class="form-control" th:value="${info.detailCate}" style="display:none">
+											<input type="text" name="detailCate" class="form-control" th:value="${info.detailCate}" style="display:none">
+										</div>
+										<div class="form-group">
+											<label for="author">문의 날짜</label> 
+											<input type="text" name="memId" class="form-control" th:value="${#dates.format(info.writeDate, 'yyyy년 MMM dd일')}" readonly>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="title">제목</label> 
+											<input class="form-control" name="title" th:value="${info.title}" readonly>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="content"> 내용 </label>
+											<textarea class="form-control" cols="50"
+												rows="5" th:text="${info.content}" readonly></textarea>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="content"> 답변하기 </label>
+											<textarea class="form-control" cols="50"
+												rows="5" name="content"></textarea>
+										</div>
+									</div>
+									<p class="btn_set">
+										<button type="submit" id="modNo" style="float: right;" class="btn btn-success m-1">답변 등록</button>
+									</p>
+								</div>
+							<div class="modal fade" id="confimModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+							    <div class="modal-dialog" role="document">
+							        <div class="modal-content">
+							            <div class="modal-header">
+							                <h5 class="modal-title" id="deleteConfirmationModalLabel">등록 확인</h5>
+							            </div>
+							            <div class="modal-body">
+							                <p>정말 등록하시겠습니까?<br>등록 후 수정 및 삭제가 불가능합니다.</p>
+							            </div>
+							            <div class="modal-footer">
+							                <button type="button" class="btn btn-secondary" id="yesBtn" data-dismiss="modal" aria-hidden="false">네</button>
+							                <button type="button" class="btn btn-danger" id="noBtn" data-dismiss="modal" aria-hidden="false">아니오</button>
+							            </div>
+							        </div>
+							    </div>
+							 </div>
+							 <script>
+							 	const swalWithBootstrapButtons = Swal.mixin({
+								  customClass: {
+								    confirmButton: "btn btn-success",
+								    cancelButton: "btn btn-danger"
+								  },
+								  buttonsStyling: false
+								});
+								$('form[name="inquireComments"]').on('submit',commentInsert);
+	
+								function commentInsert(event){
+									event.preventDefault();
+									let content = $('[name="content"]');
+									console.log(content);
+									
+									if(content.val()==''){
+										alert('내용이 입력되지 않았습니다.');
+										content.focus();
+										return;
+									};
+									swalWithBootstrapButtons.fire({
+										  title: "정말 등록하시겠습니까??",
+										  text: "등록 후에는 수정 및 삭제가 불가능합니다.",
+										  icon: "question",
+										  showCancelButton: true,
+										  confirmButtonText: "등록",
+										  cancelButtonText: "취소",
+										  reverseButtons: true
+										}).then((result) => {
+										  if (result.isConfirmed) {
+										    swalWithBootstrapButtons.fire({
+										      title: "답변이 등록되었습니다.",
+										      text: "등록한 답변을 확인해보세요",
+										      icon: "success"
+										    });
+										    inquireComments.submit();
+										  } else if (
+										    /* Read more about handling dismissals below */
+										    result.dismiss === Swal.DismissReason.cancel
+										  ) {
+										    swalWithBootstrapButtons.fire({
+										      title: "취소되었습니다.",
+										      text: "등록을 취소하였습니다.",
+										      icon: "error"
+										    });
+										  }
+										});
+								};
+								
+							</script>
+						</form>
+					</section>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

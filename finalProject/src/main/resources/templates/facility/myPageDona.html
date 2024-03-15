@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>시설마이페이지</title>
+ <link rel="stylesheet" type="text/css" href="/css/sidebar.css">
+ <style>
+ .btn:hover,
+ .btn:focus {
+    background-color: #689f38; 
+    color: white;
+    	cursor : pointer;
+ }
+ p{
+	font-weight:bold;
+	font-size:15px;
+}
+</style>
+</head>
+<body>
+
+   <section layout:fragment="content"  class="d-flex">
+   <div class="container" >
+    <div th:insert="~{banner/empty::banner}"></div>
+       <div class="side" th:insert="~{facility/sidebar::side}"></div>	
+         <div class="container">
+         
+  					       
+                <div class="row justify-content-center hotel_booking_table">
+                <h2 style="color:#689f38">기부중</h2><br><br>
+                        <div class="row" style="text-align:center;">
+                                <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                     <p style="color:white;  font-size:20px">기부제목</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                      <p style="color:white;  font-size:20px">모집기간</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                       <p style="color:white;  font-size:20px">모집금액</p>
+                                       
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                       <p style="color:white;  font-size:20px">달성률</p>
+                                       
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                       <p style="color:white;  font-size:20px">기간연장</p>
+                                       
+                                    </div>
+                                </div>
+                        
+                          
+                  
+                 
+                            
+                            <th:block th:each="dona0:${donaList0}">
+                            
+                             
+                             <div th:if="dona0.length ==0">
+			                  <div class="col-md-12">
+			                  </div>
+			                 <h2>아직 기부내역이 없습니다</h2>
+			                </div>
+			                
+                                <div class="col-md-3">
+                                    <div class="book_tabel_item">
+                                     <p><a th:href="@{/donaDetail(id=${dona0.donId}, facId=${dona0.facId})}" th:text="${dona0.title}"></a></p>
+                                    <input type="hidden" id="did" th:value="${dona0.donId}"> 
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="book_tabel_item">
+                                      <p id="endP" th:text="${#dates.format(dona0.recPeriod,'yyyy-MM-dd')} +'~'+${#dates.format(dona0.endPeriod,'yyyy-MM-dd')}"></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="book_tabel_item">
+                                       <p th:text="${#numbers.formatInteger(dona0.targetOk,3,'COMMA')+'원'}"></p>
+                                     
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="book_tabel_item">
+                                       <p th:text="${dona0.donationRatio}+'%'"></p>
+                                     
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="book_tabel_item">
+                                   
+                                       
+                                      <a href="#"  ><button th:attr="data-extP=${dona0.extPeriod}, data-endP=${dona0.endPeriod}" th:onclick="openExtModal(this,[[${dona0.donId}]])" class="btn" >연장하기</button></a>
+                                    </div>
+                                </div>
+                                </th:block>   
+                       
+                </div>
+<th:block th:if="${#lists.size(donaList0)}!=0">
+<nav class="blog-pagination justify-content-center d-flex">
+	<ul class="pagination">
+		<li class="page-item">
+			<a th:href="@{/fac/donaInfo(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1})}" class="page-link" aria-label="Previous"> <span aria-hidden="true"> <span class="lnr lnr-chevron-left"></span></span></a></li>
+		<li class="page-item" th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			 <a class="page-link" th:href="@{/fac/donaInfo(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage})}" th:text="${pageNum}"></a></li>
+		<li class="page-item"><a th:href="@{/fac/donaInfo(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}" class="page-link" aria-label="Next"> <span aria-hidden="true"> <span class="lnr lnr-chevron-right"></span></span></a></li>
+	</ul>
+</nav>
+</th:block>           
+                </div>
+                
+                <br>
+                <br>
+                <br>
+                <br>
+               
+                <div class="row justify-content-center hotel_booking_table">
+                <h2 style="color:#689f38">기부마감</h2><br><br>
+                         <div class="row" style="text-align:center;">
+                                <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                     <p style="color:white;  font-size:20px">기부제목</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                      <p style="color:white;  font-size:20px">모집기간</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                       <p style="color:white;  font-size:20px">모집금액</p>
+                                       
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+                                    <div class="book_tabel_item">
+                                       <p style="color:white;  font-size:20px">달성률</p>
+                                       
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2" style="background-color:#689f38; text-align:center;">
+
+                                    <div class="book_tabel_item">
+                                       <p style="color:white;  font-size:20px">후기작성</p>
+                                       
+                                    </div>
+                                </div>
+
+                        
+                            <th:block th:each="dona:${donaList1}">
+                            
+                            <div th:if="dona.length ==0">
+			                  <div class="col-md-12">
+			                  </div>
+			                 <h2>아직 기부내역이 없습니다</h2>
+			                </div>
+                                <div class="col-md-3">
+                                    <div class="book_tabel_item">
+                                     <p><a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" th:text="${dona.title}"></a></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="book_tabel_item">
+                                      <p th:text="${#dates.format(dona.recPeriod,'yyyy-MM-dd')} +'~'+${#dates.format(dona.endPeriod,'yyyy-MM-dd')}"></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="book_tabel_item">
+                                       <p th:text="${#numbers.formatInteger(dona.targetOk,3,'COMMA')+'원'}"></p>
+                                     
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="book_tabel_item">
+                                       <p th:text="${dona.donationRatio}+'%'"></p>
+                                     
+                                    </div>
+                                </div>
+                            	<div class="col-md-2">
+                                    <div class="book_tabel_item">
+                                      <button class="btn" onclick="openReviewForm(this)" th:attr="data-donId=${dona.donId}, data-facId=${dona.facId}, data-hasrev=${dona.hasreview}" >후기작성</button>
+                                     
+                                    </div>
+                                </div>
+                           
+                       
+        
+                    </th:block> 
+                </div>
+                
+                <th:block th:if="${#lists.size(donaList1)}!=0">
+<nav class="blog-pagination justify-content-center d-flex">
+	<ul class="pagination">
+		<li class="page-item">
+			<a th:href="@{/fac/donaInfo(start=${vo2.start - vo2.cntPerPage}, end=${vo2.start - 1})}" class="page-link" aria-label="Previous"> <span aria-hidden="true"> <span class="lnr lnr-chevron-left"></span></span></a></li>
+		<li class="page-item" th:each="pageNum : ${#numbers.sequence(vo2.startPage, vo2.endPage)}" th:class="${pageNum == vo2.currentPage ? 'page-item active' : 'page-item'}">
+			 <a class="page-link" th:href="@{/fac/donaInfo(start=${(pageNum - 1) * vo2.cntPerPage + 1}, end=${pageNum * vo2.cntPerPage})}" th:text="${pageNum}"></a></li>
+		<li class="page-item"><a th:href="@{/fac/donaInfo(start=${vo2.end + 1}, end=${vo2.end + vo2.cntPerPage})}" class="page-link" aria-label="Next"> <span aria-hidden="true"> <span class="lnr lnr-chevron-right"></span></span></a></li>
+	</ul>
+</nav>
+</th:block> 
+           
+            </div>
+          </div>  
+            
+            
+     <div class="modal fade" id="extendDeadlineModal" tabindex="-1" role="dialog" aria-labelledby="extendDeadlineModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="extendDeadlineModalLabel"> 모금 기한 연장하기 </h5> 
+                </div>
+                <div class="modal-body">
+                    <p> 2주 이내로 기한을 연장할 수 있습니다. (1회 한정)</p>
+                    
+                    <!-- date 입력란 추가 -->
+                    <div class="form-group">
+                        <label for="newDeadline">연장 기한 선택:</label>
+                        <input type="date" class="form-control" id="newDeadline" name="newDeadline" required>
+                    </div>
+                          <!-- 숨겨진 입력 필드 추가 -->
+                         <input type="hidden" id="donIdForExtension">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="extendDeadline()"> 연장하기 </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<!-- 연장 성공 메시지 모달 -->
+<div class="modal fade" id="successExtModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">연장 성공</h5>
+            </div>
+            <div class="modal-body">
+                <p>모금기한이연장되었습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+ <!-- 이미 모달 -->
+    <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertModalLabel">✅알림</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                   <p id="alertMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+
+   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+                
+<script th:inline="javascript">
+
+
+//시작날짜 오늘로 설정
+
+var endP = document.getElementById("endP").innerHTML;
+    console.log("endP: 값 ", endP); 
+var dates = endP.split('~');
+var endDate2 = new Date(dates[1].trim());
+console.log("여기여기", endDate2);
+
+    
+    
+//document.getElementById('newDeadline').value = new Date().toISOString().substring(0, 10);
+//$('input[name=newDeadline]').attr("readonly", true);
+$('input[name=newDeadline]')
+
+// 종료일자 2주 제한
+
+let maxDate = new Date(endDate2.getTime());
+console.log("요기네용", maxDate);
+maxDate.setDate(maxDate.getDate() + 14); // 현재 날짜에 14일(2주)를 더함
+
+
+endDate = maxDate.toISOString().substring(0, 10);
+console.log("요깃넹", endDate);
+
+$('input[name=newDeadline]').prop("max", endDate);
+//시작 날짜를 endDate2로 설정
+var startDate = endDate2.toISOString().substring(0, 10);
+console.log("우와웅", startDate)
+$('input[name=newDeadline]').prop("min", startDate);
+
+
+
+//연장
+function openExtModal(button, donId){
+
+	console.log("모달창열리고고2", donId);
+	// 모달에 donId 저장하기
+    document.getElementById("donIdForExtension").value = donId;
+	
+    var extP = button.getAttribute("data-extP");
+    console.log("extP: 값 ", extP); 
+    var endP = button.getAttribute("data-endP");
+    console.log("endP: 값222 ", endP); 
+    
+   if(extP != null){
+	   openAlertModal("모금기한 연장은 1회만 가능합니다.");
+	   return;
+   }
+	
+		
+	
+	$("#extendDeadlineModal").modal("show");
+	
+	
+	$(".btn-secondary").click(function () {
+	    $("#extendDeadlineModal").modal("hide");
+	});
+}
+
+
+// 기한 연장 처리 함수
+function extendDeadline() {
+    // 선택된 기한 값 가져오기
+    let newDeadlineValue = document.getElementById("newDeadline").value;
+    //	console.log("새로운 기한:", newDeadlineValue);
+    	
+    let donIdVal = document.getElementById("donIdForExtension").value; // 수정된 부분
+    console.log("새로운 기한:", newDeadlineValue, "donId:", donIdVal);
+    
+
+ 		
+     let donaVO = {
+    		 donId : donIdVal,
+    		 extPeriod : newDeadlineValue
+     }
+     
+     console.log(donaVO);
+    	
+        $.ajax({
+        	type: 'PUT',
+            url: '/facilityMyPage/donaInfo/extension',
+            //dataType : 'json',   
+            data: JSON.stringify(donaVO),
+        	contentType : 'application/json', 
+            
+            success: function(response) {
+              
+            	   // 기존 모달 닫기
+                $("#extendDeadlineModal").modal("hide");
+
+                // 새로운 모달 열기
+                openSuccessExtModal();
+                return;
+            },
+            error: function(error) {
+            	console.log("아작스실패");
+                console.error(error);
+            }
+        })
+    	
+    	
+    	
+    // 모달 닫기
+    $("#extendDeadlineModal").modal("hide");
+}
+
+
+// open the alert modal
+function openAlertModal(msg) {
+    
+    document.getElementById("alertMessage").innerText = msg;
+    
+    $("#alertModal").modal("show");
+}
+
+
+//성공 메시지 모달 열기-영수증
+function openSuccessModal() {
+    $("#successModal").modal("show");
+
+    // 모달이 닫힐 때 이벤트 리스너 등록
+    $("#successModal").on("hidden.bs.modal", function () {
+        // 모달 닫힌 후 실행할 동작
+        
+        location.reload(); // 새로고침
+    });
+}
+
+//성공 메시지 모달 열기-연장
+function openSuccessExtModal() {
+    $("#successExtModal").modal("show");
+
+    // 모달이 닫힐 때 이벤트 리스너 등록
+    $("#successExtModal").on("hidden.bs.modal", function () {
+        // 모달 닫힌 후 실행할 동작
+        
+        location.reload(); // 새로고침
+    });
+}
+
+// 리뷰창
+function openReviewForm(button) {
+	
+	// 후기글이 존재하면 이미 후기글이 존재한다고 경고창 띄우기
+	var revStat = button.getAttribute("data-hasrev");
+	console.log(typeof(revStat));
+	console.log("revStat:", revStat); // 콘솔에 revStat 출력
+
+	if(revStat === '1' ){
+		openAlertModal("이미 후기글을 작성하였습니다.");
+		return;
+	} else {
+		
+    var donId = button.getAttribute("data-donId");
+    var facId = button.getAttribute("data-facId");
+    // donId와 facId를 이용하여 후기 작성 페이지로 이동
+    var reviewUrl = '/reviewform?donId=' + donId + '&facId=' + facId;
+    window.location.href = reviewUrl;
+	}
+}
+
+
+//영수증
+function openReceiptModal(button) {
+	console.log("영수증")
+    var donId = button.getAttribute("data-donId");
+    console.log("여donId", donId);
+    var facId = button.getAttribute("data-facId");
+    console.log("여donId", facId);
+
+    // donId와 facId를 모달에 저장
+    document.getElementById("donIdForReceipt").value = donId;
+    document.getElementById("facIdForReceipt").value = facId;
+
+    // 모달 열기
+    $("#receiptModal").modal("show");
+}
+
+function submitReceipt() {
+    // 선택된 파일과 donId, facId 가져오기
+    let receiptFile = document.getElementById("uploadFiles").files[0];
+    console.log('파일컴온', receiptFile);
+    let donId = document.getElementById("donIdForReceipt").value;
+    let facId = document.getElementById("facIdForReceipt").value;
+	
+    // FormData를 사용하여 파일 및 추가 정보 전송
+    let formData = new FormData();
+    //formData.append("donId", donId);
+    //formData.append("facId", facId);
+    
+    formData.append("uploadFiles", receiptFile);
+	//formData.append("memId", facId);
+	
+	formData.append("codeUser", facId);
+    formData.append('codeNo', donId);
+    formData.append("code", "p06")
+	
+ // 첫 번째 AJAX 요청
+	$.ajax({
+		type : 'POST',
+		url : '/uploadsAjax',
+		data : formData,
+		processData: false,
+		contentType: false,
+		success: function(response) {
+			console.log("첫 번째 AJAX 성공: " + response);
+			
+			// 두 번째 AJAX 요청
+			$.ajax({
+				type: 'POST',
+				 url: '/receiptAlert',
+				data: {memId : facId},
+				
+				success: function (applyResponse) {
+					console.log("두 번째 AJAX 성공: " + applyResponse);
+					console.log("두번째 등록 성공!");
+					// 성공 메시지 모달 열기
+                    $("#successModal").modal("show");
+
+                    // 성공 메시지 모달이 닫힐 때 이벤트 리스너 등록
+                    $("#successModal").on("hidden.bs.modal", function () {
+                        location.href = "/fac/donaInfo"; 
+                    });
+				},
+				error: function (applyError) {
+					console.error("두 번째 AJAX 실패: " + applyError);
+				}
+			});
+		},
+		error: function(error) {
+			console.error("첫 번째 AJAX 실패: " + error);
+		}
+	});
+}
+
+</script>
+</div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,50 @@
+
+		<table class="table" id="fac">
+				<thead>
+					<tr>
+						<th>시설명</th>
+						<th>시설유형</th>
+						<th>이메일</th>
+						<th>홈페이지 주소</th>
+						<th>대표자명</th>
+						<th>대표번호</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="fac : ${facilityList}" th:if="${fac.donApp}==0">
+						<tr>
+							<td th:text="${fac.facName}" class="facility" th:onclick="info2([[${fac.facId}]])">시설명</td>
+							<td th:text="${fac.facType}" >시설유형</td>
+							<td th:text="${fac.facEmail}" >이메일</td>
+							<td th:text="${fac.facWeb}" >홈페이지</td>
+							<td th:text="${fac.repName}" >대표자명</td>
+							<td th:text="${fac.repPhone}">대표번호</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			
+			<table class="table" id="don">
+				<thead>
+					<tr>
+						<th>시설 아이디</th>
+						<th>제목</th>
+						<th>목표금액</th>
+						<th>사업대상</th>
+						<th>모금 시작일</th>
+						<th>모금 마감일</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="don : ${donationList}" th:if="${don.donRegApp}==0">
+						<tr>
+							 <td th:text="${don.facId}" class="cur" th:onclick="dona([[${don.donId}]])">아이디</td>
+							 <td th:text="${don.title}" >제목</td>
+							 <td data-th-text="${#numbers.formatInteger(don.goalAmt, 3, 'COMMA') + '원'}">목표금액</td>
+							 <td th:text="${don.projTarget}">사업대상</td>
+							 <td th:text="${#dates.format(don.recPeriod, 'yyyy년 MMM dd일')}" >모금 시작일</td>
+							 <td th:text="${#dates.format(don.endPeriod, 'yyyy년 MMM dd일')}">모금 마감일</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>

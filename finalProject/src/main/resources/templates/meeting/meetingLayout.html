@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modernize Free</title>
+  <style type="text/css">
+  	#mymodals{
+  		z-index:999
+  	}
+  </style>
+		<script src="../admin/libs/jquery/dist/jquery.min.js"></script>
+        <!-- Google Web Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Source+Serif+Pro:wght@400;700&display=swap" rel="stylesheet">
+
+        <!-- Icon Font Stylesheet -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Libraries Stylesheet -->
+        <link href="../dpdd/lib/animate/animate.min.css" rel="stylesheet">
+        <link href="../dpdd/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+        <!-- Customized Bootstrap Stylesheet -->
+        <link href="../dpdd/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link href="../dpdd/css/style.css" rel="stylesheet">
+        		<!-- JavaScript Libraries -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="../dpdd/lib/easing/easing.min.js"></script>
+		<script src="../dpdd/lib/waypoints/waypoints.min.js"></script>
+		<script src="../dpdd/lib/owlcarousel/owl.carousel.min.js"></script>
+
+		<!-- Template Javascript -->
+		<script src="../dpdd/js/main.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Navbar start -->
+  <div class="container-fluid sticky-top px-0">
+      <div class="container-fluid topbar d-none d-lg-block" style="background-color:#689f38">
+          <div class="container px-0">
+              <div class="topbar-top d-flex justify-content-between flex-lg-wrap">
+                  <div class="top-info flex-grow-0">
+                      <span class="rounded-circle btn-sm-square bg-primary me-2">
+                          <i class="fas fa-heart text-white"></i>
+                      </span>
+                      <div class="pe-2 me-3 border-end border-white d-flex align-items-center">
+                          <p class="mb-0 text-white fs-6 fw-normal" id="meetingType"></p>
+                      </div>
+                      <div class="overflow-hidden" style="width: 800px;">
+                          <div id="note" class="ps-2">
+                              <img src="../image/기본이미지.jpg" class="img-fluid rounded-circle border border-3 border-primary me-2" style="width: 30px; height: 30px;" alt="">
+                              <p class="text-white mb-0 link-hover" id="oneLiner">반갑습니다~</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="container-fluid bg-light">
+          <div class="container px-0">
+              <nav class="navbar navbar-light navbar-expand-xl">
+                  <a th:href="@{../meetings(volId=${session.id})}" class="navbar-brand mt-3">
+                      <p class="display-6 mb-2" style="line-height: 0;" id="meetingName"></p><br>
+                      <div id="tags"></div>
+                  </a>
+                  <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                      <span class="fa fa-bars text-primary"></span>
+                  </button>
+                  <div class="collapse navbar-collapse bg-light py-3" id="navbarCollapse">
+                      <div class="navbar-nav mx-auto border-top">
+                          <a th:href="@{../meetings(volId=${session.id})}" class="nav-item nav-link">Home</a>
+                          <a th:href="@{../aboutMeeting(volId=${session.id})}" class="nav-item nav-link">동아리소개</a>
+                          <a th:href="@{../volBoardList(volId=${session.id})}" class="nav-item nav-link">봉사게시판</a>
+                          <a th:href="@{../reviewBoardList(volId=${session.id})}" class="nav-item nav-link" style="display:block" id="reviewBoard">후기게시판</a>
+                          <a th:href="@{../freeBoardList(volId=${session.id})}" class="nav-item nav-link">자유게시판</a>
+                          <div class="nav-item dropdown" id="myPage" style="display:none">
+                              <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">마이페이지</a>
+                              <div class="dropdown-menu m-0 bg-secondary rounded-0">
+                                  <a th:href="@{../myInfoPage(volId=${session.id})}" class="dropdown-item">내 정보</a>
+                                  <a id="showing2" style="display:none" th:href="@{../managerPage(volId=${session.id})}" class="dropdown-item">방장 페이지</a>
+                                  <a th:href="@{../WithdrawalMeeting(volId=${session.id })}" class="dropdown-item">모임 탈퇴하기</a>
+                              </div>
+                          </div>
+                          <img id="kingIcon" src="/image/방장.png" style="width:15px;height:15px;display:none">
+                      </div>
+                      <div class="d-flex flex-nowrap border-top pt-3 pt-xl-0">
+                          <div class="d-flex">
+                              <img src="../dpdd/img/weather-icon.png" class="img-fluid" alt="날씨" id="weather" style="width:50px">
+                              <div class="d-flex align-items-center">
+                                  <strong class="fs-4 text-secondary" id="degree"></strong>
+                                  <div class="d-flex flex-column ms-2" style="width: 150px;">
+                                      <span class="text-body" id="city">Korea,</span>
+                                      <small id="today"></small>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div id="showing" style="display:none"><button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">모임 가입</button></div>
+                      <div id="daegi" style="display:none"><button class="btn" style="cursor:text;background-color:#689f38;color:white">승인 대기 중</button></div>
+                  </div>
+              </nav>
+          </div>
+      </div>
+  </div>
+  <br>
+<!-- 신청 모달폼 -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">모임 가입하기</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">가입 사유:</label>
+            <textarea class="form-control" id="message-text" name="appReason"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+        <button type="button" class="btn btn-primary" onclick="approveMeeting()">신청하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Navbar End -->
+<section layout:fragment="content">
+</section>
+
+<script type="text/javascript">
+const API_KEY = "979764b808d33fb79bb7bf2a5d222afc";
+let latitude = "";
+let longitude = "";
+//날짜 포맷
+function dateFormat(value, format) {
+    let date = value == "" ? new Date() : new Date(value);
+    let year = date.getFullYear();
+    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+    let day = ("0" + date.getDate()).slice(-2);
+    let result = format
+      .replace("yyyy", year)
+      .replace("MM", month)
+      .replace("dd", day);
+    return result;
+};
+
+$('#today').text(dateFormat('','yyyy년 MM월 dd일'));
+function weather(){
+	$.ajax('https://api.openweathermap.org/data/2.5/weather?lat=35.8678528&lon=128.6012928&appid='+API_KEY+'&units=metric')
+	.done(result=>{
+		if(result.weather[0].main=='Clouds'){
+			$('#weather').attr("src", "../dpdd/img/흐림.png");
+		}else if(result.weather[0].main=='Clear'){
+			$('#weather').attr("src", "../dpdd/img/맑음.png");
+		}else{
+			$('#weather').attr("src", "../dpdd/img/weather-icon.png");
+		}
+		$('#degree').text(result.main.temp+'°C');
+		$('#city').text(result.name);
+	})
+	.fail(err=>console.log(err))
+}
+weather();
+//날씨 처리 시작
+//navigator.geolocation.getCurrentPosition(
+	//function (result) {
+	//latitude = result.coords.latitude;
+	//longitude = result.coords.longitude;
+	//잠깐 위치 정해짐
+	//$.ajax('https://api.openweathermap.org/data/2.5/weather?lat=35.8678528&lon=128.6012928&appid='+API_KEY+'&units=metric')
+	//.done(result=>{
+		//if(result.weather[0].main=='Clouds'){
+			//$('#weather').attr("src", "../dpdd/img/흐림.png");
+		//}else if(result.weather[0].main=='Clear'){
+			//$('#weather').attr("src", "../dpdd/img/맑음.png");
+		//}else{
+			//$('#weather').attr("src", "../dpdd/img/weather-icon.png");
+		//}
+		//$('#degree').text(result.main.temp+'°C');
+		//$('#city').text(result.name);
+	//})
+	//.fail(err=>console.log(err))
+	
+//},
+//function (result){console.log('위치 정보를 불러오는데 실패했습니다.')});
+
+//모임 정보 불러오기
+$.ajax('../meetingInfo?volId='+[[${session.id}]])
+.done(result => {
+	$("#oneLiner").text(result.oneLiner);
+	if(result.oneLiner==null){
+		$("#oneLiner").text('반갑습니다~');
+	}
+	$("#meetingName").text(result.meetName);
+  	if(result.meetType=='e01'){
+   	  $("#meetingType").text('일일봉사모임');
+   	  $('#reviewBoard').css('display','none');
+  	}else if(result.meetType=='e02'){
+	  $("#meetingType").text('동아리모임');
+  	}
+  	if(result.memId=='[[${session.userId}]]'){
+  		$('#showing2').css('display','block')
+  		$('#kingIcon').css('display','block')
+  	}
+})
+.fail(err => console.log(err));
+
+//모임 태그 가져오기
+$.ajax(`../meetingTag?volId=[[${session.id}]]`)
+.done(result => {
+	if(result.length>3){
+		for(let i=0;i<3;i++){
+			$("#tags").append('<small class="text-body fw-normal" style="letter-spacing: 12px;">#'+result[i].tagContent+'</small>');
+		}
+	}else if(result.length==0){
+		$("#tags").append('<small class="text-body fw-normal" style="letter-spacing: 12px;">#사랑합니다</small>');
+	}else{
+		for(let i=0;i<result.length;i++){
+			$("#tags").append('<small class="text-body fw-normal" style="letter-spacing: 12px;">#'+result[i].tagContent+'</small>');
+		}
+	}
+})
+.fail(err => console.log(err));
+//모임회원 목록
+$.ajax('../findMember?volId='+[[${session.id}]]+'&memId=[[${session.userId}]]&appCode=h02')
+.done(result => {
+	if(result==0){
+		$.ajax('../findMember?volId='+[[${session.id}]]+'&memId=[[${session.userId}]]&appCode=h01')
+		.done(result => {
+			if(result==0){
+				$('#daegi').css('display','none')
+				$('#showing').css('display','block')
+			}else{
+				$('#daegi').css('display','block')
+			}
+		})
+		.fail(err => console.log(err));
+	}else{
+		$('#showing').css('display','none')
+		$('#myPage').css('display','block')
+	}
+})
+.fail(err => console.log(err));
+
+function approveMeeting(){
+	const appReason = $("textarea[name='appReason']").val();
+	
+	var formData = new FormData();
+	formData.append("volId","[[${session.id}]]");
+	formData.append("appCode",'h01');
+	formData.append("appReason",appReason);
+	formData.append("memId",'[[${session.userId}]]');
+	$.ajax({
+   		url: '/approveMeeting',
+   		type: 'POST',
+   		processData: false,
+   		contentType: false,
+   		data: formData,
+   		success: function(data) {
+   			location.href="meetings?volId="+[[${session.id}]]
+   		},
+   		error: function(e) {
+   			console.log('실패');
+   		}
+   	});
+}
+</script>
+</body>
+</html>

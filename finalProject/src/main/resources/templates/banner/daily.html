@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    <style>
+    	.banner_content h4,
+		.banner_content h2,
+		.banner_content p {
+		    color: black; /* 기존 텍스트 색상 */
+		    text-shadow: 2px 2px 4px #FFFFFF; /* 흰색 그림자 */
+		}	
+    </style>
+        <title>봉사마루</title>
+    </head>
+    <body>
+	<div th:fragment="banner">
+         <section class="banner-home" style="height:500px; background-size:cover;background-image: url('banner/챌린지.png');
+     ">
+        <div class=" d_flex align-items-center" style=" min-height: 800px;">
+            <div class="overlay bg-parallax" data-stellar-ratio="0.9" data-stellar-vertical-offset="0"
+                data-background="">
+                
+                </div>
+            <div class="container" style="text-align:center; margin-bottom:300px;">
+                <p id="title" style="font-size:40px; font-weight: 700; margin-bottom:50px;"></p>
+                <p id="subTitle" style="font-size:22px; font-weight: 700"></p>
+                <div  style="color:#fff; "class="banner_content text-center">
+                </div>
+            </div>
+        </div>
+    </section>
+<script>
+    window.onload = function() {
+        // 현재 URL의 경로만 추출 (예: '/daily')
+        const path = window.location.pathname;
+
+        // 경로에 따라 조건 분기
+        if(path.includes('/daily')) {
+            document.querySelector('#title').textContent = '일일 봉사';
+            document.querySelector('#subTitle').textContent = '딱 하루! 만나 봉사하는 일일 봉사';
+        } else if(path.includes('/Group')) {
+            document.querySelector('#title').textContent = '동아리';
+            document.querySelector('#subTitle').textContent = '꾸준한 정기모임을 통해 봉사하는 동아리';
+        } else if(path.includes('/FacilityVol')) {
+            document.querySelector('#title').textContent = '시설 봉사';
+            document.querySelector('#subTitle').textContent = '시설에 직접 가서 봉사하는 시설 봉사';
+        }
+    };
+</script>
+   </div>
+    </body>
+</html>

@@ -1,0 +1,105 @@
+			<div id="more">
+			<th:block th:if="${reportList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${reportList.size} != 0">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>모임번호</th>
+						<th>신고자</th>
+						<th>신고날짜</th>
+						<th>신고사유</th>
+						<th>신고처리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="report,st : ${reportList}">
+						 <td th:text="${st.count}">번호</td>
+						 <td><a th:href="@{meetings(volId=${report.categoryNo})}" target='_blank' style="color:black">모임으로 이동</a></td>
+						 <td th:text="${report.memId}" >신고자</td>
+						 <td th:text="${#dates.format(report.repDate, 'yyyy년 MMM dd일')}" >날짜</td>
+						 <td th:if="${report.repReason}=='s01'" >스팸홍보/도배글입니다</td>
+						 <td th:if="${report.repReason}=='s02'" >음란물입니다</td>
+						 <td th:if="${report.repReason}=='s03'" >불법정보를 포함하고 있습니다</td>
+						 <td th:if="${report.repReason}=='s04'" >혐오/차별적 표현입니다</td>
+						 <td th:if="${report.repReason}=='s05'" >주제와 상관이 없음</td>
+						 <td th:if="${report.reqCode}==0" class="cur" th:onclick="openModal([[${report.repId}]])">처리하기</td>
+						 <td th:if="${report.reqCode}==1">처리완료</td>
+						 <td th:if="${report.reqCode}==2">반려된 신고건</td>
+					</tr>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev2([[${vo}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current2([[${vo}]],[[${pageNum}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next2([[${vo}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+			</div>
+			
+			<div id="comm">
+			<th:block th:if="${reportList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${reportList.size} != 0">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>댓글번호</th>
+						<th>신고자</th>
+						<th>신고날짜</th>
+						<th>신고사유</th>
+						<th>신고처리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="report,st : ${reportList}">
+						 <td th:text="${st.count}">번호</td>
+						 <td><a th:href="@{/feed/${userId}/1}" target='_blank' style="color:black">게시글으로 이동</a></td>
+						 <td th:text="${report.memId}" >신고자</td>
+						 <td th:text="${#dates.format(report.repDate, 'yyyy년 MMM dd일')}" >날짜</td>
+						 <td th:if="${report.repReason}=='s01'" >스팸홍보/도배글입니다</td>
+						 <td th:if="${report.repReason}=='s02'" >음란물입니다</td>
+						 <td th:if="${report.repReason}=='s03'" >불법정보를 포함하고 있습니다</td>
+						 <td th:if="${report.repReason}=='s04'" >혐오/차별적 표현입니다</td>
+						 <td th:if="${report.repReason}=='s05'" >주제와 상관이 없음</td>
+						 <td th:if="${report.reqCode}==0" class="cur" th:onclick="openModal([[${report.repId}]])">[[${userId}]]</td>
+						 <td th:if="${report.reqCode}==1">처리완료</td>
+						 <td th:if="${report.reqCode}==2">반려된 신고건</td>
+					</tr>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev3([[${vo}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current3([[${vo}]],[[${pageNum}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next3([[${vo}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+			</div>

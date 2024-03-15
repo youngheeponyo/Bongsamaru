@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>비밀번호 검증</title>
+<style>
+.title {
+	height: 800px;
+	margin:0 auto;
+	text-align:center;
+	color: black;
+	font-family: 'Orbit', sans-serif;
+}
+
+.imagelogo{
+	width: 300px;
+	height: 300px;
+}
+p {
+	font-size:18px;
+}
+
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+  <div class="container">
+  	<div class="title">
+	    <div th:each="item : ${list}">
+			<input type="text" id="id" th:value="${item.memId}" style="display:none;" >
+	    	<div>회원탈퇴</div>
+	    	<img src="/image/bongsalogo.png" class="imagelogo">
+	    	<p style="font-size:20px;">회원정보를 삭제하시려면 비밀번호를 입력하셔야 합니다.</p>
+	    	<p style="font-size:14px;">회원님의 개인정보 보호를 위한 본인 확인 절차이오니, 봉사마루 회원 로그인 시 사용하시는 비밀번호를 입력해주세요.</p>
+	    	<div style="margin-bottom:30px;">
+			    <input style="padding-left:17px;" type="password" id="currentPassword" name="currentPassword" placeholder="비밀번호를 입력해주세요">
+			    <p id="errorText" style="display:none;">비밀번호가 일치하지 않습니다</p>
+	    	</div>
+		    <input id="cancelBtn"  class="btn btn-outline-dark btn-lg" type="button" value="취소">	    	
+		    <input id="submitBtn"  class="btn btn-outline-dark btn-lg" type="submit" value="인증">	    	
+	    </div>
+  	</div>
+  </div>
+
+	<script>
+	// 현재 비밀번호 검증
+		$("#submitBtn").on('click', function() {
+		  let currentPassword = $("#currentPassword").val();
+		  let memId = $("#id").val();
+		  
+          let userVO = {
+		  
+		  	memId: $("#id").val(),
+          
+          };
+		  $.ajax({
+		    url: "/passwordCheck",
+		    type: "POST",
+		    data: { currentPassword: currentPassword },
+		    success: function(response) {
+				
+				$.ajax({
+		            url: "/deleteMember", // 서버 사이드 스크립트 파일의 경로
+		            method: "POST",
+		            contentType: "application/json",
+		            data: JSON.stringify(userVO), // 객체를 폼 데이터로 직렬화
+		            success: function(response) {
+						window.location.href = "/bye";
+		            },
+		            error: function(xhr, status, error) {
+		            }
+		        });
+		    },
+		    error: function(xhr, status, error) {
+		      console.log(error);
+		      $("#errorText").removeAttr("style");
+		      $("#errorText").css("color", "red");
+/* 		      var errorText = $("<div>").text("비밀번호가 일치하지 않습니다.").css("color", "red");
+		      $("#currentPassword").parent().append(errorText); */
+		    }
+		  });
+		});
+	
+	
+		$("#cancelBtn").on('click', function() {
+		    window.location.href = "/my";
+		});
+	
+	document.addEventListener("keydown", function(event) {
+		if (event.key == "Enter") {
+		    event.preventDefault(); // 기본 엔터 동작을 막음
+		    document.getElementById("submitBtn").click(); // 버튼 클릭 이벤트 실행
+		  }
+	});
+	</script>
+</section>
+</body>
+</html>

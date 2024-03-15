@@ -1,0 +1,56 @@
+			<div id="facility">
+			<div style="float:right">
+				<input class="form-control-sm me-2" onkeypress="handleKeyPress2(event)" id="search" type="search" placeholder="시설을 검색하세요" aria-label="Search" th:value="${vo.searchKeyword}">
+				<button class="btn btn-outline-success" onclick="search1()" type="button">검색</button>
+				<button class="btn btn-outline-primary" type="button" onclick="show2()">초기화</button>
+			</div>
+			<th:block th:if="${userListDetail.size} == 0" style="text-align:center">
+				<h3>데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${userListDetail.size} != 0">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th>시설명</th>
+						<th>사업자등록번호</th>
+						<th>대표자명</th>
+						<th>대표 전화</th>
+						<th>이메일</th>
+						<th>홈페이지 주소</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="user,st : ${userListDetail}">
+						<tr>
+							 <td th:text=${user.RN}>no</td>
+							 <td th:text="${user.facName}" class="cur" th:onclick="info([[${user.facId}]])">시설명</td>
+							 <td th:text="${user.bizNum}" >사업자등록번호</td>
+							 <td th:text="${user.repName}" >대표자명</td>
+							 <td th:text="${user.repPhone}">대표 전화</td>
+							 <td th:text="${user.facEmail}">이메일</td>
+							 <td><a th:text="${user.facWeb}" th:href="${user.facWeb}" target='_blank'>홈페이지</a></td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev([[${vo}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current([[${vo}]],[[${pageNum}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next([[${vo}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+			</div>
+			

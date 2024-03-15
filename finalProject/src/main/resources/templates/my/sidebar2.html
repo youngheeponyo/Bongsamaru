@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+<!-- 마이페이지 사이드바 -->
+<div th:fragment="side">
+
+  <div style="background-color: #fff;
+    margin-bottom: 40px;
+        border-bottom: 1px solid #dcdcdc;">
+        
+      <ul id="myList" class="container" style="display: flex;justify-content: center; list-style: none; margin-bottom:0"> 
+        <li style="cursor: pointer;" > <a id="/daily" style="display: inline-block;
+    padding: 30px 45px;
+    color: #797979;
+    font-size: 1.125rem;
+    font-weight: 500;">일일봉사</a></li>
+        <li style="cursor: pointer;" > <a  id="/Group" style="display: inline-block;
+    padding: 30px 45px;
+    color: #797979;
+    font-size: 1.125rem;
+    font-weight: 500;">동아리</a></li>
+        <li style="cursor: pointer;" > <a  id="/FacilityVol" style="display: inline-block;
+    padding: 30px 45px;
+    color: #797979;
+    font-size: 1.125rem;
+    font-weight: 500;">시설봉사</a></li>
+      </ul>
+</div>
+<script th:inline="javascript">
+    $('#myList a').click(function (e) {
+        var href = $(this).attr('id'); // 클릭한 요소의 id 속성 값을 가져옵니다.
+        window.location.href = href; // 해당 경로로 이동합니다.
+    });
+    
+    $(function () {
+        // 현재 페이지의 URL을 가져옵니다.
+        var currentUrl = window.location.href;
+
+        // 리스트 항목을 순회하며 현재 페이지와 연관된 항목을 찾습니다.
+        $('#myList a').each(function () {
+            var href = $(this).attr('id');
+            
+            // 현재 페이지와 id 속성 값이 일치하는 경우 해당 항목에 스타일을 적용합니다.
+            if (currentUrl.indexOf(href) > -1) {
+                $(this).css({
+                    'color': 'black',
+                    'font-size' : '24px',
+                    'font-weight': 'bold', 
+                    	'box-shadow': '0 1px 0 0 #689f38'
+                });
+            } else {
+                // 다른 항목들은 기본 스타일로 설정합니다.
+                $(this).css({
+                    'color': 'gray', // 기본 글씨 색상으로
+                    'font-weight': '' // 기본 글씨 두께로
+                });
+            }
+        });
+    });
+</script>
+</div>
+</body>
+</html>

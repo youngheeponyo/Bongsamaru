@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bongsamaru.meeting.mapper.MeetingMapper">
+	<select id="dailyAllList" resultType="VolunteerVO">
+		select vol_id,vol_date 
+		from vol_act 
+		where vol_id is not null
+		and vol_id in (select vol_id from volunteer where meet_type='e01')
+	</select>
+	<select id="meetingInfo" resultType="VolunteerVO">
+		select VOL_ID
+			,MEET_NAME
+			,MEET_TYPE
+			,CAP
+			,MEET_PURP
+			,MEET_DESC
+			,REGION
+			,ROOM_STAT
+			,REC_PERIOD
+			,END_PERIOD
+			,MEM_ID
+			,ONE_LINER
+			,(select file_path from files where code='p09' and code_no=volunteer.vol_id) path
+			,category
+		from volunteer
+		where VOL_ID = #{volId}
+	</select>
+	<!-- 파일 가져오기 -->
+	<select id="findFile" resultType="String">
+		select file_path 
+		from files 
+		where code=#{code} and code_no=#{codeNo}
+	</select>
+	<!-- 파일 삭제 -->
+	<delete id="delFile" parameterType="FilesVO">
+		delete 
+		from files 
+		where code = #{code}
+		and code_no = #{codeNo}
+	</delete>
+	<!-- 모임 가입하기 -->
+	<insert id="approveMeeting" parameterType="VolMemVO">
+		insert into vol_mem(
+			VOL_MEM_ID
+			,VOL_ID
+			,APP_CODE
+			,APP_DATE
+			,APP_REASON
+			,MEM_ID
+		)
+		values(
+			VOLMEMBER_SEQ.NEXTVAL
+			,#{volId}
+			,#{appCode}
+			,sysdate
+			,#{appReason}
+			,#{memId}
+		)
+	</insert>
+	
+	<!-- 봉사활동게시판 -->
+	<select id="meetingVolActListCnt" resultType="int">
+		select count(*)
+		from vol_act
+		where vol_id = #{volId}
+	</select>
+	<select id="meetingVolActListPaging" resultType="VolActVO">
+		SELECT * 
+		from(
+			SELECT ROWNUM RN 
+			,A.* 
+		from(  
+        	select VOL_ACT_ID
+				,VOL_ID
+				,CATEGORY
+				,TITLE
+				,CONTENT
+				,LOCATION
+				,CAP
+				,VOL_DATE
+				,START_DATE
+				,EXPIRE_DATE
+			from vol_act
+			where vol_id = #{volId}
+			order by vol_date desc) A)
+        where RN BETWEEN #{start} AND #{end}
+	</select>
+	<select id="findVolActNo" resultType="int">
+		select VOLACT_SEQ.NEXTVAL
+		from dual
+	</select>
+	<insert id="insertVolAct" parameterType="VolActVO">
+		insert into VOL_ACT(
+				VOL_ACT_ID
+				,VOL_ID
+				,CATEGORY
+				,TITLE
+				,CONTENT
+				,LOCATION
+				,CAP
+				,VOL_ZIP
+				,VOL_ZIP2
+				,VOL_DATE
+				,START_DATE
+				,EXPIRE_DATE)
+		values(#{volActId}
+				,#{volId}
+				,#{category}
+				,#{title}
+				,#{content}
+				,#{location}
+				,#{cap}
+				,#{volZip}
+				,FIND_ZIP(#{volZip})
+				,#{volDate}
+				,#{startDate}
+				,#{expireDate}
+				)
+	</insert>
+	<select id="volActBoardInfo" resultType="VolActVO">
+		select VOL_ACT_ID
+				,VOL_ID
+				,CATEGORY
+				,TITLE
+				,CONTENT
+				,LOCATION
+				,CAP
+				,VOL_DATE
+				,START_DATE
+				,EXPIRE_DATE
+		from VOL_ACT
+		where VOL_ACT_ID=#{volActId}
+	</select>
+	<delete id="delVolActBoard" parameterType="int">
+		delete 
+		from VOL_ACT 
+		where VOL_ACT_ID=#{volActId}
+	</delete>
+	
+	
+	
+	<!-- 봉사후기게시판 -->
+	<select id="volActReviewListPaging" resultType="VolActVO">
+		SELECT * 
+		from(
+			SELECT ROWNUM RN 
+			,A.* 
+		from(  
+        	select REVIEW_ID
+        			,VOL_ID
+			        ,VOL_ACT_ID
+			        ,TITLE
+			        ,CONTENT
+			        ,writer
+			        ,WRITE_DATE
+			        ,(select file_path from files where code='p13' and code_no=vol_review.REVIEW_ID) filePath
+			from vol_review
+			where vol_id = #{volId}
+			<if test="writer!=null and writer!=''">
+				and writer = #{writer}
+			</if>
+			order by vol_act_id) A)
+        where RN BETWEEN #{start} AND #{end}
+	</select>
+	<select id="volActReviewListCnt" resultType="int">
+       	select count(*)
+		from vol_review
+		where vol_id = #{volId}
+		<if test="writer!=null and writer!=''">
+			and writer = #{writer}
+		</if>
+	</select>
+	<select id="findReviewNo" resultType="int">
+		select REVIEW_SEQ.NEXTVAL
+		from dual
+	</select>
+	<insert id="insertReview" parameterType="VolActReviewVO">
+		insert into VOL_REVIEW(
+			REVIEW_ID
+			,VOL_ID
+			,VOL_ACT_ID
+			,TITLE
+			,CONTENT
+			,WRITER
+			,WRITE_DATE)
+		values(#{reviewId}
+				,#{volId}
+				,#{volActId}
+				,#{title}
+				,#{content}
+				,#{writer}
+				,sysdate)
+	</insert>
+	<select id="ReviewInfo" resultType="VolActReviewVO">
+		select REVIEW_ID
+				,VOL_ID
+				,VOL_ACT_ID
+				,TITLE
+				,CONTENT
+				,WRITER
+				,WRITE_DATE
+		from vol_review
+		where REVIEW_ID=#{reviewId}
+	</select>
+	<delete id="delReview" parameterType="int">
+		delete 
+		from vol_review 
+		where REVIEW_ID=#{reviewId}
+	</delete>
+	
+	<!-- 자유게시판 -->
+	<select id="getBoardList" resultType="FreeBoardVO">
+		SELECT * 
+		from(
+			SELECT ROWNUM RN 
+			,A.* 
+		from(  
+        	select BOARD_NO
+					,VOL_ID
+					,TITLE
+					,WRITER
+					,WRITE_DATE
+					,CONTENT
+					,VIEW_CNT
+		from free_board
+		where VOL_ID = #{volId}
+		order by BOARD_NO) A)
+        where RN BETWEEN #{start} AND #{end}
+	</select>
+	<select id="getBoardListCnt" resultType="int">
+        select count(*)
+		from free_board
+		where VOL_ID = #{volId}
+		order by BOARD_NO
+	</select>
+	<select id="findBoardNo" resultType="int">
+		select FREEBOARD_SEQ.NEXTVAL 
+		from dual
+	</select>
+	<insert id="insertBoard" parameterType="FreeBoardVO">
+		insert into free_board(
+				BOARD_NO
+				,VOL_ID
+				,TITLE
+				,WRITER
+				,WRITE_DATE
+				,CONTENT
+				,VIEW_CNT)
+		values(#{boardNo}
+				,#{volId}
+				,#{title}
+				,#{writer}
+				,sysdate
+				,#{content}
+				,0)
+	</insert>
+	<select id="freeBoardInfo" resultType="FreeBoardVO">
+		select BOARD_NO
+				,VOL_ID
+				,TITLE
+				,WRITER
+				,WRITE_DATE
+				,CONTENT
+				,VIEW_CNT
+		from free_board
+		where VOL_ID = #{volId}
+		and BOARD_NO = #{boardNo}
+	</select>
+	<update id="updateFreeBoard" parameterType="FreeBoardVO">
+		update free_board
+		set title = #{title},
+			content = #{content}
+		where VOL_ID = #{volId}
+		and BOARD_NO = #{boardNo}
+	</update>
+	<delete id="deleteFreeBoard" parameterType="int">
+		delete 
+		from free_board
+		where VOL_ID = #{volId}
+		and BOARD_NO = #{boardNo}
+	</delete>
+	
+	<select id="meetingMemList" resultType="VolMemVO">
+		select VOL_MEM_ID
+			,VOL_ID
+			,APP_DATE
+			,APP_REASON
+			,APP_code
+			,MEM_ID
+			,(select file_path 
+			from files 
+			where code='p01' 
+			and code_user=vol_mem.mem_id) path
+		from vol_mem 
+		where app_code=#{appCode}
+		and vol_id = #{volId}
+		<if test="memId!=null and memId!=''">
+			and mem_id = #{memId}
+		</if>
+		order by app_date
+	</select>
+	<select id="findMember" resultType="int">
+		select count(*) 
+		from vol_mem 
+		where vol_id = #{volId}
+		and mem_id = #{memId}
+		and app_code = #{appCode}
+	</select>
+	<select id="chamMem" resultType="int">
+		select count(*) 
+		from vol_act_mem 
+		where mem_id = #{memId}
+		and vol_act_id = #{volActId}
+	</select>
+	<!-- 회원별 봉사활동한 리스트 -->
+	<select id="MemVolActList" resultType="VolMemVO">
+		select m.vol_act_id,a.title,a.vol_date
+		from vol_Act_mem m join vol_act a 
+		on m.VOL_ACT_ID=a.VOL_ACT_ID
+		where a.vol_id = #{volId}
+		and mem_id = #{memId}
+		order by m.vol_act_id
+	</select>
+	<!-- 봉사활동 정보 -->
+	<select id="volActInfo" resultType="VolActVO">
+		select VOL_ACT_ID
+				,VOL_ID
+				,CATEGORY
+				,TITLE
+				,CONTENT
+				,LOCATION
+				,VOL_DATE 
+		from VOL_ACT 
+		where VOL_ID=#{volId} 
+		and VOL_ACT_ID=#{volActId}
+	</select>
+	<!-- 회원별 봉사활동 횟수 -->
+	<select id="volCnt" resultType="VolMemVO">
+		select m.mem_id
+				,count(m.mem_id) cnt
+				,(select file_path 
+				from files 
+				where code='p01' 
+				and code_user=m.mem_id) path
+		from vol_Act_mem m join vol_act a 
+		on m.VOL_ACT_ID=a.VOL_ACT_ID
+		where a.vol_id = #{volId}
+		<if test="memId!=null and memId!=''">
+			and m.mem_id = #{memId}
+		</if>
+		group by m.mem_id
+		order by cnt desc
+	</select>
+	<!-- 봉사활동별 참여 인원 -->
+	<select id="volActMemCnt" resultType="int">
+		select count(mem_id) cnt 
+		from vol_act_mem 
+		where vol_act_id=#{volActId}
+	</select>
+	<select id="volReviewCnt" resultType="VolActReviewVO">
+		select count(*) cnt,review_id
+		from vol_review 
+		where vol_id=#{volId}
+		and vol_act_id=#{volActId}
+		and writer=#{writer}
+		 group by review_id
+	</select>
+	
+	<!-- 회원 상태변경 -->
+	<update id="withdrawalMeeting" parameterType="VolMemVO">
+		update vol_mem 
+		set app_code = #{appCode} 
+		where vol_id=#{volId}
+		and mem_id=#{memId}
+	</update>
+	<!-- 모임 삭제 -->	
+	<update id="deleteMeeting" parameterType="int">
+		update volunteer
+		set meet_type = 'e04' 
+		where vol_id=#{volId}
+	</update>
+	<!-- 삭제시 회원상태수정 -->
+	<update id="deleteMember" parameterType="VolMemVO">
+		update vol_mem 
+		set app_code = 'h04' 
+		where vol_id=#{volId}
+	</update>
+	<insert id="insertMeeting" parameterType="VolunteerVO">
+		<selectKey keyProperty="volId" order="BEFORE" resultType="int">
+         	select VOLUNTEER_SEQ.NEXTVAL from dual
+      	</selectKey>
+		insert into volunteer values(
+        		 #{volId}
+		        ,#{meetName}
+		        ,#{meetType}
+		        ,#{cap}
+		        ,#{meetPurp}
+		        ,#{meetDesc}
+		        ,#{region}
+		        ,1
+		        ,#{recPeriod}
+		        ,#{endPeriod}
+		        ,#{memId}
+		        ,#{oneLiner}
+		        ,#{category}
+		)
+	</insert>
+	<update id="updateMeeting" parameterType="VolunteerVO">
+		update volunteer
+		set meet_name = #{meetName},
+			cap = #{cap},
+			meet_purp = #{meetPurp},
+			meet_desc = #{meetDesc},
+			one_liner = #{oneLiner},
+			end_period = #{endPeriod}
+		where vol_id = #{volId}
+	</update>
+	<delete id="deleteFile" parameterType="int">
+		delete from files
+		where code = 'p09' and code_no = #{codeNo}
+	</delete>
+	<insert id="insertTag" parameterType="TagVO">
+		insert into tag
+		values(
+			tag_seq.nextval,
+			#{tagContent},
+			#{volId}
+		)
+	</insert>
+	<insert id="insertVolActMem" parameterType="VolMemVO">
+		insert into vol_act_mem
+		values(
+			VOL_ACT_MEM_SEQ.nextval,
+			#{volActId},
+			#{memId}
+		)
+	</insert>
+</mapper>

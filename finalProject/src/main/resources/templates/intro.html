@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+body {
+     font-family: Arial, sans-serif;
+     margin: 0;
+     padding: 0;
+}
+.banner {
+     width: 100%;
+     height: 400px;
+}
+.main1 {
+    text-align: center;
+    padding: 20px;
+}
+.main1 h1 {
+    text-decoration: underline;
+}
+.main2 {
+     padding: 20px;
+}
+   .main2 h3 {
+    color: green;
+   font-size: 24px;
+  font-weight: bold;
+}
+.main2 p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+	<div class="container">
+	  <div class="banner">
+	    <img src="/banner/home2.png" style="width: 100%; height: 100%;" alt="배너 이미지">
+	  </div>
+	  <div class="main1">
+	    <h1>봉사마루</h1>
+	  </div>
+	  <div class="main2">
+	    <h3>기부와 봉사를 연결하는 플랫폼</h3>
+	    <p>봉사마루는 기부와 봉사를 연결하여 사회적 가치를 실현하는 플랫폼입니다. 우리는 봉사 활동을 통해 더 나은 세상을 만들기 위해 노력하고 있습니다.</p>
+	    <p>우리는 다양한 사회 문제에 대한 기부금을 모금하고, 이를 활용하여 사회적 약자를 지원하고 사회적 문제를 해결하는 데 기여하고 있습니다. 또한, 봉사자와 봉사 기관, 봉사자와 봉사자를 연결하여 상호간의 가치를 실현할 수 있도록 돕고 있습니다. 이를 통해 더욱 사회적인 연대를 강화하고, 봉사 활동의 의미와 가치를 널리 알리고자 합니다.</p>
+	    <p>봉사마루는 소중한 기부금을 효율적으로 관리하며, 이를 사회적 문제 해결을 위한 시설에 정확하게 전달합니다. 우리는 사회적으로 취약한 이들에게 필요한 지원을 제공하고, 사회적 가치를 실현하는 데 최선을 다하고 있습니다. 봉사마루는 기부금을 소중하게 보호하며, 그 가치가 사회에 긍정적인 영향을 미칠 수 있도록 최선을 다하고 있습니다.</p>
+	    <p>우리는 아름다운 세상을 만들기 위해 끊임없는 노력과 열정을 가지고 있습니다. 이를 통해 사회적으로 어려움을 겪는 분들께 희망과 지지를 전달하고, 더 나은 미래를 위한 변화를 이끌어내고자 합니다.</p>
+	  </div>
+	</div>
+  <script>
+  </script>
+</section>
+</body>
+</html>

@@ -1,0 +1,65 @@
+       	<div id="facVolList">
+       	<div style="float:left;padding:10px">
+			<input class="form-control-sm me-2" onkeypress="handleKeyPress2(event)" id="search2" type="search" placeholder="시설봉사를 검색하세요" aria-label="Search" th:value="${vo.searchKeyword}">
+			<button class="btn btn-outline-success" onclick="search2()" type="button">검색</button>
+			<button class="btn btn-outline-primary" type="button" onclick="show2()">초기화</button>
+		</div>
+		<br>
+		<div style="float:right;color:black" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">모임 봉사 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 시설 봉사</a>
+		</div>
+		<br><hr>
+		<th:block th:if=${facVol.size}!=0>
+       	<br>
+	        <div class="row">
+	          <div class="col-sm-6 col-xl-3" style="color:black;width:25%;height:30%" th:each="facVol : ${facVol}">
+	            <div class="card overflow-hidden rounded-2">
+	              <div class="position-relative">
+	                <a th:href="@{fInfo/facilityInfo(facId=${facVol.facId})}" target='_blank'>
+	                <img th:if="${facVol.filePath}!=null" th:src="@{${facVol.filePath}}" onError="this.src='donation/board/img/fruite-item-5.jpg'" class="card-img-top rounded-0" alt="..." style="height:200px">
+					<img th:if="${facVol.filePath}==null" src="donation/board/img/fruite-item-5.jpg"class="card-img-top rounded-0" alt="..." style="height:200px">
+	                </a>
+	              </div>
+	              <div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px;left: 10px;background-color:#ffb524">
+				    <span>모집중</span><br>
+					</div>
+	               <div class="d-flex align-items-center justify-content-between">
+		            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+		                <h4><a th:text="${facVol.title}" th:href="@{fInfo/facilityInfo(facId=${facVol.facId})}"> 제목</a></h4>
+		                <a th:href="@{fInfo/facilityInfo(facId=${facVol.facId})}" target='_blank' style="color:gray">
+						   <span th:text="${facVol.facName}"></span>
+						</a>
+						<br>
+	                    <span th:text="'장소 : '+${facVol.location}">2024-02-04</span>
+						<br>
+	                    <span th:text="'봉사날짜 : '+${#dates.format(facVol.volDate, 'yy.MM.dd')}">2024-02-04</span>
+	                    <br>
+	                    <span th:text="'정원 : '+${facVol.capCnt}+'/'+${facVol.cap}+'명'">정원 : 3/10명</span>
+						 <br>
+		            </div>
+	               </div>
+	            </div>
+	          </div>
+	        </div>
+	        <nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" type="button" th:onclick="prev([[${vo.start}]],[[${vo.cntPerPage}]],[[${vo.searchKeyword}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" type="button" th:onclick="current([[${pageNum}]],[[${vo.cntPerPage}]],[[${vo.searchKeyword}]])" th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" type="button" th:onclick="next([[${vo.end}]],[[${vo.cntPerPage}]],[[${vo.searchKeyword}]])" >다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+			<th:block th:if="${facVol.size}==0">
+			<h3>데이터가 존재하지 않습니다</h3>
+			</th:block>
+        </div>

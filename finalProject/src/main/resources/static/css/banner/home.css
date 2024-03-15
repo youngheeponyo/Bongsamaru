@@ -1,0 +1,20 @@
+<style>
+    .banner-home {
+        position: relative;
+        overflow: hidden; /* 이미지가 컨테이너를 넘치지 않도록 함 */
+        height: 100px; /* 원하는 높이로 조절 */
+    }
+    .banner-home img {
+        width: 100%; /* 너비는 화면에 꽉 차게 */
+        height: 100%; /* 높이는 .banner-home 높이에 맞춤 */
+        object-fit: cover; /* 이미지가 비율을 유지하면서 꽉 채우도록 함 */
+    }
+    .banner_content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* 중앙 정렬 */
+        color: black;
+        text-align: center;
+    }
+</style>

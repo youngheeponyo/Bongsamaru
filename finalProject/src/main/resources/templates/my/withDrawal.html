@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사마루</title>
+<style scoped="scoped">
+.title {
+	height: 700px;
+	margin:0 auto;
+	text-align:center;
+	color: black;
+	font-family: 'Orbit', sans-serif;
+}
+
+.imagelogo{
+	width: 300px;
+	height: 300px;
+}
+p {
+	font-size:18px;
+}
+
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+  <div class="container">
+	  <div class="title">
+	    <div>
+	    	<span>회원탈퇴</span>
+	    	<p>회원 탈퇴 신청 전 유의사항을 확인하세요.</p>
+	    	<image src="/image/bongsalogo.png" class="imagelogo">
+	    	<p style="font-size:20px;">신청 후 30일 후 재가입 가능합니다.</p>
+	    	<p style="font-size:14px;">사이트에 등록된 회원 정보, 이용정보 등 모든 내용이 삭제되며,<br>
+	    	삭제된 데이터는 복구되지 않습니다.
+	    	</p>
+			<input type="button" id="cancelBtn" class="btn btn-dark-lg" data-toggle="modal" data-target="#staticBackdrop" value="확인" style="text-align: right;" />		
+	    </div>
+  	</div>
+  </div>
+	<!-- Modal -->
+	<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="staticBackdropLabel">회원 탈퇴 신청</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        정말로 회원 탈퇴하시겠습니까?
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" id="byeBtn">탈퇴하기</button>
+	        <button type="button" class="btn btn-dark" id="backBtn" data-dismiss="modal">뒤로가기</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+<script>
+	$("#byeBtn").on('click',function(){
+		window.location.href = "/password";
+	});
+	
+	$("#backBtn").on('click',function(){
+		
+		window.location.href = "/my";
+	});
+	
+</script>
+</section>
+</body>
+</html>

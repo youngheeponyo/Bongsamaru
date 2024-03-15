@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<style>
+.chal{
+<!--background-color: rgba(104, 159, 56, 0.3);-->
+border: double 2px solid #689f38;
+}
+.card {
+    position: relative;
+  }
+
+  .action-badge {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #689f38;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .more-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: blue;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+.btn-custom{
+ border-radius:50px;
+ padding: 20px 40px;
+ font-size: 25px;
+}
+
+</style>
+<meta charset="UTF-8">
+<title>챌린지리스트</title>
+</head>
+<body>
+	<section layout:fragment="content">
+
+	<div th:insert="~{banner/empty::banner}"></div>
+	<div class="chal text-center">
+
+	<br>
+	<br>
+		<h1 style="color:#689f38 ">나의 사소한 노력이 모여 <br>우리의 긍정적인 영향을 더해줍니다!</h1>
+		<p th:text="'봉사마루 챌린지 총 ' +${challengeList[0].allParticipants}+'명 참여중'" style="color:black; font-size:20px;"></p>
+		<a class="btn btn-outline-warning btn-custom float-center" th:if="${session.userId} != null" th:href="@{/challengeInsert}" >함께하고싶은 챌린지가 있으신가요? 등록해보세요</a>
+		<a class="btn btn-outline-warning btn-custom float-center" th:if="${session.userId} == null" th:href="@{/login}" >함께하고싶은 챌린지가 있으신가요? 등록해보세요</a>
+		<br>
+		<br>
+		</div>
+<div class="container ">		
+<div class="row">
+<th:block th:each="challenge:${challengeList}">
+<div class="col-6">
+
+
+<div class="hover">
+<a class="light"
+			th:href="@{/challenge/challengeInfo(chalId=${challenge.chalId})}">
+<div class="card mb-3 " style= "border:5px solid #689f38;">
+  <div class="row">
+    <div class="col-md-7" style="position: relative;">
+      <img th:if="${challenge.file.filePath}!=null" th:src="${challenge.file.filePath}" alt="" onError="this.src='../image/기본이미지.jpg'" class=" img-fluid rounded-start object-fit: cover" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    <div class="col-md-5">
+      <div class="card-body">
+
+      <div th:if="${#dates.format(challenge.endDate, 'yyyy-MM-dd') > #dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+    <div class="rounded-circle action-badge" style="border: solid 1px; border-radius: 50%;  background-color: #689f38;">
+        <p>행동중</p>
+    </div>
+</div>
+<div th:if="${#dates.format(challenge.endDate, 'yyyy-MM-dd') < #dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+    <div class="rounded-circle action-badge" style="border: solid 1px; border-radius: 50%;  background-color: gray;">
+        <p>행동종료</p>
+    </div>
+</div>
+<div th:if="${#dates.format(challenge.endDate, 'yyyy-MM-dd') == #dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+    <div class="rounded-circle action-badge" style="border: solid 1px; border-radius: 50%;  background-color: orange;">
+        <p>오늘종료</p>
+    </div>
+</div>
+		<br>
+		<br>
+		<br>
+		<h5 class="card-title" th:text="${challenge.title}"></h5><br><br>
+		<div class="text-right">
+       	<img class="img-zoomin img-fluid rounded-circle w-50" style="border-radius: 50%;" th:if="${challenge.file.filePath}!=null"  th:src="${challenge.profil}" onError="this.src='../image/기본이미지.jpg'">
+        <p class="card-text" th:text="${challenge.memId}" ></p>
+        </div>
+        <div class="text-left">
+        
+        <p class="card-text" th:text="${challenge.participants}+'명 참여중'" ></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</a>
+</div>
+</div>
+</th:block>
+</div>
+</div>	
+	</section>
+</body>
+</html>

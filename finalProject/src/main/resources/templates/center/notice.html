@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<style>
+.navigation-bar {
+  display: flex;
+}
+
+.nav-item {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+div[th:if] {
+  display: none;
+}
+.container {
+	justify-content: center;
+}
+.content {
+	text-align : left;
+}
+
+.navigation-bar {
+	text-align : center;
+}
+.title_cont {
+	font-size: 17px;
+	margin: 47px 0 45px;
+}
+.wrap_cont {
+	padding-bottom: 30px;
+}
+.accordion {
+	margin-top: 30px;
+	border-top: 0 none;
+}
+.ico_pin{
+	display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 9px;
+    background: url(//t1.kakaocdn.net/together_image/common/ico_pin.svg) no-repeat 50%;
+    vertical-align: middle;
+}
+
+.content{
+	margin-top: 30px;
+	text-align: left;
+	margin-bottom: 50px;
+}
+.a-tag {
+    color: black;
+    text-decoration: none;
+    
+}
+  
+.a-tag:hover {
+    color: black;
+    font-weight: bold;
+    
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+<div class="container" style="color: black;">
+  	<div class="side" th:insert="~{center/sidebar::side}"></div>
+	<div class="col-10">
+		<div class="container">
+			<div style="text-align:center; display:flex; gap:10px;">
+			    <input class="form-control me-2" id="search" type="search" placeholder="검색어를 입력해주세요" aria-label="Search">
+			    <button class="btn btn-outline-success" id="searchBtn" type="button">검색</button>
+			    <button class="btn btn-outline-dark" id="resetBtn" type="button">초기화</button>
+			</div>
+				<th:block th:each="item : ${list}" >
+					<div class="content" th:if="${list.size} != 0" >
+						<span class="ico_pin" th:if="${item.priority == 1}"></span>
+						<a class="a-tag" th:text="${item.title}" th:onclick="noticeDetail('[[${item.boardId}]]')"></a>
+						<p style="font-size:14px;">
+						작성일 [[${#dates.format(item.writeDate, 'yyyy.MM.dd')}]]
+							<span>조회수 [[${item.views}]]</span>
+						</p>
+					</div>
+				</th:block>
+				<div class="content" th:if="${list.size} == 0">
+					<p>검색결과가 존재하지 않습니다<p>
+				</div>
+				
+			<nav aria-label="Page navigation example" style="text-align:center;">
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/notice(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1}, category=${category})}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:if="${list.size} != 0" th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/notice(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage}, category=${category})}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/notice(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage}, category=${category})}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<script>
+$('#search').on('change',function(){
+	let keyword = $('#search').val();
+	window.location.href = `/notice?searchKeyword=${keyword}`;		
+});
+
+$('#resetBtn').on('click',function(){
+	window.location.href = `/notice`;		
+});
+
+$('#searchBtn').on('click',function(){
+	let keyword = $('#search').val();
+	if(keyword == '') {
+		alert('검색하실 내용을 입력하세요');
+	}
+});
+
+function noticeDetail(boardId) {
+  window.location.href = `/notice/${boardId}`;
+  
+  $.ajax({
+    url: '/updateViews',
+    method: 'POST',
+    data: { boardId: boardId },
+    success: function(response) {
+      alert("조회수가 증가되었습니다.");
+    },
+    error: function(xhr, status, error) {
+      console.error(error);
+    }
+  });
+}
+</script>
+</section>
+</body>
+</html>

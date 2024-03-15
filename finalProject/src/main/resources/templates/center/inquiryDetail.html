@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<style>
+.navigation-bar {
+  display: flex;
+}
+
+.nav-item {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.container {
+	justify-content: center;
+}
+.content {
+	text-align : left;
+}
+
+.navigation-bar {
+	text-align : center;
+}
+.title_cont {
+	font-size: 17px;
+	margin: 47px 0 45px;
+}
+.wrap_cont {
+	padding-bottom: 30px;
+}
+.accordion {
+	margin-top: 30px;
+	border-top: 0 none;
+}
+.ico_pin{
+	display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 9px;
+    background: url(//t1.kakaocdn.net/together_image/common/ico_pin.svg) no-repeat 50%;
+    vertical-align: middle;
+}
+
+.content{
+	margin-top: 30px;
+	text-align: left;
+}
+.a-tag {
+    color: black;
+    text-decoration: none;
+    
+}
+  
+.a-tag:hover {
+    color: black;
+    font-weight: bold;
+    
+}
+.adminContent {
+	margin: 30px;
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+<div class="container" style="color: black;">
+    <div class="side" th:insert="~{center/sidebar::side}"></div>
+    <div class="container"  th:each="item : ${list}">
+            <div class="content">
+                <h1 th:text="${item.title}"></h1>
+                <span style="font-size:18px;">[[${#dates.format(item.writeDate, 'yyyy.MM.dd')}]]</span>
+                <hr>
+                <div style="width:500px; height: 300px; margin: 30px;">
+                    <div th:text="${item.content}"></div>
+                </div>
+                <hr>
+            </div>
+            <div class="adminContent">
+                <div th:if="${item.commContent} != null">
+	                <span style="font-size:18px;">[[${#dates.format(item.writeDate, 'yyyy.MM.dd')}]]</span>            
+	                <p th:text="${item.commContent}"></p>
+				</div>
+                <div th:if="${item.commContent} == null">
+	                <p>아직 답변이 작성되지 않았습니다.</p>
+				</div>
+			</div>
+    </div>
+</div>
+<script>
+</script>
+</section>
+</body>
+</html>

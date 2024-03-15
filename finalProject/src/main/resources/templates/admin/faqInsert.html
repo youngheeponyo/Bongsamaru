@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<style>
+.content {
+	width: 700px;
+	margin: auto
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+	<section layout:fragment="content">
+		<div class="body-wrapper">
+			<!--  Header Start -->
+			<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+			<!--  Header End -->
+			<div class="container-fluid">
+				<div class="container">
+					<div class="page_tits">
+						<h3>자주하는 질문 작성</h3>
+					</div>
+					<br> <br>
+					<div class="content">
+						<section>
+							<form name="insertFaq" action="faqInsert" method="post">
+								<div class="col-md-12">
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="title">카테고리</label>
+											<select name="category" class="nav-item dropdown form-control">
+												<option class="dropdown-item" value="a01">챌린지</option>
+												<option class="dropdown-item" value="a02">봉사활동</option>
+												<option class="dropdown-item" value="a03">기부</option>
+											</select>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="title">제목</label> <input type="text"
+												class="form-control" name="title" placeholder="제목을 입력하세요">
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="content"> 내용 </label>
+											<textarea class="form-control" name="content" cols="50"
+												rows="5" placeholder="내용을 입력하세요"></textarea>
+										</div>
+									</div>
+									<p class="btn_set">
+										<button type="submit" style="float: right;" class="btn btn-success m-1">등록</button>
+									</p>
+								</div>
+							</form>
+							<script>
+								$('form[name="insertFaq"]').on('submit',boardInsert);
+								function boardInsert(event){
+									event.preventDefault();
+									let title = $('[name="title"]');
+									let content = $('[name="content"]');
+	
+									if(title.val()==''){
+										checkingTitle();
+										title.focus();
+										return;
+									}
+									if(content.val()==''){
+										deleteBoard();
+										content.focus();
+										return;
+									};
+									swalWithBootstrapButtons.fire({
+									  title: "정말 등록하시겠습니까??",
+									  text: "등록 후에는 수정이 불가능합니다.",
+									  icon: "question",
+									  showCancelButton: true,
+									  confirmButtonText: "등록",
+									  cancelButtonText: "취소",
+									  reverseButtons: true
+									}).then((result) => {
+									  if (result.isConfirmed) {
+									    swalWithBootstrapButtons.fire({
+									      title: "등록되었습니다",
+									      text: "내용을 확인해보세요",
+									      icon: "success"
+									    });
+									    insertFaq.submit();
+										$('#tableData').load("../faqList #faq");
+									  } else if (
+									    /* Read more about handling dismissals below */
+									    result.dismiss === Swal.DismissReason.cancel
+									  ) {
+									    swalWithBootstrapButtons.fire({
+									      title: "취소되었습니다.",
+									      text: "등록을 취소하였습니다.",
+									      icon: "error"
+									    });
+									  }
+									});
+								};
+								
+								const swalWithBootstrapButtons = Swal.mixin({
+								  customClass: {
+								    confirmButton: "btn btn-success",
+								    cancelButton: "btn btn-danger"
+								  },
+								  buttonsStyling: false
+								});
+								function checkingTitle(seq){
+									Swal.fire({
+									  icon: "error",
+									  title: "제목이 입력되지 않았습니다.",
+									  text: "제목을 입력해주세요!",
+									});
+								}
+								function deleteBoard(seq){
+									Swal.fire({
+									  icon: "error",
+									  title: "내용이 입력되지 않았습니다.",
+									  text: "내용을 입력해주세요!",
+									});
+								}
+							</script>
+						</section>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

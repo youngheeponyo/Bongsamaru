@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>  </title>
+
+    <link rel="stylesheet" th:href="@{/donation/form/bootstrap.min.css}">
+    <!-- 다른 필요한 CSS 파일 여기에 추가 -->
+    
+    <style>
+    .form-select{
+    width: 20%;
+    }
+    
+    .form-control-sm {
+        width: 50%; /* 현재 크기의 1/3로 조정 */
+    }
+    
+    .form-control[type="file"] {
+        width: 33.33%; /* Set to one-third of the current size */
+    }
+
+      #execAmt::placeholder,
+    #bizCost::placeholder {
+        text-align: right;
+    }
+    
+     .form-control textarea {
+    white-space: pre-wrap;
+  }
+    </style>
+    
+</head>
+<body>
+
+ <section layout:fragment="content" >
+ 
+ <div th:insert="~{banner/empty::banner}"></div>
+<div class="container" style="margin:0 auto;">
+<form name="reviewForm">
+
+
+  <fieldset>
+    <legend style="font-weight:bold;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+  <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+</svg> 후기등록 </legend>
+
+   
+ 
+  
+    <div class="form-group">
+      <label for="execAmt" class="form-label mt-4">  ⦁ 총 집행금액</label>
+      <input type="text" class="form-control" name="execAmt" id="execAmt" placeholder="(원)" autocomplete="off" style="width: 33.33%;">
+    </div>
+<!--       
+    <div class="form-group">
+      <label for="goalAmt" class="form-label mt-4">목표모금액</label>
+      <input type="text" class="form-control" id="goalAmt" placeholder="(원)" autocomplete="off">
+    </div>
+-->     
+    
+    <div class="form-group">
+      <label for="period" class="form-label mt-4">  ⦁ 사업집행기간</label>
+       <div class="row">
+        <div class="col-md-3">
+      <input type="date" class="form-control" name="startPeriod" th:datetime="${#dates.format(startPeriod, 'yyyy-MM-dd')}" id="startPeriod" placeholder="기부모금시작 " autocomplete="off">
+      </div>
+        <div class="col-md-3">
+      <input type="date" class="form-control" name="endPeriod" th:datetime="${#dates.format(endPeriod, 'yyyy-MM-dd')}" id="endPeriod" placeholder="기부모금종료기간 " autocomplete="off">
+    </div>
+    </div>
+    </div>
+
+
+    <div class="form-group">
+      <label for="bizCost" class="form-label mt-4">  ⦁ 총사업비</label>
+      <input type="text" class="form-control" name="bizCost" id="bizCost" placeholder="(원)" autocomplete="off" style="width: 33.33%;">
+    </div>
+    
+    
+    <div class="form-group">
+      <label for="usePlan" class="form-label mt-4">  ⦁ 기부금 사업내역</label>
+      <div id = "dynamicFields" class="mb-3" style="width: 66.66%;">
+      	<div class="input-group">
+	      <input type="text" class="form-control" name="bizContent" id="usePlan" placeholder="구체적사업내용" autocomplete="off"> 
+	      <input type="text" class="form-control" name="bizAmt" placeholder="구체적사업비(원)" autocomplete="off">
+	      <button type="button" class="btn btn-outline-secondary" onclick="addInputs('dynamicFields')">+</button>
+      	</div>
+      </div>
+    </div>
+    
+    
+    <div class="form-group">
+	  <label for="review" class="form-label mt-4">  ⦁ 후기글</label>
+	    <div id="articleContainer" class="mb-3" style="width: 66.66%;">
+	        <div class="input-group">
+	        	<input type="text" class="form-control" name="title" id="title" placeholder="제목" autocomplete="off" >
+	        </div>
+	        <div class="input-group">
+	            <textarea class="form-control textarea" name="content" id="content" rows="3" ></textarea>
+	        </div>
+	        
+	    </div>
+	</div>
+	
+
+	<div class="form-group" style="margin-bottom: 50px;">
+	    <label for="formFile2" class="form-label mt-4">  ⦁ 영수증 </label>
+	    <div id="formFile2Container" class="mb-3" style="width: 33%;" >
+	        <div class="input-group">
+	            <input class="form-control" type="file" name="uploadfiles" id="formFile2" style="width: 66.66%;">
+	            <button type="button" class="btn btn-outline-secondary" onclick="addInputs('formFile2Container')">+</button>
+	        </div>
+	    </div>
+	</div>
+    
+    
+
+
+    
+    <button type="button" class="btn btn-primary" onclick="submitForm()">등록하기 </button>
+    
+  </fieldset>
+</form>
+</div>
+
+    <!-- 영수증 첨부 모달 -->
+<div class="modal fade" id="receiptModal" tabindex="-1" role="dialog" aria-labelledby="receiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiptModalLabel">영수증 첨부</h5>
+            </div>
+            <div class="modal-body">
+                <!-- 파일 첨부 양식 -->
+                <form id="receiptForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="receiptFile">영수증 파일 선택:</label>
+                        <input type="file" class="form-control-file" id="uploadFiles" name="uploadFiles" accept=".pdf, .jpg, .png" required>
+                    </div>
+                    <!-- 추가: 숨겨진 입력 필드 -->
+                    <input type="hidden" id="donIdForReceipt">
+                    <input type="hidden" id="facIdForReceipt">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="okbtn" onclick="firstrec()">제출하기</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 영수증 첨부 성공 메시지 모달 -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">영수증 등록 성공</h5>
+            </div>
+            <div class="modal-body">
+                <p>영수증이 성공적으로 등록되었습니다!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="javascript">
+//URL에서 파라미터 값을 가져오는 함수
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+// donId와 facId 값을 가져오기
+var donId = getParameterByName('donId');
+console.log(donId);
+var facId = getParameterByName('facId');
+console.log(facId);
+
+//성공 메시지 모달 열기-영수증
+function openSuccessModal() {
+    $("#successModal").modal("show");
+
+    // 모달이 닫힐 때 이벤트 리스너 등록
+    $("#successModal").on("hidden.bs.modal", function () {
+        // 모달 닫힌 후 실행할 동작
+        
+       
+    });
+}
+
+var codeNo = 0;
+
+
+//폼 제출하기
+	function submitForm(){
+		console.log('제출하기 클릭!');
+	    event.preventDefault();
+	
+	
+
+		//영수증
+		
+	
+    
+    
+    let formData = new FormData(document.querySelector('form[name="reviewForm"]'));
+    							
+ // donId와 facId 값을 가져오기
+    var donId = getParameterByName('donId');
+    console.log(donId);
+    var facId = getParameterByName('facId');
+    console.log(facId);
+  
+
+   
+    formData.append('donId', donId);
+    formData.append('facId', facId);
+    formData.append('memId', facId);
+    
+    
+
+	
+	let fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(function(fileInput) {
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('uploadfiles', fileInput.files[i]);
+        }
+    });
+	
+    
+    
+		    document.querySelectorAll('form[name="reviewForm"] input').forEach(function(input) {
+		        console.log(input.name + ': ' + input.value);
+		    });
+    
+		    
+		    
+		  
+		
+		    
+    $.ajax({
+    	type: 'POST',
+        url: 'reviewForm',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+        	
+        	 // 영수증모달 열기
+		    $("#receiptModal").modal("show");
+		    codeNo = response;
+        	console.log(codeNo);
+        	
+        	
+        	
+   
+            console.log("ajax 안에 success response " + response);
+
+          
+            
+            return;
+        }, 
+        error: function(error) {
+           
+            console.error(error);
+        }
+    }) //리뷰인서트아작스끝
+    
+	} //end
+	
+	function firstrec(){
+		// 선택된 파일과 donId, facId 가져오기
+	    let receiptFile = document.getElementById("uploadFiles").files[0];
+	    console.log('파일컴온', receiptFile);
+	   
+	   
+		
+	    // FormData를 사용하여 파일 및 추가 정보 전송
+	    let formData = new FormData();
+	   
+	    formData.append("uploadFiles", receiptFile);
+		
+		
+		formData.append("codeUser", facId);
+	    formData.append('codeNo', codeNo);
+	    formData.append("code", "p06");
+	    
+	    
+		 // 첫 번째 AJAX 요청
+		$.ajax({
+			type : 'POST',
+			url : '/uploadsAjax',
+			data : formData,
+			processData: false,
+			contentType: false,
+			success: function(response) {
+				console.log("첫 번째 AJAX 성공: " + response);
+				  //영수증
+				  codeNo = response
+		   
+				// 두 번째 AJAX 요청
+				$.ajax({
+					type: 'POST',
+					 url: '/receiptAlert',
+					data: {memId : facId},
+					
+					success: function (applyResponse) {
+						console.log("두 번째 AJAX 성공: " + applyResponse);
+						
+						// 성공 메시지 모달 열기
+	                    $("#successModal").modal("show");
+
+	                    // 성공 메시지 모달이 닫힐 때 이벤트 리스너 등록
+	                    $("#successModal").on("hidden.bs.modal", function () {
+	                        location.href = "/fac/donaInfo"; // 새로고침 또는 다른 동작 수행
+	                    });
+					},
+					error: function (applyError) {
+						console.error("두 번째 AJAX 실패: " + applyError);
+					}
+				});
+			},
+			error: function(error) {
+				console.error("첫 번째 AJAX 실패: " + error);
+			}
+		});
+	    
+		 
+	}
+	
+
+	function submitReceipt() {
+	    // 선택된 파일과 donId, facId 가져오기
+	    let receiptFile = document.getElementById("uploadFiles").files[0];
+	    console.log('파일컴온', receiptFile);
+	    let donRevId = document.getElementById("donIdForReceipt").value;
+	    let facId = document.getElementById("facIdForReceipt").value;
+		
+	    // FormData를 사용하여 파일 및 추가 정보 전송
+	    let formData = new FormData();
+	    //formData.append("donId", donId);
+	    //formData.append("facId", facId);
+	    
+	    formData.append("uploadFiles", receiptFile);
+		//formData.append("memId", facId);
+		
+		formData.append("codeUser", facId);
+	    formData.append('codeNo', donRevId);
+	    formData.append("code", "p06")
+		
+	 // 첫 번째 AJAX 요청
+		$.ajax({
+			type : 'POST',
+			url : '/uploadsAjax',
+			data : formData,
+			processData: false,
+			contentType: false,
+			success: function(response) {
+				console.log("첫 번째 AJAX 성공: " + response);
+				
+				// 두 번째 AJAX 요청
+				$.ajax({
+					type: 'POST',
+					 url: '/receiptAlert',
+					data: {memId : facId},
+					
+					success: function (applyResponse) {
+						console.log("두 번째 AJAX 성공: " + applyResponse);
+						
+						// 성공 메시지 모달 열기
+	                    $("#successModal").modal("show");
+
+	                    // 성공 메시지 모달이 닫힐 때 이벤트 리스너 등록
+	                    $("#successModal").on("hidden.bs.modal", function () {
+	                        location.href = "donaInfo"; // 새로고침 또는 다른 동작 수행
+	                    });
+					},
+					error: function (applyError) {
+						console.error("두 번째 AJAX 실패: " + applyError);
+					}
+				});
+			},
+			error: function(error) {
+				console.error("첫 번째 AJAX 실패: " + error);
+			}
+		});
+	}
+
+
+
+	
+	
+//동적 폼 처리하기
+    let dynamicFieldsCount = 1;
+    let formFile2ContainerCount = 1;
+    const maxCount = 3;
+
+    function addInputs(type) {
+
+        let container = document.getElementById(type);
+        if (!container) {
+            console.error("찾을 수 없는 CONTAINER: " + type);
+            return;
+        }
+
+        let count;
+        
+
+        switch (type) {
+        case "dynamicFields":
+            count = dynamicFieldsCount;
+            if (count >= maxCount) {
+                alert("더 이상 추가할 수 없습니다.");
+                return;
+            }
+            dynamicFieldsCount++;
+            break;
+        case "formFile2Container":
+            count = formFile2ContainerCount;
+            if (count >= maxCount) {
+                alert("더 이상 추가할 수 없습니다.");
+                return;
+            }
+            formFile2ContainerCount++;
+            break;
+        default:
+            console.error("Invalid type: " + type);
+            return;
+    }
+
+        let newFields = document.createElement("div");
+        newFields.className = "mb-3";
+
+        if (type === "dynamicFields") {
+            newFields.innerHTML =
+                `<div class="input-group">` +
+                `<input type="text" class="form-control" name="bizContent${count + 1}" id="detailBiz" placeholder="구체적사업내용" autocomplete="off">` +
+                `<input type="text" class="form-control"  name="bizAmt${count + 1}" id="detailAmt" placeholder="구체적사업비" autocomplete="off">` +
+                `<button type="button" class="btn btn-outline-secondary" onclick="removeInputs(this, '${type}')">-</button>` +
+                `</div>`;
+        } else if (type === "formFile2Container") {
+            newFields.innerHTML =
+                `<div class="input-group">` +
+                `<input class="form-control" type="file" name="uploadfiles${count+1}" id="formFile2">` +
+                `<button type="button" class="btn btn-outline-secondary" onclick="removeInputs(this, '${type}')">-</button>` +
+                `</div>`;
+        }
+
+        container.appendChild(newFields);
+    }
+
+    function removeInputs(button, type) {
+        button.parentNode.remove();
+    }
+</script>
+
+</div>
+</section>
+</body>

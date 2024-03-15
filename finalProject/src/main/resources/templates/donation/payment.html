@@ -1,0 +1,343 @@
+
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}"
+	 xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <meta charset="utf-8">
+
+		
+		<!-- 아임포트 api -->
+			 <!-- jQuery -->
+			  <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+			 <!-- iamport.payment.js -->
+			  <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
+			  
+
+    <meta charset="UTF-8"/>
+    <title></title>
+    
+		
+		<style>
+		  .section-top-border{
+		    background-color:  rgba(250, 250, 250, 0.9) !important;
+		    
+		  }
+		
+		  .container {
+		    max-width: 1000px; /* 폼의 최대 너비를 1000px로 설정 */
+		  }
+		  
+		      .mt-10 {
+        margin-top: 10px; /* 버튼과 텍스트 입력란 간격 조절 */
+    }
+    
+
+
+	.button-group-area > a {
+	 color : black; 
+	}
+	
+		.button::hover {
+			cursor : pointer;
+			}
+
+		</style>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+	</head>
+
+	<body>
+	 <section layout:fragment="content">
+ 	<div th:insert="~{banner/empty::banner}"></div>
+		
+		
+		
+			<h3 class="mb-20 title_color"></h3>
+	<div class="whole-wrap">
+		<div class="container">
+
+			
+			
+			<div class="section-top-border ">
+			<div class="row justify-content-center">
+			<div class="col-lg-8 col-md-8">
+				<form action="#">
+					<h6> 기부금 입력하기 </h6>
+					<div class="mt-10" style="display: flex; align-items: baseline;">
+					    <input type="text" id="c_address" name="c_address" class="single-input mb-10" placeholder="금액을 입력해주세요"  onblur="valbtn()" style="flex: 0.5;" required>
+					    <!--  <input type="button" id="valBtn" name="valBtn" class="genric-btn primary-border small valBtn" value="입력하기" onclick="valbtn()" style="width : 100px;  margin-left: 5px;  padding: 5px 10px;  color: black;">
+-->					</div>
+
+
+									
+											
+					<div class="button-group-area mt-40 mb-30">
+						<a href="#" style="color : black; " class="genric-btn warning circle medium kakaoPayBtn" id="kakao" onclick="selectPaymentMethod('kakao')">카카오페이</a>
+						<a href="#" style="color : black; " class="genric-btn success circle medium" id="card" onclick="selectPaymentMethod('card')">카드결제</a>
+						<a href="#" style="color : black; " class="genric-btn info circle medium" id="toss" onclick="selectPaymentMethod('toss')">토스페이</a>
+						<a href="#" style="color : black; " class="genric-btn primary circle medium" id="deposit" onclick="selectPaymentMethod('deposit')">무통장입금</a>
+					</div>
+									
+					<div class="single-element-widget mt-10" style="display: flex; flex-direction: column;">
+					    <div class="switch-wrap d-flex justify-content-start align-items-center" style="margin-bottom: 10px;">
+					        <div class="primary-checkbox">
+					            <input type="checkbox" id="default-checkbox" value="1" style="margin: 0;">
+					            <label for="default-checkbox"></label>
+					        </div>
+					        <p style="margin-left: 10px;"> <b>'익명'</b>으로 기부하겠습니다.</p>
+					    </div>
+					    <div class="switch-wrap d-flex justify-content-start align-items-center">
+					        <div class="primary-checkbox">
+					            <input type="checkbox" id="primary-checkbox" style="margin: 0;">
+					            <label for="primary-checkbox"></label>
+					        </div>
+					        <p style="margin-left: 10px;"> 약관에 동의합니다.</p> 
+					        <a href="#" data-toggle="modal" data-target="#termsModal">보기</a>
+					    </div>
+					</div>
+
+	
+							
+					<div class="button-group-area mt-10 text-center">
+						<a href="#" class="genric-btn default-border radius" onclick="goback()">이전으로</a>
+						<a href="javascript:history.back()" class="genric-btn info-border radius" onclick="requestPay()">결제하기</a>
+					</div>	
+											
+					</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+		
+		
+<div class="modal fade" id="termsModal" tabindex="-1" role="dialog" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">서비스 이용 약관 </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="닫기">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- 약관내용 -->
+              <h6>1. 결제 취소 정책</h6>
+				<p>1-1. 기부금 결제 후에는 결제 취소가 불가능합니다.</p>
+				<p>1-2. 결제 취소는 특별한 사유가 없는 한 일절적으로 제공되지 않습니다. 결제 전에 신중한 결정 부탁드립니다.</p>
+				
+				<h6>2. 기부금 미달 시 사업 변경 정책</h6>
+				<p>2-1. 기부금이 시설의 목표금액에 미달할 경우, 사업의 성격과 목적을 고려하여 명시한 사업을 변경하여 기부금을 적절하게 사용할 수 있습니다.</p>
+				<p>2-2. 변경된 사업의 내용과 목적은 투명하게 공개됩니다.</p>
+				<p>2-3. 기부자는 변경된 사업에 대한 이해를 바탕으로 추가 기부를 지원할수 있습니다.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+	
+
+
+		<script th:inline="javascript">
+			
+		function goback(){
+			 window.history.back();
+		}
+			function valbtn(){
+				let amountInput = document.getElementById('c_address').value;
+				console.log(amountInput);
+				
+				 // 유효성 검사: 숫자이면서 100원 이상인지 확인
+			    if (amountInput == '' || isNaN(amountInput) || parseInt(amountInput) < 100) {
+			    	Swal.fire("100원 이상의 금액을 입력해주세요.");
+			        //alert('100원 이상의 금액을 입력해주세요.');
+			        return;
+			    }
+
+			    // 입력된 금액이 100원 단위가 아니면 경고창 띄우고 수정
+			    if (amountInput % 100 !== 0) {
+			    	Swal.fire("100원 단위로 기부 가능");
+			        //alert('100원단위로기부가가능합니다.');
+			        
+			        // 100원 단위로 내림
+			        let roundedAmount = Math.floor(amountInput / 100) * 100;
+
+			        // 입력 상자에 내림된 금액 설정
+			        document.getElementById('c_address').value = roundedAmount;
+			        return;
+			    }
+			}
+		
+		
+		
+		
+			//DonId 가져오기
+			function getParam(param){
+				let urlParam = new URLSearchParams(window.location.search);
+				console.log("유알엘파람"+ urlParam);
+				
+				return urlParam.get(param);
+			}
+			
+				let donId = getParam("donId");
+				console.log("앞에서 가져온 돈아이디"+ donId);
+		
+		    
+		 
+		//결제결제결제
+		
+			let selectedPaymentMethod = '';  //결제수단 
+			
+			function selectPaymentMethod(paymentMethod) {
+			    // 모든 버튼의 스타일을 초기화
+			    $('.genric-btn').css({
+			        'background-color': '', // 기본 배경색으로 설정
+			        'color': 'black', // 글씨색을 검정색으로 설정
+			    });
+
+			    // 선택된 결제 방식에 해당하는 버튼의 스타일을 변경
+			    $('#' + paymentMethod).css({
+			        'background-color': 'white', // 배경색을 흰색으로 변경
+			        'color': 'black', // 글씨색을 검정색으로 설정
+			    });
+
+			    // 선택된 결제 방식을 저장
+			    selectedPaymentMethod = paymentMethod;
+			    console.log('결제수단: ' + selectedPaymentMethod + ' 선택됨!');
+			}
+		
+			function getPg(paymentMethod){
+				console.log(paymentMethod, "asdfasdf")
+				switch(paymentMethod){
+					case 'deposit':
+						return '무통장';
+					case 'kakao':
+						console.log('넌 카카오');
+						return 'kakaopay.TC0ONETIME';
+						
+					case 'toss':
+						return 'tosspay';	
+					case 'card':
+						return 'html5_inicis.INIBillTst';
+					default:
+						return '';
+				} 
+			}
+			
+	
+			 
+			 function requestPay() {
+				 
+				 
+			 var IMP = window.IMP;
+			 IMP.init("imp48428178");
+			
+				    let amountInput = document.getElementById('c_address').value;
+				    let agreementCheckbox = document.getElementById('primary-checkbox');
+				    
+				    if (!amountInput) {
+				    	Swal.fire("기부할 금액을 입력해주세요.");
+				       // alert('기부할 금액을 입력해주세요.');
+				        return;
+				    }
+				    if (!selectedPaymentMethod) {
+				    	Swal.fire("결제 수단을 선택해주세요.");
+				        //alert('결제 수단을 선택해주세요.');
+				        return;
+				    }
+
+				    if (!agreementCheckbox.checked) {
+				    	Swal.fire("약관에 동의해주세요.");
+				        //alert('약관에 동의해주세요.');
+				        return;
+				    }
+
+				    // 날짜
+				    let today = new Date();
+				    let year = today.getFullYear();
+				    let month = today.getMonth() + 1;
+				    let day = today.getDate();
+
+				    // 시간 
+				    let hours = today.getHours();
+				    let minutes = today.getMinutes();
+				    let seconds = today.getSeconds();
+
+				    
+				    month = month < 10 ? '0' + month : month;
+				    day = day < 10 ? '0' + day : day;
+				    hours = hours < 10 ? '0' + hours : hours;
+				    minutes = minutes < 10 ? '0' + minutes : minutes;
+				    seconds = seconds < 10 ? '0' + seconds : seconds;
+
+				    let currentDate = year + '-' + month + '-' + day;
+				    let currentTime = hours + ':' + minutes + ':' + seconds;
+
+				    // 결제 일자 , 결제 번호 
+				    let payDate = currentDate 
+				    let payId = currentDate.replace(/-/g, '') + currentTime.replace(/:/g, '');
+
+				    // **세션에서 회원 아이디를 가져오는 부분
+				  
+				    let memId =  [[${#authentication.name}]];
+
+				    // 익명 체크 여부
+				    let anonCheck = document.getElementById('default-checkbox').checked; 
+				    let anonCheckVal = anonCheck ? '1' : '0';
+
+				   
+
+				 
+				    IMP.request_pay({
+				        pg: getPg(selectedPaymentMethod),
+				        pay_method: selectedPaymentMethod,
+				        merchant_uid: "ORD" + currentDate.replace(/-/g, '') + '-' + currentTime.replace(/:/g, ''),
+				        name: donId,
+				        amount: parseInt(amountInput),
+				    }, function (rsp ){
+				    	console.log(rsp)
+				    	if(rsp.success){
+				    		// 로컬 스토리지에 데이터 저장
+				            localStorage.setItem('donationAmount', amountInput);
+				           
+				            localStorage.setItem('memId', memId);
+				        $.ajax({
+				            type: 'POST',
+				            url: '/paymentProcess',
+				            contentType: 'application/json', 
+				            data: 
+				            	JSON.stringify({
+				                //donLedId: 'DONLEDGER_SEQ.NEXTVAL', 
+				                donAmt: parseInt(amountInput),
+				                payMethod: selectedPaymentMethod,
+				                payDate: payDate,
+				                payStat: 'g01',
+				                payId: payId,
+				                anonCheck: anonCheckVal,
+				                memId: memId,
+				                donId: donId
+				            	})
+				            
+			         }).done(function(data) {
+			        	 console.log(data);
+			        	 window.location.href = "/paymentComplete";
+			          });
+				    	}else{
+				    		Swal.fire("결제가 취소되었습니다.")
+				    		$('#c_address').val('');
+				    		   $('.genric-btn').css({
+							        'background-color': '', // 기본 배경색으로 설정
+							        'color': 'black', // 글씨색을 검정색으로 설정
+							    });
+				    		
+				    	}
+			       });
+			     }
+			 
+			 
+   		 </script>
+   	</section>
+	</body>
+
+</html>

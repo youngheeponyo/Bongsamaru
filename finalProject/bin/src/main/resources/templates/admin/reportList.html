@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>공지사항/자주하는 질문</title>
+<style>
+.cur{
+	cursor:pointer;
+	color : black;
+}
+.modal {
+	left : 10%;
+	top : 10%;
+}
+.modal-content{
+	width : 60%;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>공지사항/자주하는 질문</h2>
+		<div style="float:right;" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">게시글 신고건 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 댓글 신고건</a>
+		</div>
+		<div id=tableData>
+			<div id="notice">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>신고글</th>
+						<th>신고자</th>
+						<th>신고날짜</th>
+						<th>신고사유</th>
+						<th>신고처리</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="report,st : ${reportList}">
+						<tr>
+							 <td th:text="${st.count}">번호</td>
+							 <td>여기 누르면 각 게시글로 이동</td>
+							 <td th:text="${report.memId}" >신고자</td>
+							 <td th:text="${#dates.format(report.repDate, 'yyyy년 MMM dd일')}" >날짜</td>
+							 <td th:if="${report.repReason}=='s01'" >스팸홍보/도배글입니다</td>
+							 <td th:if="${report.repReason}=='s02'" >음란물입니다</td>
+							 <td th:if="${report.repReason}=='s03'" >불법정보를 포함하고 있습니다</td>
+							 <td th:if="${report.repReason}=='s04'" >혐오/차별적 표현입니다</td>
+							 <td th:if="${report.reqCode}==0" class="cur btn-deleteAsk">처리하기</td>
+							 <td th:if="${report.reqCode}==1">처리완료</td>
+							 <td th:if="${report.reqCode}==2">반려된 신고건</td>
+							 <td><input type="hidden" th:value="${report.repId}"></td>
+						</tr>
+			<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+			    <div class="modal-dialog" role="document">
+			        <div class="modal-content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel">신고처리</h5>
+			            </div>
+			            <div class="modal-body">
+			            	<div class="form-check">
+						    	<input class="form-check-input" type="radio" name="optionsRadios" id="optionsRadios1" value=1 checked>
+						        <label class="form-check-label" for="optionsRadios1">
+						          신고 승인
+						        </label>
+						    </div>
+						     <br>
+			            	<div class="form-check">
+						    	<input class="form-check-input" type="radio" name="optionsRadios" id="optionsRadios2" value=2>
+						        <label class="form-check-label" for="optionsRadios1">
+						          신고 반려
+						        </label>
+						     </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+			                <button class="btn btn-danger" th:onclick="insertComm([[${report.repId}]])">완료</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+					</th:block>
+				</tbody>
+			</table>
+			</div>
+		</div>
+		<script th:inline="javascript">
+			function show1(){
+				$('#tableData').load("../getReportList?category=r01 #notice");
+			}
+			function show2(){
+				$('#tableData').load("../MoreReport?category=r02 #more");
+			}
+			
+		    $(".btn-deleteAsk").click(function () {
+		      $("#deleteConfirmationModal").modal("show");
+		    });
+		    
+		    $(".btn-secondary").click(function () {
+		      $("#deleteConfirmationModal").modal("hide");
+		    });
+		    
+		    function insertComm(id){
+		    	console.log(typeof id)
+		    	
+		        let code = $('input[name="optionsRadios"]:checked').val();
+		    	let obj = {
+			    		repId : id,
+			    		 reqCode: code
+			    		
+			    	}
+		        $.ajax({
+		            url: '../updateReport', // 올바른 엔드포인트 URL 확인
+		            type: 'POST', // 서버가 요구하는 메소드 타입 사용 (GET, POST 등)
+		      		data : obj,
+		            
+		            success: function(result) {
+		                location.href="getReportList?category=r01"
+		            },
+		            error: function(xhr, status, error) {
+		                console.error("오류 발생: ",xhr, status, error);
+		                // 오류 발생 시 처리
+		            }
+		        });
+		    }
+		    
+		</script>
+      </div>
+    </div>
+    </div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+
+<head>
+    <title>로그인 </title>
+    <style>
+        .form-control {
+            width: 300px;
+            margin-bottom: 10px;
+        }
+
+        .loginMethod {
+            font-size: 22px;
+            font-weight: 500;
+            padding-bottom: 100px;
+            color: gray;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .active-click {
+            font-weight: 700;
+            color: black;
+        }
+        .kakao{
+        	background-color: #f9e000;
+        	font-weight:600;
+        	height: 55px;
+        }
+        .big-button{
+        	font-weight:600;
+        	height: 55px;
+        	border: 1px #fbb200 solid;
+        }
+        .sign{
+         color: #fbb200;
+        }
+        .login{
+        background-color: #fbb200;
+        color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <section layout:fragment="content">
+        <div class="justify-content-center" style="text-align:center; padding:100px;">
+            <div style="margin-bottom:20px; align-content:center;">
+                <span style="cursor:pointer " class="loginMethod" id="user"> 일반회원</span>
+                <span style="cursor:pointer " class="loginMethod" id="facility"> 시설회원</span>
+            </div>
+
+            <div><label><button id="kakao" class="form-control kakao" >카카오톡 로그인</button></label></div>
+            <form th:action="@{/login}" method="post" id="loginForm">
+                <div><label> <input class="form-control" type="text" name="username" placeholder="아이디를 입력해주세요" />
+                    </label></div>
+                <div><label> <input class="form-control" type="password" name="password" placeholder="비밀번호를 입력해주세요" />
+                    </label></div>
+                <div><label><button id="button-test" class="form-control big-button login" >로그인</button></label></div>
+                <div><label><button id="" class="form-control big-button sign" >회원가입</button></label></div>
+            </form>
+            	<div> 
+				<span><a>아이디 찾기</a></span>
+				<span><a>비밀번호 찾기</a></span>
+				</div>
+            <script type="text/javascript">
+                let user = true;
+                let facility = false;
+                $('#user').addClass('active-click');
+                window.onload = function () {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.has('error')) {
+                        alert('로그인에 실패하였습니다. 아이디 또는 비밀번호를 확인해주세요.');
+                    }
+                };
+
+                $('#user').on('click', function (e) {
+                    user = true;
+                    facility = false;
+                    $('#user').addClass('active-click');
+                    $('#facility').removeClass('active-click');
+                    $('#userContent').removeClass('hidden');
+                    $('#facilityContent').addClass('hidden');
+                    $('#kakao').removeClass('hidden');
+                });
+
+                $('#facility').on('click', function (e) {
+                    user = false;
+                    facility = true;
+                    $('#user').removeClass('active-click');
+                    $('#facility').addClass('active-click');
+                    $('#facilityContent').removeClass('hidden');
+                    $('#userContent').addClass('hidden');
+                    $('#kakao').addClass('hidden');
+                });
+
+                $('#button-test').on('click', function (e) {
+                    if (user) {
+                       	$('#loginForm').submit();
+                    } else {
+                    }
+                })
+            </script>
+
+        </div>
+    </section>
+</body>
+
+</html>

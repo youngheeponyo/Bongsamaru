@@ -1,0 +1,24 @@
+			<div id="faq">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>내용</th>
+						<th>카테고리</th>
+					</tr>
+				</thead>
+				<tbody>
+				 	<th:block th:each="board,st : ${faqList}" >
+						<tr>
+							 <td th:text="${st.count}" >번호</td>
+							 <td><a th:text="${board.title}" class="cur" th:href="@{getFaqOne(faqId=${board.faqId})}"></a></td>
+							 <td th:text="${board.content}" >내용</td>
+							 <td th:if="${board.category}=='a01'" >기부금</td>
+							 <td th:if="${board.category}=='a02'" >봉사활동</td>
+							 <td th:if="${board.category}=='a03'" >모임</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<a type="button" style="float:right;" class="btn btn-dark m-1" th:href="@{faqInsert}">등록</a></div>

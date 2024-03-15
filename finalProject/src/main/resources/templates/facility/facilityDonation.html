@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>기부 후기</title>
+<style>
+.facilities_item{
+display:inline-block;
+}
+
+
+</style>
+
+</head>
+<body>
+<section layout:fragment="content">
+<div class="container">
+<div th:insert="~{banner/empty::banner}"></div>
+<div th:insert="~{facility/facilityNav::nav}"></div>
+<div class="container">
+<h3 class="title_color section_title text-center">기부 중</h3>
+<div class="row mb_30">
+<th:block th:each="funding:${fundingList}">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="accomodation_item text-center facilityIntro">
+                            <div class="hotel_img">
+                                <img  th:src="${funding.filePath}" onError="this.src='../image/기본이미지.jpg'" alt="">
+                                <a th:href="@{info.do(donId=${funding.donId}, name=${funding.donId})}" th:text="${funding.title}"></a>
+                            </div>
+                            <div class="details">
+                                <div class="tags">
+                                    
+                                </div>
+                                <h4 class="sec_h3" th:text="${funding.title}" style="color:black;"></h4>
+                                <p th:text="${funding.donors}+'명 참여'" style="color:black;"></p>
+                                <div class="progress">
+											  <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" th:style="'width: ' + ${funding.donationRatio} + '%'" aria-valuenow="${funding.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+											</div>
+											<div class="info-item">
+								                <strong></strong><span th:text="${funding.donationRatio}"></span> %
+								            </div>
+                                <h6 class="date title_color" data-th-text="${#numbers.formatInteger(funding.goalAmt,3,'COMMA')+'원'}"></h6>
+                            
+                            </div>	
+                        </div>
+                    </div>
+                     </th:block>
+                </div> 
+  <th:block th:if="${fundingList!= null and #lists.size(fundingList)!=0}">                
+<nav class="blog-pagination justify-content-center d-flex">
+    <ul class="pagination">
+        <li class="page-item">
+            <a th:href="@{/fInfo/fundingList(facId=${session.facilityInfo.facId}, start=${vo.start - vo.cntPerPage}, end=${vo.start - 1})}" class="page-link" aria-label="Previous">
+                <span aria-hidden="true">
+                    <span class="lnr lnr-chevron-left"></span>
+                </span>
+            </a>
+        </li>
+        <li class="page-item" th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+            <a class="page-link" th:href="@{/fInfo/fundingList(facId=${session.facilityInfo.facId}, start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage})}" th:text="${pageNum}"></a>
+        </li>
+        <li class="page-item">
+            <a th:href="@{/fInfo/fundingList(facId=${session.facilityInfo.facId}, start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}" class="page-link" aria-label="Next">
+                <span aria-hidden="true">
+                    <span class="lnr lnr-chevron-right"></span>
+                </span>
+            </a>
+        </li>
+    </ul>
+</nav>
+</th:block>
+
+</div>
+<div class="container">
+<h3 class="title_color section_title text-center">기부 마감</h3>
+<div class="row mb_30">
+<th:block th:each="funded:${fundedList}">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="accomodation_item text-center facilityIntro">
+                           <div class="hotel_img">
+                                <img th:src="${funded.filePath}" onError="this.src='../image/기본이미지.jpg'" alt="">
+                                <a th:href="@{info.do(donId=${funded.donId}, name=${funded.donId})}" th:text="${funded.title}"></a>
+                            </div>
+                            <div class="details">
+                                <div class="tags">
+                                </div>
+                                <h4 class="sec_h3" th:text="${funded.title}" style="color:black;"></h4>
+                                <p th:text="${funded.donors}+'명 참여'" style="color:black;"></p>
+                                <h6 class="date title_color" th:text="${funded.goalAmt}"></h6>
+                            </div>	
+                        </div>
+                    </div>
+    </th:block>                                
+
+                </div> 
+ <th:block th:if="${fundedList!= null and #lists.size(fundedList)!=0}">              
+<nav class="blog-pagination justify-content-center d-flex">
+	<ul class="pagination">
+		<li class="page-item">
+			<a th:href="@{/fInfo/fundingList(facId=${session.facilityInfo.facId},start=${vo2.start - vo2.cntPerPage}, end=${vo2.start - 1})}" class="page-link" aria-label="Previous"> <span aria-hidden="true"> <span class="lnr lnr-chevron-left"></span></span></a></li>
+		<li class="page-item" th:each="pageNum : ${#numbers.sequence(vo2.startPage, vo2.endPage)}" th:class="${pageNum == vo2.currentPage ? 'page-item active' : 'page-item'}">
+			 <a class="page-link" th:href="@{/fInfo/fundingList(facId=${session.facilityInfo.facId},start=${(pageNum - 1) * vo2.cntPerPage + 1}, end=${pageNum * vo2.cntPerPage})}" th:text="${pageNum}"></a></li>
+		<li class="page-item"><a th:href="@{/fInfo/fundingList(facId=${session.facilityInfo.facId},start=${vo.end + 1}, end=${vo.end + vo.cntPerPage})}" class="page-link" aria-label="Next"> <span aria-hidden="true"> <span class="lnr lnr-chevron-right"></span></span></a></li>
+	</ul>
+</nav>
+</th:block>
+</div>
+</div>
+</section>
+</body>
+</html>

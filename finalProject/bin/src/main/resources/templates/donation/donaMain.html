@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <meta charset="utf-8">
+        <title> Donation Main Page</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="" name="keywords">
+        <meta content="" name="description">
+
+        <!-- Google Web Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet"> 
+
+        <!-- Icon Font Stylesheet -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Libraries Stylesheet -->
+        <link href="donation/board/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+        <link href="donation/board/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+        <!-- Customized Bootstrap Stylesheet -->
+        <link href="donation/board/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link href="donation/board/css/style.css" rel="stylesheet">
+    </head>
+
+    <body>
+
+        <!-- Spinner Start -->
+        <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+            <div class="spinner-grow text-primary" role="status"></div>
+        </div>
+        <!-- Spinner End -->
+
+
+        <!-- Navbar start -->
+        <div class="container-fluid fixed-top">
+
+            <div class="container px-0">
+                <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                    <a href="index.html" class="navbar-brand"><h1 class="text-primary display-6"> 기부</h1></a>
+
+                    <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                        <div class="navbar-nav mx-auto">
+                            <a href="index.html" class="nav-item nav-link">Home</a>
+                            <a href="shop.html" class="nav-item nav-link active">모집중</a>
+                            <a href="shop-detail.html" class="nav-item nav-link">모금완료</a>
+
+                           
+                        </div>
+
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!-- Navbar End -->
+
+
+        <!-- Modal Search Start -->
+        <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex align-items-center">
+                        <div class="input-group w-75 mx-auto d-flex">
+                            <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Search End -->
+
+
+        <!-- Single Page Header start -->
+        <div class="container-fluid page-header py-5">
+            <h1 class="text-center text-white display-6">Donation</h1>
+            
+        </div>
+        <!-- Single Page Header End -->
+
+
+        <!-- Fruits Shop Start-->
+        <div class="container-fluid fruite py-5">
+            <div class="container py-5">
+                <h1 class="mb-4">봉사마루</h1>
+                <div class="row g-4">
+                 <div class="col-lg-12">   
+                  <div class="row g-4">
+
+					<div class="col-xl-3">
+					    <div class="col-lg-12">
+					        <div class="mb-3">
+					            <h4>Categories</h4>
+					            <div class="row">
+					            
+					            	<!-- 유형유형 -->
+					                <div class="col-md-4 " th:each="category : ${categoryList}">
+					                    <div id="donaCategory" class="d-flex justify-content-between fruite-name">
+					                        <a href="#" th:text="${category.subCodeName}"><i class="fas fa-apple-alt me-2"></i>유형 1</a>
+					                   
+					                    </div>
+					                </div>
+					                
+
+					               
+					            </div>
+					        </div>
+					    </div>               
+			         </div>
+                    
+                        <div class="row g-4">
+                           <div class="col-xl-3 ms-auto">
+                                <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between mb-4">
+                                    <label for="fruits">정렬 :</label>
+                                    <select id="fruits" name="fruitlist" class="border-0 form-select-sm bg-light me-3" form="fruitform">
+                                        <option value="volvo">선택하기</option>
+                                        <option value="saab">기준1</option>
+                                        <option value="opel">기준2</option>
+                                        <option value="audi">기준3</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-4">
+     
+                            <div class="col-lg-9">
+                                <div class="row g-4 justify-content-center">
+                                   <div class="col-md-6 col-lg-6 col-xl-4" th:each="dona : ${list}">
+								    <div class="rounded position-relative fruite-item">
+								        <div class="fruite-img">
+								            <img src="donation/board/img/fruite-item-5.jpg" class="img-fluid w-100 rounded-top" alt="">
+								        </div>
+								        
+								       <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">
+    										<span th:text="${dona.recStat} == '0' ? '모금중' : '모금완료'"></span>
+										</div>
+
+
+
+								        <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+								            <h4><a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" th:text="${dona.title}"> 제목</a></h4>
+		
+								           
+								            <div class="info-item">
+								                <strong>목표금액 :</strong><span th:text="${dona.goalAmt}"></span> 원
+								                
+								            </div>
+								            <div class="info-item">
+								                <strong>n명 참여:</strong><span th:text="${dona.donationCount}"></span>명
+								            </div>
+
+											<div class="progress">
+											  <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" th:style="'width: ' + ${dona.donationRatio} + '%'" aria-valuenow="${dona.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+											</div>
+											<div class="info-item">
+								                <strong></strong><span th:text="${dona.donationRatio}"></span> %
+								            </div>
+								
+								            <div class="d-flex justify-content-between flex-lg-wrap">
+								                <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary"><span th:text="${dona.facilityName}">명 참여</span></a>
+								            </div>
+								        </div>
+								    </div>
+								</div>
+                                    
+
+
+                                    <div class="col-12">
+                                        <div class="pagination d-flex justify-content-center mt-5">
+                                            <a href="#" class="rounded">&laquo;</a>
+                                            <a href="#" class="active rounded">1</a>
+                                            <a href="#" class="rounded">2</a>
+                                            <a href="#" class="rounded">3</a>
+                                            <a href="#" class="rounded">4</a>
+                                            <a href="#" class="rounded">5</a>
+                                            <a href="#" class="rounded">6</a>
+                                            <a href="#" class="rounded">&raquo;</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- rowg-4 카테고리용  -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Fruits Shop End-->
+
+
+       
+       
+
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>   
+
+        
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="donation/board/lib/easing/easing.min.js"></script>
+    <script src="donation/board/lib/waypoints/waypoints.min.js"></script>
+    <script src="donation/board/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="donation/board/lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="donation/board/js/main.js"></script>
+    
+    
+    
+    <script>
+	    $.ajax('/categories/')
+		    .done(result => {
+		        console.log(result);
+		    })
+		    .fail(err => console.log(err));
+    </script>
+    </body>
+
+</html>

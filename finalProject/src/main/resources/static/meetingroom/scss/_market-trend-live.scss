@@ -1,0 +1,99 @@
+.market-trend-live-tream{
+    // &::before{
+    //     content: "";
+    //     position: absolute;
+    //     width: 1671px;
+    //     height: 1671px;
+    //     left: -42%;
+    //     top: 0;
+    //     background-color: $primary;
+    //     opacity: 0.06;
+    //     filter: blur(200px);
+    //     z-index: -1;
+    // }
+    padding: 170px 0 78px;
+    .market-trend-live-table{
+        background-color: $white;
+        border-radius: $border-radius-xl;
+        box-shadow: $box-shadow;
+        padding-bottom: 1px;
+        &::before{
+            content: "";
+            position: absolute;
+            width: 239.51px;
+            height: 239.51px;
+            left: -90px;
+            top: -70px;
+            z-index: -1;
+            background-image: url(../../assets/images/shape/shape-1.svg);
+            background-repeat: no-repeat;
+            opacity: 0.66;
+            transform: matrix(-0.99, 0.11, 0.11, 0.99, 0, 0);
+        }
+        &::after{
+            content: "";
+            position: absolute;
+            width: 81px;
+            height: 79px;
+            right: -48px;
+            bottom: -44px;
+            z-index: -1;
+            background-image: url(../../assets/images/shape/shape-2.svg);
+            background-repeat: no-repeat;
+        }
+        .market-trend-tltle{
+            padding: 38px 55px 26px;
+        }
+        .table{
+            thead{
+                tr{
+                    border-top: 1.6px solid $gray-500;
+                    border-bottom: 1.6px solid $gray-500;
+                    th:first-child{
+                        padding-left: 68px;
+                    }
+                    th:last-child{
+                        padding-right: 68px;
+                    }
+                }
+            }
+            tbody{
+                tr{
+                    td:first-child{
+                        padding-left: 68px;
+                    }
+                    td:last-child{
+                        padding-right: 68px;
+                    }
+                    td{
+                        font-weight: $font-weight-medium;
+                        .coin-name{
+                            .coin-img{
+                                margin-right: 12px;
+                            }
+                            .coin-title{
+                                .coin-title-small{
+                                    margin-left: 8px;
+                                    color: $gray-200;
+                                }
+                            }
+                        }
+                    }
+                    .green-text{
+                        color: $green;
+                    }
+                    .red-text{
+                        color: $red;
+                    }
+                }
+            }
+        }
+        .market-trend-tltle{
+            a{
+                font-weight: $font-weight-medium;
+                letter-spacing: 0.01em;
+                line-height: 29px;
+            }
+        }
+    }
+}

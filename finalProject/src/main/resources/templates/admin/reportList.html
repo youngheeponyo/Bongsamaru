@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>신고 관리</title>
+<style>
+.cur{
+	cursor:pointer;
+	color : black;
+}
+.modal {
+	left : 10%;
+	top : 10%;
+}
+.modal-content{
+	width : 60%;
+}
+#tableData{
+	margin-top : 50px;
+}
+</style>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>신고 관리</h2>
+		<div style="float:right;" class="cur">
+			<a style="color:black;font-size:14px" onclick="show1()">챌린지 신고건 |</a>
+			<a style="color:black;font-size:14px" onclick="show2()"> 모임 신고건 |</a>
+			<a style="color:black;font-size:14px" onclick="show3()"> 피드댓글 신고건</a>
+		</div>
+		<br><hr>
+		<div id=tableData>
+			<div id="notice">
+			<th:block th:if="${reportList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${reportList.size} != 0">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>챌린지 번호</th>
+						<th>신고자</th>
+						<th>신고날짜</th>
+						<th>신고사유</th>
+						<th>신고처리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="report,st : ${reportList}">
+						 <td th:text="${st.count}">번호</td>
+						 <td><a th:href="@{/challenge/challengesList(chalId=${report.categoryNo})}" target='_blank' style="color:black">챌린지로 이동</a></td>
+						 <td th:text="${report.memId}" >신고자</td>
+						 <td th:text="${#dates.format(report.repDate, 'yyyy년 MMM dd일')}" >날짜</td>
+						 <td th:if="${report.repReason}=='s01'" >스팸홍보/도배글입니다</td>
+						 <td th:if="${report.repReason}=='s02'" >음란물입니다</td>
+						 <td th:if="${report.repReason}=='s03'" >불법정보를 포함하고 있습니다</td>
+						 <td th:if="${report.repReason}=='s04'" >혐오/차별적 표현입니다</td>
+						 <td th:if="${report.repReason}=='s05'" >주제와 상관이 없음</td>
+						 <td th:if="${report.reqCode}==0" class="cur" th:onclick="openModal([[${report.repId}]])">처리하기</td>
+						 <td th:if="${report.reqCode}==1">처리완료</td>
+						 <td th:if="${report.reqCode}==2">반려된 신고건</td>
+					</tr>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev([[${vo}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current([[${vo}]],[[${pageNum}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next([[${vo}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+		    <div class="modal-dialog" role="document">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <h5 class="modal-title" id="deleteConfirmationModalLabel">신고처리</h5>
+		            </div>
+		            <div class="modal-body">
+		            	<div class="form-check">
+					    	<input class="form-check-input" type="radio" name="optionsRadios" id="optionsRadios1" value=1 checked>
+					        <label class="form-check-label" for="optionsRadios1">
+					          신고 승인
+					        </label>
+					    </div>
+					     <br>
+		            	<div class="form-check">
+					    	<input class="form-check-input" type="radio" name="optionsRadios" id="optionsRadios2" value=2>
+					        <label class="form-check-label" for="optionsRadios1">
+					          신고 반려
+					        </label>
+					     </div>
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+		                <button class="btn btn-danger" th:onclick="insertComm()">완료</button>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+		
+		<script th:inline="javascript">
+			var repId = '';
+			function show1(){
+				$('#tableData').load("../getReportList?category=r01 #notice");
+			}
+			function show2(){
+				$('#tableData').load("../MoreReport?category=r02 #more");
+			}
+			function show3(){
+				$('#tableData').load("../MoreReport?category=r03 #comm");
+			}
+			
+			function openModal(id){
+				repId=id;
+		      $("#deleteConfirmationModal").modal("show");
+			}
+			
+		    $(".btn-secondary").click(function () {
+		      $("#deleteConfirmationModal").modal("hide");
+		    });
+		    
+		    function prev(vo){
+				$('#tableData').load(`../getReportList?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&category=r01 #notice`);
+			}
+			
+			function current(vo,pageNum){
+				$('#tableData').load(`../getReportList?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&category=r01 #notice`);
+			}
+			
+			function next(vo){
+				$('#tableData').load(`../getReportList?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&category=r01 #notice`);
+			}
+			
+		    function prev2(vo){
+				$('#tableData').load(`../MoreReport?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&category=r02 #more`);
+			}
+			
+			function current2(vo,pageNum){
+				$('#tableData').load(`../MoreReport?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&category=r02 #more`);
+			}
+			
+			function next2(vo){
+				$('#tableData').load(`../MoreReport?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&category=r02 #more`);
+			}
+			
+		    function prev3(vo){
+				$('#tableData').load(`../MoreReport?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&category=r03 #comm`);
+			}
+			
+			function current3(vo,pageNum){
+				$('#tableData').load(`../MoreReport?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&category=r03 #comm`);
+			}
+			
+			function next3(vo){
+				$('#tableData').load(`../MoreReport?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&category=r03 #comm`);
+			}
+		    function insertComm(){
+			let code = $('input[name="optionsRadios"]:checked').val();
+	    	let obj = {
+		    		repId : repId,
+		    		reqCode: code
+		    	}
+	        $.ajax({
+	            url: '../updateReport', // 올바른 엔드포인트 URL 확인
+	            type: 'POST', // 서버가 요구하는 메소드 타입 사용 (GET, POST 등)
+	      		data : obj,
+	            
+	            success: function(result) {
+	                location.href="getReportList?category=r01"
+	            },
+	            error: function(xhr, status, error) {
+	                console.error("오류 발생: ",xhr, status, error);
+	                // 오류 발생 시 처리
+	            }
+	        });
+		    }
+		    
+		</script>
+      </div>
+    </div>
+    </div>
+	</section>
+</body>
+</html>

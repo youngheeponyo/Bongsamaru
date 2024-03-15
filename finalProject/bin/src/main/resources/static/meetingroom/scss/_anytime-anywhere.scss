@@ -1,0 +1,43 @@
+.anytime-anywhere{
+    padding: 111px 0 90px;
+    .anytime-anywhere-wrapper{
+        .anytime-anywhere-img{
+            margin: 0 0 0 -250px;
+        }
+        .anytime-anywhere-content{
+            max-width: 568px;
+            width: 100%;
+            padding-left: 50px;
+            .small-title{
+                letter-spacing: 0.1em;
+                font-weight: $font-weight-normal;
+                margin-bottom: 11px;
+            }
+            .title{
+                color: $gray-900;
+                font-weight: $font-weight-bolder;
+                line-height: 78px;
+                letter-spacing: 0.01em;
+                margin-bottom: 7px;
+                .primary-text{
+                    color: $primary;
+                }
+            }
+            .text{
+                margin-bottom: 29px;
+            }
+            .coinzar-system{
+                opacity: 0.7;
+                .coinzar-system-list{
+                    margin-right: 40px;
+                    &:last-child{
+                        margin-right: 0;
+                    }
+                    .coinzar-system-title{
+                        margin-top: 10px;
+                    }
+                }
+            }
+        }
+    }
+}

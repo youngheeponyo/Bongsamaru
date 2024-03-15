@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bongsamaru.user.mapper.UserMapper">
+   <insert id="userSignUp" parameterType="UserVO">
+      INSERT INTO member (
+    MEM_ID,
+    MEM_PWD,
+    MEM_NICK,
+    MEM_PHONE,
+    MEM_ZIP,
+    MEM_ADDR,
+    MEM_BDATE,
+    MEM_DEPT,
+    MEM_EMAIL,
+    DON_RECEIPT,
+    MEM_SSN,
+    EMAIL_AGREE,
+    SMS_AGREE,
+    MEM_STAT,
+    MEM_NAME
+) VALUES (
+    #{memId},
+    #{memPwd},
+    #{memNick},
+    #{memPhone},
+    #{memZip},
+    #{memAddr},
+    #{memBdate},
+    #{memDept},
+    #{memEmail},
+    #{donReceipt},
+    #{memSsn},
+    #{emailAgree},
+    #{smsAgree},
+    (UPPER(#{memStat})),
+    #{memName}
+)
+   </insert>
+
+
+   <select id="userList" resultType="UserVO">
+      select MEM_ID,
+            MEM_PWD,
+            MEM_NICK,
+            MEM_PHONE,
+            MEM_ZIP,
+            MEM_ADDR,
+            MEM_BDATE,
+            MEM_DEPT,
+            MEM_EMAIL,
+            DON_RECEIPT,
+            MEM_SSN,
+            EMAIL_AGREE,
+            SMS_AGREE,
+            ACCT_NUM,
+            BANK_NAME,
+            upper(MEM_STAT) as MEM_STAT,
+            MEM_NAME
+      from member where MEM_ID = #{memId}
+   </select>
+
+
+   <select id="countMemId" resultType="int">
+       SELECT COUNT(*)
+       FROM member
+       WHERE mem_id = #{memId}
+   </select>
+   
+   <select id="countMemNick" resultType="int">
+       SELECT COUNT(*)
+       FROM member
+       WHERE mem_nick = #{memNick}
+   </select>
+
+	<select id="cateList" resultType="CategoryLikeVO">
+		select sub_code_id as id ,
+			   sub_code_name as name 
+	    from sub_code 
+	    where main_code_id = 'd' 
+	    or main_code_id = 'f';
+	</select>
+</mapper>

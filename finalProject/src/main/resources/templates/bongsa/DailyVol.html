@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+.page-item.active .page-link {
+    z-index: 2;
+    color: #fff;
+    background-color: #689f38;
+    border-color: #689f38;
+}
+.page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: black;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+.search-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.search-input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+}
+.search-button, .reset-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: white;
+    background-color: #ffb524;
+    border: none;
+    cursor: pointer;
+}
+.reset-button {
+    background-color: #6c757d;
+}
+
+
+/* 검색 및 필터 컨테이너 스타일 */
+.search-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* 날짜 입력 필드 스타일 */
+.date-input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+}
+
+/* 검색 및 초기화 버튼 호버 효과 */
+.search-button:hover, .reset-button:hover {
+    opacity: 0.8;
+}
+
+
+.date-input {
+    margin-right: 10px; /* 날짜 입력 필드 간 간격 */
+}
+.cur{
+	cursor : pointer;
+}
+</style>
+</head>
+
+<body>
+	  <section layout:fragment="content">
+	<div th:insert="~{banner/daily::banner}"></div>
+  	<div  th:insert="~{bongsa/sidebar::side}"></div>
+	  <div class="container">
+  <div>
+  <div class="search-container">
+	    <div style="display: flex; justify-content: space-between; width: 100%;">
+	    <!-- 왼쪽으로 정렬될 요소들의 컨테이너 -->
+	    <div>
+	        <button style="opacity: 0.8;" type="button" class="btn btn-outline-primary m-1" onclick="location.href='../regMeetingPage'">등록</button>
+	    </div>
+	    <!-- 오른쪽으로 정렬될 요소들의 컨테이너 -->
+	    <div style="display: flex; gap: 10px;">
+	        <input type="text" id="searchKeyword" class="search-input" placeholder="검색어 입력...">
+	        <button onclick="search()" class="btn btn-outline-secondary m-1">검색</button>
+	        <button onclick="resetSearch()" class="btn btn-outline-dark m-1">초기화</button>
+	    </div>
+	</div>
+	    <!-- 드롭다운 및 날짜 입력 -->
+	    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+	        <div style="display: flex; gap:10px; ">
+	            <select  class="date-input" id="location" onchange="search()" style="text-align: center" >
+	                <option value="">==지역==</option>
+	                <option th:each="location:${location}" th:text="${location.value}"th:value="${location.subCode}"> </option>
+	            </select>
+	            <select class="date-input" id="cate" onchange="search()" style="text-align: center">
+	                <option value="">==봉사유형==</option>
+	                <option th:each="cate:${cate}" th:text="${cate.value}" th:value="${cate.subCode}"> </option>
+	            </select>
+	        </div>
+	        <div>
+	            <span class="date-label">시작 날짜:</span>
+	            <input type="date" id="startDate" class="date-input" onchange="search()">
+	            <span class="date-label">종료 날짜:</span>
+	            <input type="date" id="endDate" class="date-input" onchange="search()">
+	        </div>
+	    </div>
+	</div>
+ 
+    </div>
+	<div id="tableData">
+				<div class="content" th:if="${list.size() == 0}" style="text-align:center;margin-top:200px;">
+				<span>검색결과가 존재하지 않습니다</span>
+			</div>
+		<div id="meetVolList">
+		<br>
+	        <div class="row">
+	          <div class="col-sm-6 col-xl-3" style="color:black; width:25%;" th:each="list ,stat : ${list}">
+	            <div class="card overflow-hidden rounded-2" style=" margin-bottom: 20px;">
+	              <div class="position-relative" >
+	                <a class="cur" th:onclick="newMeet([[${list.vol.volId}]])"><img th:src="@{${list.vol.path}}" class="card-img-top rounded-0"onerror="this.onerror=null; this.src='/userresources/image/nonono.png';"style="height:200px;"></a>
+	              </div>
+	              <div class="text-white px-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+				    <span>모집중</span>
+				    </div>
+	              <div class="text-white px-1 rounded position-absolute" style="top: 10px; right: 10px;background-color:#28a745;">
+					<span th:text="|${list.vol.mainCategory}|">관심분야할거임 </span>
+					</div>
+	               <div class="d-flex align-items-center justify-content-between">
+		            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+		                <h4><a class="cur" th:text="${list.vol.meetName}" th:onclick="newMeet([[${list.vol.volId}]])">동아리명</a></h4>
+		                <a class="region-link" href="#" style="color:gray">
+						   <span th:text="|#${list.vol.region}|">지역할거임</span>
+						</a>
+						<span th:if="${list.tag.size()}!=0">
+						   <span class="tag-link"style="margin-right:5px; cursor:pointer; color:gray" th:each="tag : ${list.tag}" th:text="|#${tag.tagContent}|"></span>
+						 </span>
+						 <br>			
+						<Strong><span>모집기간</span></Strong>
+						<br>
+	                    <span th:text="${#dates.format(list.vol.recPeriod, 'yy.MM.dd')}+' ~ '"></span> 
+	                    <span th:if="${#dates.format(list.vol.endPeriod, 'yy.MM.dd')} != 49.12.30" th:text="${#dates.format(list.vol.endPeriod, 'yy.MM.dd')}">2024-02-04 ~ 2024-09-04</span>
+	                    <br>
+	                    <span th:text="'정원 : '+ ${list.vol.meetingCnt} +' / '+ ${list.vol.cap}+'명'">정원 : 해야함</span>
+						 <br>
+		            </div>
+	               </div>
+	            </div>
+	          </div>
+	        </div>
+        </div>
+      </div>
+      <nav style="margin-top:50px;" aria-label="Page navigation example" th:if="${list.size() != 0}">
+    <ul class="pagination justify-content-center">
+        <!-- 이전 버튼 -->
+        <li class="page-item" th:if="${vo.prev}">
+            <a class="page-link" th:href="@{/daily(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1}, category=${category}, zip=${zip})}">이전</a>
+        </li>
+        <!-- 페이지 번호 출력 -->
+        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+            <a class="page-link" th:href="@{/daily(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage}, category=${category}, zip=${zip})}"
+               th:text="${pageNum}"></a>
+        </li>
+        <!-- 다음 버튼 -->
+        <li class="page-item" th:if="${vo.next}">
+            <a class="page-link" th:href="@{/daily(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage}, category=${category}, zip=${zip})}">다음</a>
+        </li>
+    </ul>
+</nav>
+
+</div>
+<script th:inline="javascript">
+$(document).ready(function() {
+	mss.scrollIntoView();
+	 $('#searchKeyword').keypress(function(event) {
+	        // 엔터 키 코드는 13입니다.
+	        if (event.which == 13) {
+	            event.preventDefault(); // 폼 제출에 의한 페이지 리로드 방지
+	            search(); // 검색 함수 호출
+	        }
+	    });
+	
+	
+    // 페이지 로드 시 실행: URL 쿼리 파라미터 기반으로 드롭다운 설정
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    const location = urlParams.get('location');
+    const searchKeyword = urlParams.get('searchKeyword');
+    const startDateParam = urlParams.get('startDate');
+    const endDateParam = urlParams.get('endDate');
+    // 드롭다운 값 설정
+    if (category) $('#cate').val(category);
+    if (location) $('#location').val(location);
+    if (searchKeyword) $('#searchKeyword').val(searchKeyword);
+    if (startDateParam) $('#startDate').val(startDateParam);
+    if (endDateParam) $('#endDate').val(endDateParam);
+	
+    // 페이지네이션 링크 업데이트 함수 호출 수정
+    updatePaginationLinks();
+});
+
+function updatePaginationLinks() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    const location = urlParams.get('location');
+    const searchKeyword = urlParams.get('searchKeyword'); // 검색어 변수 추가
+
+    document.querySelectorAll('.page-link').forEach(link => {
+        let href = link.getAttribute('href');
+        let newHref = new URL(href, window.location.origin);
+		
+        // URL에 카테고리, 위치, 검색어 추가
+        if (category) newHref.searchParams.set('category', category);
+        if (location) newHref.searchParams.set('location', location);
+        if (searchKeyword) newHref.searchParams.set('searchKeyword', searchKeyword); // 링크에 검색어 추가
+
+        link.setAttribute('href', newHref.toString());
+    });
+}
+
+function search() {
+    let baseUrl = '/daily?start=1&end=8';
+    const cate = $('#cate').val();
+    const location = $('#location').val();
+    const searchKeyword = $('#searchKeyword').val();
+    const startDate = $('#startDate').val();
+    const endDate = $('#endDate').val();
+
+    if (cate) baseUrl += `&category=${encodeURIComponent(cate)}`;
+    if (location) baseUrl += `&location=${encodeURIComponent(location)}`;
+    if (searchKeyword) baseUrl += `&searchKeyword=${encodeURIComponent(searchKeyword)}`;
+    if (startDate) baseUrl += `&startDate=${encodeURIComponent(startDate)}`;
+    if (endDate) baseUrl += `&endDate=${encodeURIComponent(endDate)}`;
+
+    window.location.href = baseUrl;
+}
+
+function resetSearch() {
+    window.location.href = '/daily';
+}
+
+function newMeet(id){
+	src_width = screen.availWidth*0.1;
+	src_height = screen.availHeight*0.1;
+	window.open("meetings?volId="+id, "pop", "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1400, height=800, top="+src_height+",left="+src_width+",location=no");
+}
+</script>
+  </section>
+</body>
+</html>

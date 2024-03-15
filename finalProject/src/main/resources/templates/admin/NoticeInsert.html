@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<style>
+.content {
+	width: 700px;
+	margin: auto
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+	<section layout:fragment="content">
+		<div class="body-wrapper">
+			<!--  Header Start -->
+			<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+			<!--  Header End -->
+			<div class="container-fluid">
+				<div class="container">
+					<div class="page_tits">
+						<h3>공지사항 작성</h3>
+					</div>
+					<br> <br>
+					<div class="content">
+						<section>
+							<form>
+								<div class="col-md-12">
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="title">중요도</label>
+											<select name="priority" class="nav-item dropdown form-control">
+												<option class="dropdown-item" value="0">일반</option>
+												<option class="dropdown-item" value="1">중요</option>
+											</select>
+											<input name="category" value="b01" type="hidden">
+										</div>
+										<div class="form-group">
+											<label for="author"> 작성자 </label> 
+											<input type="text" class="form-control" value="관리자" readonly>
+										</div>
+										<div class="form-group" style="width: 500px">
+											<label for="title">제목</label> <input type="text"
+												class="form-control" name="title" placeholder="제목을 입력하세요">
+										</div><br>
+										<div class="form-group" style="width: 500px">
+											<label for="content"> 내용 </label>
+											<textarea class="form-control" name="content" cols="50"
+												rows="5" placeholder="내용을 입력하세요"></textarea>
+										</div><br>
+										<div class="form-group">
+											<div class="subheading">
+												<em class="highlight"></em>파일첨부
+											</div>
+											<input class="form-control" id="imageInput"
+												name="uploadFiles" type="file" multiple><br>
+												<img id="imagePreview" src="/userresources/image/미리보기.jpg"
+											style="width: 100px; height: 100px;">
+										</div>
+									</div>
+									<p class="btn_set">
+										<button type="button" style="float: right;" id="subm" onclick="checking()" class="btn btn-success m-1">등록</button>
+									</p>
+								</div>
+							</form>
+							<script>
+							
+								document.getElementById('imageInput').addEventListener('change', function (event) {
+									var image = document.getElementById('imagePreview');
+									var file = event.target.files[0];
+									var reader = new FileReader();
+	
+									reader.onloadend = function () {
+										image.src = reader.result;
+									}
+	
+									if (file) {
+										reader.readAsDataURL(file);
+									} else {
+										image.src = "";
+									}
+								});
+								
+								function checking(){
+									let title = $('[name="title"]');
+									let content = $('[name="content"]');
+	
+									if(title.val()==''){
+										checkingTitle();
+										title.focus();
+										return;
+									}
+									if(content.val()==''){
+										deleteBoard();
+										content.focus();
+										return;
+									};
+									
+									swalWithBootstrapButtons.fire({
+										  title: "정말 등록하시겠습니까??",
+										  text: "등록 후에는 수정이 불가능합니다.",
+										  icon: "question",
+										  showCancelButton: true,
+										  confirmButtonText: "등록",
+										  cancelButtonText: "취소",
+										  reverseButtons: true
+										}).then((result) => {
+										  if (result.isConfirmed) {
+										    swalWithBootstrapButtons.fire({
+										      title: "등록되었습니다",
+										      text: "내용을 확인해보세요",
+										      icon: "success"
+										    });
+										    var formDa = $("form").serialize();
+											$.ajax({
+												url: '/noticeInsert',
+												type: 'POST',
+												data: formDa,
+												success: function (result) {
+													var fileLength = $("input[type='file']");
+													var file2 = fileLength[0].files;
+													if(file2.length==0){
+														location.href="boardList?category=b01"
+														return;
+													}else{
+														console.log(result);
+														fileSub(result);
+													}
+												},
+												error: function (reject) {
+													alert('실풰!')
+													console.log(reject);
+												}
+											})
+										  } else if (
+										    /* Read more about handling dismissals below */
+										    result.dismiss === Swal.DismissReason.cancel
+										  ) {
+										    swalWithBootstrapButtons.fire({
+										      title: "취소되었습니다.",
+										      text: "등록을 취소하였습니다.",
+										      icon: "error"
+										    });
+										  }
+										});
+								}
+								function fileSub(cnt) {
+									var formData = new FormData(); //FormData 객체 생성
+									var inputFile = $("input[type='file']");
+									//input 태그의 type이 file인것을 찾아서 inputFile이라는 변수로 지정
+									var files = inputFile[0].files;
+									if(files.length==0){
+										return;
+									}
+									//files : 선택한 모든 파일을 나열하는 FileList 객체입니다.
+									//multiple 특성을 지정하지 않닸다면 두 개 이상의 파일을 포함하지 않습니다.
+									for (var i = 0; i < files.length; i++) {
+										formData.append("uploadFiles", files[i]); //키,값으로 append 
+									}
+									formData.append("code", "p05")
+									formData.append("codeNo", cnt);
+									formData.append("codeUser", "ADMIN");
+
+									//jQuery.ajax
+									$.ajax({
+										url: '/uploadsAjax',
+										type: 'POST',
+										processData: false, //기본값은 true, ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+										contentType: false, // multipart/form-data타입을 사용하기위해 false 로 지정합니다.
+										data: formData,
+										success: function (result) {
+											location.href="boardList?category=b01"
+										},
+										error: function (reject) {
+											console.log(reject);
+										}
+									});
+								};
+								
+								const swalWithBootstrapButtons = Swal.mixin({
+								  customClass: {
+								    confirmButton: "btn btn-success",
+								    cancelButton: "btn btn-danger"
+								  },
+								  buttonsStyling: false
+								});
+								function checkingTitle(seq){
+									Swal.fire({
+									  icon: "error",
+									  title: "제목이 입력되지 않았습니다.",
+									  text: "제목을 입력해주세요!",
+									});
+								}
+								function deleteBoard(seq){
+									Swal.fire({
+									  icon: "error",
+									  title: "내용이 입력되지 않았습니다.",
+									  text: "내용을 입력해주세요!",
+									});
+								}
+							</script>
+						</section>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+
+* { list-style: none; color: #000; }
+
+.service_section1 .tab_line_area {
+    margin-bottom: 30px;
+}
+
+.tab_line_area ul li {
+    position: relative;
+    padding: 20px;
+    color: #6a6a6a;
+    font-size: 1.125rem;
+}
+
+.tab_line_area ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+a {
+	font-weight: bold;
+    color: #000;
+    font-size: 17px;
+    font-family: 'Orbit', sans-serif;
+}
+
+.tab_line_area ul li + li:before {
+    content: '';
+    display: block;
+    position: absolute;
+    margin-top: -7px;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 14px;
+    background-color: #d5d5d5;
+}
+
+.main1, .main2 {
+	text-align: center;
+}
+
+.main2 {
+	width: 100%;
+	background-color: khaki;
+}
+
+.hidden {
+      display: none;
+}
+
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+	<div class="container">
+		<div class="tab_line_area">
+			<ul>
+				<li><a href="/intro">행복마루 소개</a></li>
+				<li><a href="/intro2">센터 소개</a></li>
+			</ul>
+		</div>
+		<div class="main1">
+			<h1>100%</h1>
+			<h1 style="text-decoration: underline;">곧장기부</h1>
+			<h3>1원도 빠짐없이 100%</h3>
+			<p>행복마루는 "기부금을 그대로 이웃에게 전달하고 싶어하는 분들이 믿고 기부할 수 있는 플랫폼"이 되고자 합<br>
+			니다. "지역아동센터의 아이들에게 필요한 물건을 후원한다"는 핵심기능에 집중하고 이미 대중화된 오픈 마<br>
+			켓 배송시스템 등을 활용하여 기부의 투명성을 최대로 높일 수 있었습니다.<br>
+			<br>
+			<img src="/userresources/image/banner/logo.png" alt="" style="width:324px; height: 240px;">
+		</div>
+		<br>
+		<div class="main2">
+		    <br>
+		    <h3 style="text-decoration: underline;">아이들에게</h3>
+		    <h1>곧장</h1>
+		    <p>여러분의 기부금은 아이들에게 필요한 물건을 사는 데에만 사용되고, 그물건들은 지역아동센터로 배송되어<br>
+		    아이들을 위해 사용됩니다. 기부금이 현금 그대로 전달될 때보다, 어떻게 아이들에게 쓰였는지 보다 확실하게<br>
+		    알 수 있습니다. 보다 진솔한 기부를 위해 아이들의 얼굴 노출을 지양합니다.<br>
+		    <br>
+		    <img src="/userresources/image/banner/logo2.png" alt="" style="width:324px; height: 240px;">
+		</div>
+		  <input type="text" id="inputField">
+  		  <button id="confirmButton">확인</button>
+  		  <input type="text" id="inputField2" class="hidden">
+  		  <button id="sendButton" class="hidden">보내기</button>
+  		  <input type="text" id="inputTel" class="hidden">
+  		  <button class="hidden" id="changeTel">변경</button>
+	</div>
+  <script>
+
+    $('#confirmButton').on('click', function() {
+    	$("input").remove("#inputField");
+    	$("button").remove("#confirmButton");
+        $("#sendButton").removeClass('hidden');
+        $("#inputField2").removeClass('hidden');
+      
+    });
+
+    $("#sendButton").on('click', function() {
+      $("button").remove("#sendButton");
+      $("input").remove("#inputField2");
+      $("#inputTel").removeClass('hidden');
+      $("#changeTel").removeClass('hidden');
+      alert('인증 완료');
+      
+    $("#changeTel").on('click', function(){
+    	alert('변경 완료');
+    })
+    });
+  </script>
+</section>
+</body>
+</html>

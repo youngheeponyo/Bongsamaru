@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<title>봉사마루</title>
+<style>
+.area_pluspal .tit_noperiod {
+	display: block;
+	padding: 13px 0 17px;
+	font-weight: 400;
+	font-size: 25px;
+	color: #dc287c;
+	font-family: bold;
+}
+
+.area_pluspal .info_plusfriend {
+    display: inline-block;
+    padding-top: 1px;
+    line-height: 22px;
+    color: #999;
+    text-align: left;
+    white-space: pre-line;
+    vertical-align: top;
+    font-size: 13px;
+}
+
+.area_pluspal .btn_plusfriend {
+    display: inline-block;
+    width: 113px;
+    height: 45px;
+    margin-left: 20px;
+    border-radius: 6px;
+    background-color: #ffe500;
+    vertical-align: top;
+}
+.title {
+	display: flex; 
+	justify-content: center; 
+	align-items: center; 
+	width: 100%; 
+	height: 100vh;
+}
+* {
+	font-family: 'Orbit', sans-serif;
+}
+
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+<div class="side" th:insert="~{my/sidebar::side}"></div>
+	<div class="container">
+		<div class="title">
+			<div class="area_pluspal">
+				<span class="tit_noperiod">지금은 연말정산 기간이 아닙니다.</span>
+				<plus-friend-button data-tiara-layer="plusfriend receipt" data-tiara-action-kind="AddTalkChannel" data-tiara-action-name="채널추가_클릭" guidetext="기부금영수증 신청기간을 알려드려요.">
+					<div class="cont_plusfriend"><!---->
+						<span class="info_plusfriend">연말정산이 기간이 되면 신청할수 있습니다.
+						</span><!---->
+					</div>
+				</plus-friend-button>
+			</div>
+		</div>
+	</div>
+</div>
+<script  th:inline="javascript">
+</script>
+</section>
+</body>
+</html>

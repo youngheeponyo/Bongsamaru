@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>시설 마이페이지 사이드바</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+<div th:fragment="side">
+  <div style="background-color: #fff; margin-bottom: 40px; border-bottom: 1px solid #dcdcdc;">
+    <ul id="mainList" class="container" style="display: flex; justify-content: center; list-style: none; padding-bottom: 10px;">
+      <li style="cursor: pointer;">
+        <a style="display: inline-block; padding: 30px 45px; color: #797979; font-size: 1.125rem; font-weight: 500;" id="volunteer" data-target="#volunteerSub">봉사관련</a>
+      </li>
+      <li style="cursor: pointer;">
+        <a style="display: inline-block; padding: 30px 45px; color: #797979; font-size: 1.125rem; font-weight: 500;" id="donation" data-target="#donationSub">기부관련</a>
+      </li>
+      <li style="cursor: pointer;">
+        <a style="display: inline-block; padding: 30px 45px; color: #797979; font-size: 1.125rem; font-weight: 500;" id="infoUpdate" data-target="#">정보수정</a>
+      </li>
+    </ul>
+    <div id="volunteerSub" class="container" style="display: none; justify-content: center; list-style: none; margin-top: 10px;">
+      <a th:href="@{/fac/volJoin}" style="font-size: 1.25rem; margin-right: 20px;">신청 및 신청내역</a>
+      <a th:href="@{/fac/volFinish}" style="font-size: 1.25rem; margin-right: 20px;">봉사완료 후기작성</a>
+    </div>
+    <div id="donationSub" class="container" style="display: none; justify-content: center; list-style: none; margin-top: 10px;">
+      <a th:href="@{/fac}" style="font-size: 1.25rem; margin-right: 20px;">기부승인</a>
+      <a th:href="@{/fac/donaInfo}" style="font-size: 1.25rem; margin-right: 20px;">기부내역</a>
+    </div>
+  </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script th:inline="javascript">
+$(document).ready(function() {
+    $('#mainList a').on('click', function (e) {
+        e.preventDefault(); // 기본 동작 방지
+
+        // 모든 소분류 숨기기 및 스타일 초기화
+        resetSubcategories();
+
+        // 활성화된 대분류에 스타일 적용
+        setActiveStyle($(this));
+
+        // 관련 소분류 표시
+        var target = $(this).data('target');
+        $(target).css({
+          'display': 'flex',
+          'flex-direction': 'row', // 가로로 나열
+          'justify-content': 'center', // 가운데 정렬
+          'align-items': 'center', // 세로 방향에서도 가운데 정렬
+          'font-size': '1.25rem', // 글자 크기 조정
+          'margin-top': '10px' // 상단 마진 조정
+        });
+    });
+
+    function resetSubcategories() {
+        $('div[id$="Sub"]').hide();
+        $('div[id$="Sub"] a').css({
+            'font-weight': 'normal',
+            'color': '#000'
+        });
+    }
+
+    function setActiveStyle(element) {
+        // 모든 대분류 링크 스타일 초기화
+        $('#mainList a').css({
+            'color': '#797979',
+            'font-size': '1.125rem',
+            'font-weight': '500',
+            'box-shadow': 'none'
+        });
+
+        // 활성화된 대분류에 스타일 적용
+        element.css({
+            'color': 'black',
+            'font-size': '24px',
+            'font-weight': 'bold',
+            'box-shadow': '0 1px 0 0 #689f38'
+        });
+    }
+});
+</script>
+<script>
+$(document).ready(function() {
+    // 현재 페이지의 URL을 가져옵니다.
+    var currentPath = window.location.pathname;
+
+    // 각 메뉴 항목의 대상 URL과 비교합니다.
+    $('#mainList a').each(function() {
+        var menuItem = $(this);
+        var targetPath = menuItem.data('target-path'); // HTML에서 data-target-path 속성으로 경로를 설정해야 합니다.
+
+        // 현재 페이지의 경로가 메뉴 항목의 대상 경로와 일치하는 경우
+        if (currentPath.indexOf(targetPath) !== -1) {
+            menuItem.css({
+                'color': 'black',
+                'font-size': '24px',
+                'font-weight': 'bold',
+                'box-shadow': '0 1px 0 0 #689f38'
+            });
+
+            // 관련된 소분류 항목을 보여줍니다.
+            var targetSub = menuItem.data('target');
+            $(targetSub).show().css({
+              'display': 'flex',
+              'flex-direction': 'row',
+              'justify-content': 'center',
+              'align-items': 'center',
+              'font-size': '1.25rem',
+              'margin-top': '10px'
+            });
+
+            // 신청 및 신청내역 페이지에서는 대분류 메뉴도 유지시킵니다.
+            menuItem.parent().siblings().children('a').css({
+                'color': '#797979',
+                'font-size': '1.125rem',
+                'font-weight': '500',
+                'box-shadow': 'none'
+            });
+        }
+    });
+});
+</script>
+</div>
+</body>
+</html>

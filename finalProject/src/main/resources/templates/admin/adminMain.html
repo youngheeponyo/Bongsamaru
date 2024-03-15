@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}"
+>
+<head>
+<!-- Slick 슬라이더 관련 CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+
+<!-- jQuery와 Slick 슬라이더 관련 JavaScript -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<meta charset="UTF-8">
+<title>관리자페이지</title>
+<style>
+.cur{
+	cursor:pointer;
+}
+.slick-arrow {
+    z-index: 10;
+    background: rgba($bk, 0.2);
+    border-radius: 50%;
+    transition: background 0.5s;
+    &:hover {
+        background: rgba($pt, 0.9);
+		color : black;
+        &::before {
+            color : black;
+        }
+    }
+    &::before {
+        font-weight: 900;
+        font-size: 49px;
+        transition: all 0.5s;
+    }
+}
+.center{
+	width:95%;
+	margin:auto;
+}
+</style>
+</head>
+<body>
+<section layout:fragment="content">
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+        <div class="row justify-content-center" style="text-align:center">
+           <h3 class="fw-semibold mb-4">이달의 기부리스트</h3>
+           <div class="table-responsive">
+             <table class="table">
+               <thead class="text-dark fs-4">
+                 <tr>
+                   <th class="border-bottom-0">
+                     <h6 class="fw-semibold mb-0">No</h6>
+                   </th>
+                   <th class="border-bottom-0">
+                     <h6 class="fw-semibold mb-0">Id</h6>
+                   </th>
+                   <th class="border-bottom-0">
+                     <h6 class="fw-semibold mb-0">Name</h6>
+                   </th>
+                   <th class="border-bottom-0">
+                     <h6 class="fw-semibold mb-0">Donation Amount</h6>
+                   </th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr th:each="king,st : ${king}" th:if="${st.count}<=10">
+                 	<td>
+			            <img th:if="${st.count} == 1" th:src="@{/image/gold.png}" alt="Gold Medal" style="width: 20px; height: 20px;"/>
+			            <img th:if="${st.count} == 2" th:src="@{/image/silver.png}" alt="Silver Medal" style="width: 20px; height: 20px;"/>
+			            <img th:if="${st.count} == 3" th:src="@{/image/bronze.png}" alt="Bronze Medal" style="width: 20px; height: 20px;"/>
+			            <span th:unless="${st.count} == 1 or ${st.count} == 2 or ${st.count} == 3" th:text="${st.count}+'.'"></span>
+			        </td>
+                   <td class="border-bottom-0">
+                       <h6 class="mb-0 fw-normal" th:text="${king.memId}"></h6>
+                   </td>
+                   <td class="border-bottom-0">
+                     <p class="mb-0 fw-normal" th:text="${king.mName}"></p>
+                     <p class="mb-0 fw-normal" th:if="${king.mName}==null">익명</p>
+                   </td>
+                   <td class="border-bottom-0">
+                       <span class="fw-semibold mb-1" data-th-text="${#numbers.formatInteger(king.total, 1, 'COMMA') + '원'}"></span>
+                   </td>
+                 </tr> 
+               </tbody>
+             </table>
+           </div>
+        </div>
+       	<h3>현재 진행중인 기부 프로젝트</h3>
+       	<br>
+        <div class="row" th:classappend="${before.size>3} ? 'center' : ''">
+          <div class="col-sm-6 col-xl-3" style="color:black;width:25%;margin-right:20px;" th:each="dona,st : ${before}" th:if="${st.count}<6">
+            <div class="card overflow-hidden rounded-2">
+              <div class="position-relative">
+                <a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}">
+                <img th:if="${dona.filePath}!=null" th:src="@{${dona.filePath}}" onError="this.src='../donation/board/img/fruite-item-5.jpg'" class="card-img-top rounded-0" alt="..." style="height:200px">
+				<img th:if="${dona.filePath}==null" src="../donation/board/img/fruite-item-5.jpg"class="card-img-top rounded-0" alt="..." style="height:200px">
+                </a>
+              </div>
+              <div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+			    <span>모금중</span><br>
+				</div>
+               <div class="d-flex align-items-center justify-content-between">
+	            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+	                <h4><a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" th:text="${dona.title}"> 제목</a></h4>
+	                <a href="#" style="color:gray">
+					   <span th:text="${dona.facilityName}"></span>
+					</a>
+					<br>
+	                <div class="progress">
+	                    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" th:style="'width: ' + ${dona.donationRatio} + '%'" aria-valuenow="${dona.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+	                </div><br>
+	                <h5>
+	                    <span th:text="${dona.donationRatio}"></span> %
+	                    <span style="float:right" data-th-text="${#numbers.formatInteger(dona.total, 1, 'COMMA') + '원'}"></span>
+	                </h5>
+					 <br>
+	            </div>
+               </div>
+            </div>
+          </div>
+        </div>
+       	<h3>현재 진행중인 모임봉사 프로젝트</h3>
+       	<br>
+        <div class="row" th:classappend="${meet.size>3} ? 'center' : ''">
+          <div class="col-sm-6 col-xl-3" style="color:black;width:25%;margin-right:20px;" th:each="meet : ${meet}">
+            <div class="card overflow-hidden rounded-2">
+              <div class="position-relative">
+                <a th:href="@{meetings(volId=${meet.volId})}" target='_blank'>
+                <img th:if="${meet.filePath}!=null" th:src="@{${meet.filePath}}" onError="this.src='../donation/board/img/fruite-item-5.jpg'" class="card-img-top rounded-0" alt="..." style="height:200px">
+				<img th:if="${meet.filePath}==null" src="../donation/board/img/fruite-item-5.jpg"class="card-img-top rounded-0" alt="..." style="height:200px"></a>
+              </div>
+              <div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px;left: 10px;background-color:#ffb524">
+			    <span>모집중</span><br>
+				</div>
+               <div class="d-flex align-items-center justify-content-between">
+	            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+	                <h4><a th:text="${meet.meetName}">동아리명</a></h4>
+	                <a href="#" style="color:gray">
+					   <span th:if="${meet.region}=='z01'">#서울특별시</span>
+						   <span th:if="${meet.region}=='z02'">#부산광역시</span>
+						   <span th:if="${meet.region}=='z03'">#대구광역시</span>
+						   <span th:if="${meet.region}=='z04'">#인천광역시</span>
+						   <span th:if="${meet.region}=='z05'">#광주광역시</span>
+						   <span th:if="${meet.region}=='z06'">#대전광역시</span>
+						   <span th:if="${meet.region}=='z07'">#울산광역시</span>
+						   <span th:if="${meet.region}=='z08'">#세종특별자치시</span>
+						   <span th:if="${meet.region}=='z09'">#경기도</span>
+						   <span th:if="${meet.region}=='z10'">#강원도</span>
+						   <span th:if="${meet.region}=='z11'">#충청북도</span>
+						   <span th:if="${meet.region}=='z12'">#충청남도</span>
+						   <span th:if="${meet.region}=='z13'">#전라북도</span>
+						   <span th:if="${meet.region}=='z14'">#전라남도</span>
+						   <span th:if="${meet.region}=='z15'">#경상북도</span>
+						   <span th:if="${meet.region}=='z16'">#경상남도</span>
+						   <span th:if="${meet.region}=='z17'">#제주특별자치도</span>
+					   <span th:each="tag : ${tag}" th:if="${tag.volId}==${meet.volId}">#[[${tag.tagContent}]] </span>
+					</a>
+					<br>
+					<Strong><span>모집기간</span></Strong>
+					<br>
+                    <span th:text="${#dates.format(meet.recPeriod, 'yy.MM.dd')}+' ~ '+${#dates.format(meet.endPeriod, 'yy.MM.dd')}">2024-02-04 ~ 2024-09-04</span>
+                    <br>
+                    <span th:text="'정원 : '+${meet.meetingCnt}+'/'+${meet.cap}+'명'">정원 : 3/10명</span>
+					 <br>
+	            </div>
+               </div>
+            </div>
+          </div>
+        </div>
+       	<h3>현재 진행중인 시설봉사 프로젝트</h3>
+       	<br>
+        <div class="row" th:classappend="${facVol.size>3} ? 'center' : ''">
+          <div class="col-sm-6 col-xl-3" style="color:black;width:25%;margin-right:20px;" th:each="facVol : ${facVol}">
+            <div class="card overflow-hidden rounded-2">
+              <div class="position-relative">
+                <a>
+                <img th:if="${facVol.filePath}!=null" th:src="@{${facVol.filePath}}" onError="this.src='../donation/board/img/fruite-item-5.jpg'" class="card-img-top rounded-0" alt="..." style="height:200px">
+				<img th:if="${facVol.filePath}==null" src="../donation/board/img/fruite-item-5.jpg"class="card-img-top rounded-0" alt="..." style="height:200px"></a>
+              </div>
+              <div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;background-color:#ffb524">
+			    <span>모집중</span><br>
+				</div>
+               <div class="d-flex align-items-center justify-content-between">
+	            <div class="p-4 pb-0 rounded-bottom" style="width:400px">
+	                <h4><a th:text="${facVol.title}"> 제목</a></h4>
+	                <a href="#" style="color:gray">
+					   <span th:text="${facVol.facName}"></span>
+					</a>
+					<br>
+                    <span th:text="'장소 : '+${facVol.location}">2024-02-04</span>
+					<br>
+                    <span th:text="'봉사날짜 : '+${#dates.format(facVol.volDate, 'yy.MM.dd')}">2024-02-04</span>
+                    <br>
+                    <span th:text="'정원 : '+${facVol.capCnt}+'/'+${facVol.cap}+'명'">정원 : 3/10명</span>
+					 <br>
+	            </div>
+               </div>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript">
+		     var $jq = jQuery.noConflict();
+		     $jq('.center').slick({
+		    	  centerMode: true,
+		    	  dots: true,
+		    	  centerPadding: '60px',
+		    	  slidesToShow: 3,
+		    	  autoplay : true,
+		    	  autoplaySpeed : 3000,
+		    	  pauseOnHover : true,
+		    	  speed : 1000,
+		    	  responsive: [
+		    	    {
+		    	      breakpoint: 500,
+		    	      settings: {
+		    	        arrows: false,
+		    	        centerMode: true,
+		    	        centerPadding: '100px',
+		    	        slidesToShow: 3
+		    	      }
+		    	    }
+		    	  ]
+		    	});
+		</script>
+      </div>
+    </div>
+</section>
+</body>
+
+</html>

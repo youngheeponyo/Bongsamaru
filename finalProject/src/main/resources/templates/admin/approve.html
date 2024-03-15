@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/adminLayout}">
+<head>
+<meta charset="UTF-8">
+<title>승인페이지</title>
+<style>
+.cur{
+	cursor:pointer;
+}
+.facility{
+	cursor:pointer;
+}
+.modal-body {
+	text-align: center;
+}
+table th {
+	width : 150px;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+	<section layout:fragment="content">
+	<div class="body-wrapper">
+      <!--  Header Start -->
+		<div class="divFooter" th:insert="~{admin/adminHeader :: head}"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+		<div class="container">
+		<h2>승인관리</h2>
+		<div style="float:right;color:black" class="cur">
+			<a style="color:black;font-size:14px" onclick="show()">시설 가입 신청| </a>
+			<a style="color:black;font-size:14px" onclick="show1()">시설 기부 신청 | </a>
+			<a style="color:black;font-size:14px" onclick="show2()">기부금 신청 | </a>
+			<a style="color:black;font-size:14px" onclick="show3()">기부금 리뷰</a>
+		</div>
+		<br>
+		<hr>
+		<div id="tableData">
+		<div id="bas">
+			<th:block th:if="${facilityList.size} == 0">
+				<h3 style="text-align:center">데이터가 존재하지 않습니다</h3>
+			</th:block>
+			<th:block th:if="${facilityList.size} != 0">
+			<table class="table">
+				<thead class="cent">
+					<tr>
+						<th>시설명</th>
+						<th>시설유형</th>
+						<th>사업자등록번호</th>
+						<th>시설 주소</th>
+						<th>대표자명</th>
+						<th>대표번호</th>
+					</tr>
+				</thead>
+				<tbody class="body">
+				 	<th:block th:each="fac,st : ${facilityList}" th:if=${fac.memApp}==0>
+						<tr>
+							 <td th:text="${fac.facName}" class="cur" th:onclick="info([[${fac.facId}]])" th:if="${fac.memApp}==0">시설명</td>
+							 <td th:if="${fac.facType}=='f01'" >아동 및 청소년</td>
+							 <td th:if="${fac.facType}=='f02'" >장애인</td>
+							 <td th:if="${fac.facType}=='f03'" >문화,체육</td>
+							 <td th:if="${fac.facType}=='f04'" >캠페인</td>
+							 <td th:if="${fac.facType}=='f05'" >보건의료</td>
+							 <td th:if="${fac.facType}=='f06'" >환경정리</td>
+							 <td th:if="${fac.facType}=='f07'" >기타</td>
+							 <td th:text="${fac.bizNum}" >사업자등록번호</td>
+							 <td th:text="${fac.facAddr}" >시설 주소</td>
+							 <td th:text="${fac.repName}" >대표자명</td>
+							 <td th:text="${fac.repPhone}">대표번호</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<nav aria-label="Page navigation example">
+			    <ul class="pagination justify-content-center cur">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:onclick="prev([[${vo}]])">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:onclick="current([[${vo}]],[[${pageNum}]])"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:onclick="next([[${vo}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+			</th:block>
+		</div>
+		</div>
+			<!-- 첫번째 모달 -->
+			<div class="modal fade" id="myModal" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content" id="content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+			            </div>
+			            <div class="modal-body">
+			            	<h3>시설 정보</h3>
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>시설명</th>
+				                			<td id="name"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설유형</th>
+				                			<td id="type"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>사업자번호</th>
+				                			<td id="bizNum"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>우편번호</th>
+				                			<td id="facZip"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설 주소</th>
+				                			<td id="addr"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>설립일</th>
+				                			<td id="esta"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표자명</th>
+				                			<td id="repName"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표 번호</th>
+				                			<td id="repPhone"></td>
+				                		</tr>
+			                		</thead>
+			                	</table>
+			                	<a href="#" target='_blank' id="homepage" style="float:right">홈페이지로 이동</a>
+			                </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+			                <button type="button" class="btn btn-danger" onclick="approveCk()">승인</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			<!-- 두번째 모달 -->
+			<div class="modal fade" id="myModal2" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content" id="content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+			            </div>
+			            <div class="modal-body">
+			            	<h3>시설 정보</h3>
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>시설명</th>
+				                			<td id="name2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설유형</th>
+				                			<td id="type2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>사업자번호</th>
+				                			<td id="bizNum2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>우편번호</th>
+				                			<td id="facZip2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>시설 주소</th>
+				                			<td id="addr2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>설립일</th>
+				                			<td id="esta2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표자명</th>
+				                			<td id="repName2"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>대표 번호</th>
+				                			<td id="repPhone2"></td>
+				                		</tr>
+			                		</thead>
+			                	</table>
+			                	<a href="#" target='_blank' id="homepage2" style="float:right">홈페이지로 이동</a>
+			                </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+			                <button type="button" class="btn btn-danger" onclick="approveCk2()">승인</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- 세번째 모달 -->
+			<div class="modal fade" id="mys" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content" id="content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel"></h5>
+			            </div>
+			            <div class="modal-body">
+			                <div>
+			                	<table class="table">
+			                		<thead>
+				                		<tr>
+				                			<th>시설아이디</th>
+				                			<td id="facId"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>사업대상</th>
+				                			<td id="object"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>제목</th>
+				                			<td id="title"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>소개</th>
+				                			<td id="intro"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>기대효과</th>
+				                			<td id="expect"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>모집 시작일</th>
+				                			<td id="startDate"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>모집 종료일</th>
+				                			<td id="end"></td>
+				                		</tr>
+				                		<tr>
+				                			<th>목표금액</th>
+				                			<td id="goal"></td>
+				                		</tr>
+			                		</thead>
+			                	</table>
+			                	<a href="#" target='_blank' id="page" style="float:right">상세페이지로 이동</a>
+			                </div>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-hidden="false">닫기</button>
+			                <button type="button" class="btn btn-danger" onclick="approveCk3()">승인</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			
+				<!-- 네번째 모달창 -->
+			<div class="modal fade" id="reviewInfo" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+			    <div class="modal-dialog" role="document">
+			        <div class="modal-content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="deleteConfirmationModalLabel">봉사활동 내역</h5>
+			            </div>
+			            <div class="modal-body">
+			                <table class="table" id="reviewInfos">
+									<tr>
+										<th>총 사업비</th>
+										<td id="bizCost"></td>
+									</tr>
+									<tr>
+										<th>사업내용</th>
+										<td id="bizContent"></td>
+									</tr>
+									<tr>
+										<th>상세지출내역</th>
+										<td id="bizAmt"></td>
+									</tr>
+							</table>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-outline-secondary" id="closing" data-dismiss="modal" aria-hidden="false">닫기</button>
+							<button type="button" class="btn btn-outline-success" onclick="approveCk4()">승인</button>
+			            </div>
+			        </div>
+			    </div>
+		 	</div>
+			</div>
+			<script th:inline="javascript">
+				function show(){
+					$('#tableData').load("../approve?memApp=0 #bas");
+				}
+				function show1(){
+					$('#tableData').load("../facilityApprove?memApp=1&donApp=0 #fac");
+				}
+				function show2(){
+					$('#tableData').load("../facilityApprove?donRegApp=0 #don");
+				}
+				function show3(){
+					$('#tableData').load("../facilityApprove #review");
+				};
+				
+				function prev(vo){
+					$('#tableData').load(`../approve?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1} #bas`);
+				}
+				
+				function current(vo,pageNum){
+					$('#tableData').load(`../approve?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage} #bas`);
+				}
+				
+				function next(vo){
+					$('#tableData').load(`../approve?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage} #bas`);
+				}
+				
+				function prev2(vo){
+					$('#tableData').load(`../facilityApprove?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&donApp=0 #fac`);
+				}
+				
+				function current2(vo,pageNum){
+					$('#tableData').load(`../facilityApprove?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&donApp=0 #fac`);
+				}
+				
+				function next2(vo){
+					$('#tableData').load(`../facilityApprove?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&donApp=0 #fac`);
+				}
+				
+				function prev3(vo){
+					$('#tableData').load(`../facilityApprove?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&donRegApp=0 #don`);
+				}
+				
+				function current3(vo,pageNum){
+					$('#tableData').load(`../facilityApprove?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&donRegApp=0 #don`);
+				}
+				
+				function next3(vo){
+					$('#tableData').load(`../facilityApprove?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&donRegApp=0 #don`);
+				}
+				
+				function prev4(vo){
+					$('#tableData').load(`../facilityApprove?start=${vo.start - vo.cntPerPage}&end=${vo.start - 1}&donRegApp=0 #review`);
+				}
+				
+				function current4(vo,pageNum){
+					$('#tableData').load(`../facilityApprove?start=${(pageNum - 1) * vo.cntPerPage + 1}&end=${pageNum * vo.cntPerPage}&donRegApp=0 #review`);
+				}
+				
+				function next4(vo){
+					$('#tableData').load(`../facilityApprove?start=${vo.end + 1}&end=${vo.end + vo.cntPerPage}&donRegApp=0 #review`);
+				}
+				
+				function dateFormat(value, format) {
+				    let date = value == "" ? new Date() : new Date(value);
+				    let year = date.getFullYear();
+				    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+				    let day = ("0" + date.getDate()).slice(-2);
+				    let result = format
+				      .replace("yyyy", year)
+				      .replace("MM", month)
+				      .replace("dd", day);
+				    return result;
+				};
+				
+				function wonComma(number) {
+				    if (number < 1000) {
+				      return number
+				    }
+				    return number.toLocaleString();
+				};
+				var revId = '';
+				function moreDetail(donRevId){
+					revId = donRevId;
+					$('#bizCost').empty();
+			        $("#bizContent").empty();
+			        $("#bizAmt").empty();
+			        $('#reviewInfos #bizContent2').remove();
+					$('#reviewInfos #bizAmt2').remove();
+					$('#reviewInfos #bizContent3').remove();
+					$('#reviewInfos #bizAmt3').remove();
+			        
+					$.ajax('../reviewInfo?donRevId='+donRevId)
+			        .done(result => {
+			           $("#bizCost").append(wonComma(result.bizCost)+'원')
+			           $("#bizContent").append(result.bizContent)
+			           $("#bizAmt").append(wonComma(result.bizAmt)+'원')
+			           if(result.bizContent2!=null&&result.bizAmt2!=null){
+				           $('#reviewInfos').append('<tr id="bizContent2"><th>사업내용2</th><td>'+result.bizContent2+'</td></tr>')
+				           $('#reviewInfos').append('<tr id="bizAmt2"><th>상세지출내역2</th><td>'+wonComma(result.bizAmt2)+'원</td></tr>')
+			           }
+			           if(result.bizContent3!=null&&result.bizAmt3!=null){
+				           $('#reviewInfos').append('<tr id="bizContent3"><th>사업내용3</th><td>'+result.bizContent3+'</td></tr>')
+				           $('#reviewInfos').append('<tr id="bizAmt3"><th>상세지출내역3</th><td>'+wonComma(result.bizAmt3)+'원</td></tr>')
+			           }
+			        })
+			        .fail(err => console.log(err));
+					
+					$("#reviewInfo").modal("show");
+				}
+				
+				$(".btn-secondary").click(function () {
+				      $("#myModal").modal("hide");
+				      $("#mymodals").modal("hide");
+				      $("#reviewInfo").modal("hide");
+			    });
+				
+				$("#closing").click(function () {
+				      $("#reviewInfo").modal("hide");
+			    });
+				
+				var facN = '';
+				var facI = '';
+				
+				
+				function info(id) {
+			    	$('#name').empty();
+			        $("#type").empty();
+			        $("#bizNum").empty();
+			        $("#facZip").empty();
+			        $("#addr").empty();
+			        $("#esta").empty();
+			        $("#repName").empty();
+			        $("#repPhone").empty();
+			        $("#homepage").prop('href','')
+			        
+			    	$.ajax('../facInfo?facId='+id)
+			       .done(result => {
+			    	   result.facEstDate = dateFormat(result.facEstDate,'yyyy년 MM월 dd일');
+			    	   facN = result.facId;
+			    	   if(result.facType=='f01'){
+		    			   result.facType='아동 및 청소년'
+		    		   }else if(result.facType=='f02'){
+		    			   result.facType='장애인'
+		    		   }else if(result.facType=='f03'){
+		    			   result.facType='문화,체육'
+		    		   }else if(result.facType=='f04'){
+		    			   result.facType='캠페인'
+		    		   }else if(result.facType=='f05'){
+		    			   result.facType='보건의료'
+		    		   }else if(result.facType=='f06'){
+		    			   result.facType='환경정리'
+		    		   }else if(result.facType=='f07'){
+		    			   result.facType='기타'
+		    		   }
+			           $("#name").append(result.facName)
+			           $("#type").append(result.facType)
+			           $("#bizNum").append(result.bizNum)
+			           $("#facZip").append(result.facZip)
+			           $("#addr").append(result.facAddr+' '+result.facAddrDetail)
+			           $("#esta").append(result.facEstDate)
+			           $("#repName").append(result.repName)
+			           $("#repPhone").append(result.repPhone)
+			           $("#homepage").prop('href',result.facWeb)
+			          })
+			       .fail(err => console.log(err));
+			    	
+			    	$("#myModal").modal("show");
+			    };
+			    
+				function info2(id) {
+			    	$('#name2').empty();
+			        $("#type2").empty();
+			        $("#bizNum2").empty();
+			        $("#facZip2").empty();
+			        $("#addr2").empty();
+			        $("#esta2").empty();
+			        $("#repName2").empty();
+			        $("#repPhone2").empty();
+			        $("#homepage2").prop('href','')
+			        
+			    	$.ajax('../facInfo?facId='+id)
+			       .done(result => {
+			    	   result.facEstDate = dateFormat(result.facEstDate,'yyyy년 MM월 dd일');
+			    	   facI = result.facId;
+		    		   if(result.facType=='f01'){
+		    			   result.facType='아동 및 청소년'
+		    		   }else if(result.facType=='f02'){
+		    			   result.facType='장애인'
+		    		   }else if(result.facType=='f03'){
+		    			   result.facType='문화,체육'
+		    		   }else if(result.facType=='f04'){
+		    			   result.facType='캠페인'
+		    		   }else if(result.facType=='f05'){
+		    			   result.facType='보건의료'
+		    		   }else if(result.facType=='f06'){
+		    			   result.facType='환경정리'
+		    		   }else if(result.facType=='f07'){
+		    			   result.facType='기타'
+		    		   }
+			    	   
+			           $("#name2").append(result.facName)
+			           $("#type2").append(result.facType)
+			           $("#bizNum2").append(result.bizNum)
+			           $("#facZip2").append(result.facZip)
+			           $("#addr2").append(result.facAddr+' '+result.facAddrDetail)
+			           $("#esta2").append(result.facEstDate)
+			           $("#repName2").append(result.repName)
+			           $("#repPhone2").append(result.repPhone)
+			           $("#homepage2").prop('href',result.facWeb)
+			          })
+			       .fail(err => console.log(err));
+			    	
+			    	$("#myModal2").modal("show");
+			    };
+			    
+
+			    $(document).on("click",".btn-secondary",function () {
+				   $("#myModal").modal("hide");
+				   $("#myModal2").modal("hide");
+				   $("#mys").modal("hide");
+				});
+				
+			    function dona(id) {
+			    	$('#facId').empty();
+			        $("#object").empty();
+			        $("#title").empty();
+			        $("#intro").empty();
+			        $("#expect").empty();
+			        $("#startDate").empty();
+			        $("#end").empty();
+			        $("#goal").empty();
+			        $("#page").prop('href','')
+			        
+			    	$.ajax('../donInfo?donId='+id)
+			       .done(result => {
+			    	   if(result.intro.length>20||result.expEffect.length>20){
+			    		   result.intro = result.intro.substring(0,20)+' ...';
+			    		   result.expEffect = result.expEffect.substring(0,20)+' ...';
+			    	   }
+			    	   result.recPeriod = dateFormat(result.recPeriod,'yyyy년 MM월 dd일');
+			    	   result.endPeriod = dateFormat(result.endPeriod,'yyyy년 MM월 dd일');
+			    	   result.goalAmt = wonComma(result.goalAmt);
+			    	   facI = result.donId;
+			           $("#facId").append(result.facId)
+			           $("#object").append(result.projTarget)
+			           $("#title").append(result.title)
+			           $("#intro").append(result.intro)
+			           $("#expect").append(result.expEffect)
+			           $("#startDate").append(result.recPeriod)
+			           $("#end").append(result.endPeriod)
+			           $("#goal").append(result.goalAmt+'원')
+			           $("#page").prop('href',`../donaDetail?id=${result.donId}&facId=${result.facId}`)
+			          })
+			       .fail(err => console.log(err));
+			    	
+			    	$("#mys").modal("show");
+			    };
+			    
+			    function approveCk(){
+			    	$.ajax('../updateFacApp?facId='+facN)
+			        .done(result => {
+			           $("#myModal").modal("hide");
+			           $('#tableData').load("../approve?memApp=0 #bas");
+			        })
+			        .fail(err => console.log(err));
+			    }
+			    
+			    function approveCk2(){
+			    	$.ajax('../updateDonApp?facId='+facI)
+			        .done(result => {
+			           $("#myModal2").modal("hide");
+			           $('#tableData').load("../facilityApprove?memApp=1&donApp=0 #fac");
+			        })
+			        .fail(err => console.log(err));
+			    }
+			    
+			    function approveCk3(){
+			    	$.ajax('../updateDonRegApp?donId='+facI)
+			        .done(result => {
+			           $("#mys").modal("hide");
+			           $('#tableData').load("../facilityApprove?donRegApp=0 #don");
+			        })
+			        .fail(err => console.log(err));
+			    }
+			    
+			    function approveCk4(){
+			    	$.ajax('../updateDonReview?donRevId='+revId)
+			        .done(result => {
+			           $("#reviewInfo").modal("hide");
+			           $('#tableData').load("../facilityApprove #review");
+			        })
+			        .fail(err => console.log(err));
+			    }
+			    function downloadButton(path,name){
+					path = (""+path).replace(/\\/g, '/')
+					var fileName = name;
+				  	var link = document.createElement('a');
+				  	link.href = path;
+				  	link.download = fileName;
+				  	link.click();
+			    }
+			</script>
+      </div>
+    </div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8">
+<style>
+.navigation-bar {
+  display: flex;
+}
+
+.nav-item {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+div[th:if] {
+  display: none;
+}
+
+.container {
+	text-align : center;
+}
+
+.navigation-bar {
+	text-align : center;
+}
+.title_cont {
+	font-size: 17px;
+	margin: 47px 0 45px;
+}
+.wrap_cont {
+	padding-bottom: 30px;
+}
+.accordion {
+	margin-top: 30px;
+	border-top: 0 none;
+}
+table {
+  border: 1px #a39485 solid;
+  font-size: .9em;
+  box-shadow: 0 2px 5px rgba(0,0,0,.25);
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+th {
+  text-align: center;
+}
+  
+thead {
+  font-weight: bold;
+  color: #fff;
+  background: #689f38;
+}
+  
+ td, th {
+  padding: 1em .5em;
+  vertical-align: middle;
+}
+  
+ td {
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  background: #fff;
+  text-align: center;
+}
+
+ @media all and (max-width: 768px) {
+    
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  
+  th {
+    text-align: right;
+  }
+  
+  table {
+    position: relative; 
+    padding-bottom: 0;
+    border: none;
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+  }
+  
+  thead {
+    float: left;
+    white-space: nowrap;
+  }
+  
+  tbody {
+    padding-top: 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    white-space: nowrap;
+
+  }
+  
+  tr {
+    display: inline-block;
+    vertical-align: top;
+  }
+  
+  th {
+    border-bottom: 1px solid #a39485;
+  }
+  
+  td {
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .hidden {
+  	display: none;
+  }
+</style>
+<!-- Bootstrap JS (Popper.js 포함) -->
+<!-- 부트스트랩 5.3 버전 CSS 링크 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+<body>
+<section layout:fragment="content">
+<div th:insert="~{banner/empty::banner}"></div>
+<div class="container" style="color: black;">
+  	<div class="side" th:insert="~{center/sidebar::side}"></div>
+		<div class="container">
+		  	<table>
+				<thead>
+					<tr>
+						<th>제목</th>
+						<th>상태</th>
+						<th>날짜</th>
+						<th></th>
+					</tr>
+				</thead>
+			   <tbody>
+			       <tr th:each="item : ${list}">
+					   <td class="yearCheck">
+					       <a style="color:black;" th:text="${item.title}" th:href="@{/inquiry/{boardId}(boardId=${item.boardId})}"></a>
+					   </td>
+			           <td class="yearCheck" style="color:green;" th:if="${item.commContent == null}">
+		           	   	   <input type="button" class="btn btn-lg btn-danger" disabled value="답변대기">
+			           </td>
+			           <td class="yearCheck" th:if="${item.commContent != null}">
+			           	   <input type="button" class="btn btn-lg btn-success" disabled value="답변완료">
+			           </td>
+			           <td class="yearCheck"  th:text="${#dates.format(item.writeDate, 'yyyy.MM.dd')}"></td>
+			       </tr>
+				   <tr>
+				   </tr>
+			   </tbody>
+			</table>
+			<table id="noList">
+			    <tbody>
+			        <tr th:if="${list.size == 0}">
+			            <td style="height: 600px;">문의하신 내역이 없습니다</td>    		
+			        </tr>
+			    </tbody>
+			</table>
+		  	<nav aria-label="Page navigation example" >
+			    <ul class="pagination justify-content-center">
+			        <!-- 이전 버튼 -->
+			        <li class="page-item" th:if="${vo.prev}">
+			            <a class="page-link" th:href="@{/inquiry(start=${vo.start - vo.cntPerPage}, end=${vo.start - 1}, category=${category})}">이전</a>
+			        </li>
+			        <!-- 페이지 번호 출력 -->
+			        <li th:if="${vo.totalPage == '0'}" th:each="pageNum : ${#numbers.sequence(vo.startPage, vo.endPage)}" th:class="${pageNum == vo.currentPage ? 'page-item active' : 'page-item'}">
+			            <a class="page-link" th:href="@{/inquiry(start=${(pageNum - 1) * vo.cntPerPage + 1}, end=${pageNum * vo.cntPerPage}, category=${category})}"
+			               th:text="${pageNum}"></a>
+			        </li>
+			        <!-- 다음 버튼 -->
+			        <li class="page-item" th:if="${vo.next}">
+			            <a class="page-link" th:href="@{/inquiry(start=${vo.end + 1}, end=${vo.end + vo.cntPerPage}, category=${category})}">다음</a>
+			        </li>
+			    </ul>
+			</nav>
+	</div>
+</div>
+<script>
+</script>
+</section>
+</body>
+</html>

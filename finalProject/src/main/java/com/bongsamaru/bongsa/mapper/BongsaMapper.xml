@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="com.bongsamaru.bongsa.mapper.BongsaMapper">
+ 
+	<select id="volList" resultType="VolunteerVO">
+	SELECT * FROM (
+	    SELECT  ROWNUM rn,
+	            vol_id,
+	            meet_name,
+	            cap,
+	            mem_id,
+	            select_sub(region) region,
+	            REC_PERIOD,
+	            end_period,
+	            (select count(*) from vol_mem where vol_id=volunteer.vol_id and app_code='h02') meetingCnt,
+	            select_file(vol_id,'p09') path,
+	            select_sub(category) mainCategory
+	    FROM volunteer
+	    WHERE END_PERIOD > sysdate
+	    	  AND meet_type = #{meetType}
+	          AND room_stat = '1'
+	    <if test="pageVO.category != null and pageVO.category != '' ">    
+	    	AND category = #{pageVO.category} <!-- Assuming region is equivalent to CATEGORY -->
+	    </if>
+	    
+	    <if test="pageVO.volZip2 != null">
+	   		 AND region = #{pageVO.volZip2} <!-- Assuming region can be used for volZip2 -->
+	    </if> 
+		
+		<if test="startDate != null">
+		    AND REC_PERIOD >= #{startDate} 
+		</if>
+	
+		<if test="meetType != 'e02'">
+			AND END_PERIOD <![CDATA[<=]]> #{endDate}	
+		</if>
+		
+	     <if test="pageVO.searchKeyword != null and pageVO.searchKeyword != ''">
+	        AND (meet_name LIKE '%' || #{pageVO.searchKeyword} || '%')     
+	        
+	    </if>
+	    order by rn)
+	WHERE rn BETWEEN #{pageVO.start} and #{pageVO.end}
+	</select>
+
+	<select id="allVol" resultType="VolunteerVO">
+		SELECT * FROM (
+	    SELECT  ROWNUM rn,
+	            vol_id,
+	            meet_name,
+	            cap,
+	            mem_id,
+	            select_sub(region) region,
+	            REC_PERIOD,
+	            end_period,
+	            (select count(*) from vol_mem where vol_id=volunteer.vol_id and app_code='h02') meetingCnt,
+	            select_file(vol_id,'p09') path,
+	            select_sub(category) mainCategory
+	    FROM volunteer
+	    WHERE END_PERIOD > sysdate
+	    	  AND meet_type = #{meetType} 
+	          AND room_stat = '1'
+        order by DBMS_RANDOM.RANDOM)	
+	</select>
+	
+	
+	
+	<select id="tagList" resultType="TagVO">
+		select tag_content,
+			   vol_id
+		from tag 
+		order by tag_id
+	</select>
+
+	
+<select id="facilityList" resultType="VolActVO">
+SELECT * FROM (
+    SELECT  ROWNUM rn,
+            vol_act_id,
+            FAC_ID,
+            (SELECT FAC_NAME FROM facility WHERE facility.fac_id = v.fac_id) AS FAC_NAME,
+            select_sub(CATEGORY) as CATEGORY,
+            TITLE, 
+            CONTENT, 
+            LOCATION, 
+            CAP, 
+            VOL_DATE,
+            start_Date,
+            expire_Date,
+            (select count(*) from vol_act_mem a where a.vol_act_id = v.vol_act_id)as capCount,
+            select_sub(vol_zip2) as volZip2,
+            select_file(vol_act_id,'p14') as path
+    from vol_act v
+    where fac_id is not null and expire_date > sysdate
+    
+    <if test="pageVO.category != null and pageVO.category != '' ">    
+    and  CATEGORY = #{pageVO.category}
+    </if>
+    
+    <if test="pageVO.volZip2 != null">
+    and vol_zip2 = #{pageVO.volZip2}
+    </if> 
+	
+	<if test="startDate != null">
+	    AND start_Date >= #{startDate} 
+	</if>
+
+	<if test="endDate != null">
+		and expire_date <![CDATA[
+<=
+]]>  #{endDate}	
+	</if>
+	
+     <if test="pageVO.searchKeyword != null and pageVO.searchKeyword != ''">
+        AND (title LIKE '%' || #{pageVO.searchKeyword} || '%')      
+    </if>
+    order by expire_date)
+where rn between #{pageVO.start} and #{pageVO.end}
+</select>
+
+	
+	<select id="cntFacilityList" resultType="int">
+		select count(*)
+		from vol_act
+		where vol_id is null
+		and expire_date > sysdate
+		<if test="category != null and category != '' ">    
+	    	AND CATEGORY = #{category}
+	    </if>	
+	    <if test="volZip2 != null and volZip2 != ''">
+	    	AND VOL_ZIP2 = #{volZip2}
+	    </if>
+        <if test="searchKeyword!=null and searchKeyword!='' ">
+    	    AND (title LIKE '%' || #{searchKeyword} || '%')		
+   		</if>
+	</select>
+	
+	<select id="countVol" resultType="CountVO">
+		select (select count(*) from volunteer where Room_stat = 1 and meet_type = 'e02'
+		<if test="category != null and category != '' ">    
+	    	AND CATEGORY = #{category}
+	    </if>	
+	    <if test="searchKeyword!=null and searchKeyword!='' ">
+    	    AND (meet_name LIKE '%' || #{searchKeyword} || '%')		
+   		</if>
+	    
+		 ) group_vol ,
+               (select count(*) from volunteer where Room_stat = 1 and meet_type = 'e01'
+      	<if test="category != null and category != '' ">    
+    		AND CATEGORY = #{category}
+	    </if>	
+	    <if test="searchKeyword!=null and searchKeyword!='' ">
+    	    AND (meet_name LIKE '%' || #{searchKeyword} || '%')		
+   		</if>      
+                ) daily_vol ,
+               (select count(*) from volunteer where Room_stat = 1 and meet_type = 'e03' 
+       	<if test="category != null and category != '' ">    
+	    	AND CATEGORY = #{category}
+	    </if>	
+	    <if test="searchKeyword!=null and searchKeyword!='' ">
+    	    AND (meet_name LIKE '%' || #{searchKeyword} || '%')		
+   		</if>      
+               ) fac_vol
+        from volunteer where rownum = 1
+	</select>
+	
+ </mapper>

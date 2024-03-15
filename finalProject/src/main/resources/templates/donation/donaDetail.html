@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="" name="keywords">
+        <meta content="" name="description">
+
+        <!-- Google Web Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet"> 
+
+        <!-- Icon Font Stylesheet -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Libraries Stylesheet -->
+        <link href="donation/board/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+        <link href="donation/board/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+        <!-- Customized Bootstrap Stylesheet -->
+        <link href="donation/board/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link href="donation/board/css/style.css" rel="stylesheet">
+       
+       <style>
+       
+    .vesitable-item {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .vesitable-img {
+        flex-grow: 1; 
+    }
+   
+   
+       </style> 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    </head>
+
+    <body>
+    
+     <section layout:fragment="content">
+     <div th:insert="~{banner/dona::banner}"></div>
+	
+
+        <!-- Single Product Start -->
+        <div class="container-fluid py-5 mt-5">
+          <div class="container py-5">
+             <div class="row g-4 mb-5">
+             
+                <div class="col-lg-8 col-xl-9">
+                
+                  <div class="row g-4">
+                  
+                     
+                     
+                      <h4 class="fw-bold mb-6" th:text="${dona.title}">제목</h4>
+                     
+                      <div class="col-lg-12">
+                      <!-- 상세페이지 안에 nav -->
+                         <nav>
+                           <div class="nav nav-tabs mb-3">
+                             <button class="nav-link active border-white border-bottom-0" type="button" role="tab"
+                              id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about"
+                              aria-controls="nav-about" aria-selected="true">소개</button>
+                             <button class="nav-link border-white border-bottom-0" type="button" role="tab"
+                                id="nav-mission-tab" data-bs-toggle="tab" data-bs-target="#nav-mission"
+                                 aria-controls="nav-mission" aria-selected="false">참여내역</button>
+                              <button class="nav-link border-white border-bottom-0" type="button" role="tab"
+                                id="nav-review-tab" data-bs-toggle="tab" data-bs-target="#nav-review"
+                                   aria-controls="nav-review" aria-selected="false" th:if="${dona.recStat != '1'}">감사합니다</button>
+                               </div>
+                           </nav>
+                                
+                        <div class="tab-content mb-5">
+                          <div class="tab-pane active" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab" th:each="dona : ${dona}" >
+                                    
+                                <!-- 메인이미지 -->
+                               <div class="col-lg-6" style="padding: 20px 5px 20px 5px;">
+                                   <div class="border rounded">
+                                       <a href="#">
+                                           <img th:if="${dona.filePath} != null" th:src="${dona.filePath}" onError="this.src='../image/bonsamaru.png'" class="rounded" alt="Image" style="width: 730px; height:400px;">
+                                       		<img th:if="${dona.filePath} == null" src="../image/bonsamaru.png" class="img-fluid w-100 rounded-top" style="height:250px" alt=""></a>
+                                       </a>
+                                   </div>
+                               </div>
+                               
+                              <div style="padding: 10px 5px 10px 5px;">  
+                                  <h4  th:text="${dona.introTitle}">제목(intro)</h4>
+                                  <p th:text="${dona.intro}">소개글(intro)</p>
+                                </div>     
+                                
+                                 <div style="padding: 10px 5px 10px 5px; margin-bottom:30px" th:if="${dona.addIntroTitle} or ${dona.addIntro}">  
+                                  <h4  th:text="${dona.addIntroTitle}">제목(intro)</h4>
+                                  <p th:text="${dona.addIntro}">소개글(intro)</p>
+                                </div>  
+                                
+                                
+ 
+                    <div class="table-responsive" style="padding: 20px 5px 20px 5px;">
+                      <table class="table" >
+                          <!-- Thead -->
+                          <thead>
+                              <tr class="table-success">
+                                  <th scope="col" style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;">총집행금액</th>
+                                  <th scope="col" colspan="2"  style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;" th:text="${#numbers.formatInteger(dona.goalAmt,3, 'COMMA')} + '원 (목표금액 )'">총 집행금액</th>
+                              </tr>
+                          </thead>
+                  
+                          <!-- Tbody - Use Thymeleaf Loop for Dynamic Data -->
+                          <tbody>
+                              <!-- Thymeleaf Loop -->
+                              <tr th:each="row : ${dona}">
+                                  <!-- 첫 번째 열: 데이터0 -->
+                                  <td>
+                                      <p class="mb-0 mt-4" style="text-align: center;">사업비</p>
+                                  </td>
+                                  
+                                  <td>
+                                      <p class="mb-0 mt-4" th:text="${row.usePlan}" style="text-align: center;"></p>
+                                  </td>
+                  
+                                  <td>
+                                      <p class="mb-0 mt-4" style="text-align: center;" th:text="${#numbers.formatInteger(row.usePlanAmt,3, 'COMMA')} + '원' "></p>
+                                  </td> 
+                                  
+                              </tr>
+                             <!-- 두번째열 -->
+							<tr th:each="row : ${dona}" th:if="${row.usePlan2 != null and row.usePlan2 != ''}" >    
+							    <td>
+							        <p class="mb-0 mt-4" style="text-align: center;">사업비</p>
+							    </td>
+							    
+							    <td>
+							        <p class="mb-0 mt-4" th:text="${row.usePlan2}" style="text-align: center;"></p>
+							    </td>
+							
+							    <td>
+							        <p class="mb-0 mt-4" style="text-align: center;" th:text="${#numbers.formatInteger(row.usePlanAmt2,3, 'COMMA')} + '원' "></p>
+							    </td>
+							</tr>
+							
+							<!-- 세번째열 -->
+							<tr th:each="row : ${dona}" th:if="${row.usePlan3 != null and row.usePlan3 != ''}">    
+							    <td>
+							        <p class="mb-0 mt-4" style="text-align: center;">사업비</p>
+							    </td>
+							    
+							    <td>
+							        <p class="mb-0 mt-4" th:text="${row.usePlan3}" style="text-align: center;"></p>
+							    </td>
+							
+							    <td>
+							        <p class="mb-0 mt-4" style="text-align: center;" th:text="${#numbers.formatInteger(row.usePlanAmt3,3, 'COMMA')} + '원' "></p>
+							    </td>
+							</tr>
+                          </tbody>
+                      </table>
+                  </div>
+                               
+
+                  <div class="table-responsive" style="padding: 20px 5px 20px 5px;">
+                     <h5> ◽ 사업대상 및 기대효과 </h5>
+                     <table class="table">
+                         <tr>
+                             <th scope="col" class="table-success" style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center; width: 20%;">사업기간</th>
+                             <td colspan="2" th:text="${#dates.format(dona.recPeriod, 'yyyy-MM-dd') + ' ~ ' + #dates.format(dona.endPeriod, 'yyyy-MM-dd')}"></td>
+                         		
+                         </tr>
+                         <tr>
+                             <th scope="col" class="table-success" style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;">사업대상</th>
+                             <td colspan="2" th:text="${dona.projTarget}"></td>
+                         </tr>
+                         <tr>
+                             <th scope="col" class="table-success" style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;">기대효과</th>
+                             <td colspan="2" th:text="${dona.expEffect}"></td>
+                         </tr>
+                     </table>
+                  </div>    
+                  
+                  
+                   <div>
+                     <h6> ◽ 관련 콘텐츠 (link)</h6>
+                       <a th:href="${dona.link}" th:if="${dona.link != null}" target="_blank" th:text="${dona.link}">link 주소</a>
+						<br><a th:if="${dona.link2 != null}" th:href="${dona.link2}" target="_blank" th:text="${dona.link2}">link 주소</a>
+                  </div>
+                  
+                  
+                  <div>
+                  	<img src="image/bongsalogo.png" style="margin:0 auto; width: 200px; height: 200px;">
+                  </div>
+
+                  
+                   </div>
+                                    
+                     <!-- Reviews 안의 영역 -->
+                     <div class="tab-pane" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
+                         <div class="d-flex" th:each="donor : ${list}">
+                             <img src="donation/board/img/avatar.jpg" class="img-fluid rounded-circle p-3" style="width: 100px; height: 100px;" alt="">
+                             <div class="">
+                                 <div class="d-flex justify-content-between">
+                                     <h5 th:text="${donor.memId}"></h5>
+                                 <p class="mb-2" style="font-size: 14px;"> <span th:text="${#dates.format(donor.payDate, 'yyyy-MM-dd')}"></span></p>
+                              
+                                 </div>
+                                 <p class="text-dark" th:text="${donor.donAmt}+'원 기부하셨습니다.'"></p>
+                                  
+                             </div>
+                         </div>
+                         
+   					  <div  th:if="${list.isEmpty()}">
+					         <p> 등록된 후기글이 없습니다.</p>
+					    </div>
+                     </div> <!--  end 리뷰안의 영역 -->
+                                    
+        <!--  모금후기  -->
+   
+      
+    <div class="tab-pane" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab" th:each="rev : ${rlist}"  >
+		
+	 
+					    
+         <div style="padding: 10px 5px 10px 5px;">  
+            <h5  th:text="${rev.title}">제목(intro)</h5>
+            <p th:text="${rev.content}" style="font-weight:'500'">소개글(intro)</p>
+         </div>     
+           
+                                
+         <div class="table-responsive" style="padding: 20px 5px 20px 5px;">
+               <h5>◽ 기부금 집행내역 </h5>
+               <table class="table">
+                  <tr  >
+                     <th scope="col" class="table-warning" style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;">집행기간</th>
+                     <td colspan="2" th:text="${#dates.format(rev.startPeriod, 'yyyy년 MM월 dd일') + ' ~ ' + #dates.format(rev.endPeriod, 'yyyy년 MM월 dd일 ')}"></td>
+                  </tr>
+                  <tr  >
+                     <th scope="col" class="table-warning" style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;">총 모금금액 <span>(목표금액)</span> </th>
+                     <td colspan="2" th:text="${dona.total} + '원' + '('+ ${dona.goalAmt} +'원' + ')' "></td>
+                  </tr>
+                  <tr >
+                     <th scope="col" class="table-warning"  style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;">사업대상</th>
+                     <td colspan="2" th:text="${dona.projTarget}"></td>
+                  </tr>
+               
+               </table>
+            </div>                          
+ 
+
+            <div class="table-responsive" style="padding: 20px 5px 20px 5px;">
+               <h5> ◽ 총 집행금액 </h5>
+               <table class="table">
+                  <!-- Thead -->
+                  <thead>
+                     <tr class="table-warning">
+                        <th scope="col" style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;">총집행금액</th>
+                        <th scope="col" colspan="2"  style="background-color: rgba(240, 240, 240, 0.8); color: #000000; text-align: center;" th:text="${#numbers.formatInteger(rev.bizCost,3,'COMMA')+'원'} + '(' + ${#numbers.formatInteger(dona.goalAmt,3,'COMMA')+'원'} + ')'">총 집행금액</th>
+                     </tr>
+                  </thead>
+            
+                  <!-- Tbody - Use Thymeleaf Loop for Dynamic Data -->
+                  <tbody>
+                     <!-- Thymeleaf Loop -->
+                     <tr th:each="row : ${rev}">
+                        <!-- 첫 번째 열: 데이터0 -->
+                        <td>
+                           <p class="mb-0 mt-4" style="text-align: center;">사업비</p>
+                        </td>
+                        
+                        <td>
+                           <p class="mb-0 mt-4" th:text="${row.bizContent}" style="text-align: center;"></p>
+                        </td>
+            
+                        <td>
+                           <p class="mb-0 mt-4" style="text-align: center;" th:text="${#numbers.formatInteger(row.bizAmt,3,'COMMA')+'원'}"></p>
+                        </td>
+                        
+                     </tr>
+                     <!-- 두번째열 -->
+					<tr th:each="row : ${rev}" th:if="${row.bizContent2 != null and row.bizContent2  != ''}" >    
+					    <td>
+					        <p class="mb-0 mt-4" style="text-align: center;">사업비</p>
+					    </td>
+					    
+					    <td>
+					        <p class="mb-0 mt-4" th:text="${row.bizContent2}" style="text-align: center;"></p>
+					    </td>
+					
+					    <td>
+					        <p class="mb-0 mt-4" style="text-align: center;" th:text="${#numbers.formatInteger(row.bizAmt2,3, 'COMMA')} + '원' "></p>
+					    </td>
+					</tr>
+					
+					<!-- 세번째열 -->
+					<tr th:each="row : ${rev}" th:if="${row.bizContent3 != null and row.bizContent3 != ''}">    
+					    <td>
+					        <p class="mb-0 mt-4" style="text-align: center;">사업비</p>
+					    </td>
+					    
+					    <td>
+					        <p class="mb-0 mt-4" th:text="${row.bizContent3}" style="text-align: center;"></p>
+					    </td>
+					
+					    <td>
+					        <p class="mb-0 mt-4" style="text-align: center;" th:text="${#numbers.formatInteger(row.bizAmt3,3, 'COMMA')} + '원' "></p>
+					    </td>
+					</tr>
+
+                  </tbody>
+               </table>
+         </div>
+            <!--모금후기 이미지 -->
+         <div class="col-lg-6" style="padding: 20px 5px 20px 5px;">
+         	<h4></h4>
+            <div class="border rounded">
+               <a href="#">
+                  <img th:if="${dona.filePath} != null" th:src="${dona.filePath}" onError="this.src='../image/thankyou.jpg'" class="img-fluid rounded" alt="Image" style="width:500px; height: 300px; margin:0 auto;">
+             		<img th:if="${dona.filePath} == null" src="../image/thankyou.jpg" style="width:500px; height: 300px; margin:0 auto;">
+               </a>
+            </div>
+         </div>
+     </div>  <!--  end 모금후기  영역 -->
+     
+					
+					
+                  </div> <!-- 하위 nav 안의 영역  -->
+                  	<div class="comments-container">
+                            <form>
+                                <h5 class="mb-5 fw-bold"> 💬 응원메세지 </h5>
+                                <div class="row g-4" id="showComments">
+                              
+                                   <div id="commentSection">   
+                                    <div id="commentList" th:each="com : ${comment}">
+                                     <!-- <td th:text="${#dates.format(report.repDate, 'yyyy년 MMM dd일')}" >날짜</td> -->
+                                      <p>
+                               <span th:utext="${com.memId} + '님' +  '<br> <span style=\'color: #333; font-size: 1.2em;\'>❝ ' + ${com.content} + ' ❞</span>' +  '<br>' + ${#dates.format(com.commDate, 'yyyy/MM/dd')} ">댓글나와랑</span>
+                           </p>
+                                    </div>
+                                   </div>
+                                   
+                                          <div class="col-lg-12">
+                                        <div class="border-bottom rounded my-4">
+                                            <input name="content" id="comment" class="form-control border-0" cols="30" rows="8" placeholder="댓글을 입력해주세요." spellcheck="false">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="d-flex justify-content-between py-3 mb-5">
+                                            <a href="#" class="btn border border-secondary text-primary rounded-pill px-4 py-3" onclick="postComment()"> 입력 </a>
+                                        </div>
+                                    </div>   
+                                    </div>
+                                
+                            </form>
+                           </div>
+                        </div>
+                    </div>
+                   
+                    
+                    
+                </div> <!--end  col-lg-8 col-xl-9 -->
+                
+                 <div class="col-lg-4 col-xl-3">
+                        <div class="row g-4 fruite">
+                     <div class="col-lg-12" >
+                     
+                     <!--  test -->
+                          <div style="text-align: left;">
+                               <strong><span  style="font-size: 30px; color: green; font-weight:bold;" th:text="${dona.donationRatio}+ '%'" ></span></strong>    
+                            
+                            </div>
+                            
+                         <div class="progress">
+                               <div class="progress-bar progress-bar bg-success" role="progressbar" th:style="'width: ' + ${dona.donationRatio} + '%'" aria-valuenow="${dona.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                         <div class="info-item"> ▫️ 현재 모금액 : <strong><span th:text="${#numbers.formatInteger(dona.total,3,'COMMA')+'원'}"></span>  </strong></div>    
+                         <div class="info-item"> ▫️ 목표금액 : <strong><span th:text="${#numbers.formatInteger(dona.goalAmt,3,'COMMA')+'원'}"></span>  </strong></div> 
+                          
+                         <p class="mb-4">▫️ 기간   <br> <span th:text=" ' ' + ${#dates.format(dona.recPeriod, 'yyyy년MM월dd일')} + ' ~ ' + ${#dates.format(dona.endPeriod, 'yyyy년MM월dd일')}"></span></p>
+                         <p class="mb-4"><strong><span th:if="${dona.recStat} == '1'" th:text="${dona.dday} + '일 남았습니다.'"></span></strong></p>
+                         
+                         
+                         
+                         <p class="mb-4" style="font-style: italic;"><i class="bi bi-info-square-fill"></i> 목표금액 미달 시 계획을 변경하여 기부금을 사용할 수 있습니다. </p>
+                     </div>
+                     <!-- 버튼 부분 유지 -->
+                     <button type="button" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary" th:disabled="${dona.donationRatio >= 100 or dona.recStat == '0'}"
+                              onclick="redirectToPayment()">
+                              
+                         <i class="bi bi-heart-fill"></i> 
+                         <span th:text="${dona.recStat == '1' ? (dona.donationRatio >= 100 ? '모금완료' : '기부하기') : '모금완료'}" style="color:black"></span>
+                     </button>
+
+
+                            <div class="col-lg-12">
+                                <h6 class="mb-4"> 🔹 시설소개</h6>
+                                <div class="d-flex align-items-center justify-content-start">
+
+                                    <div class="rounded" style="width: 150px; height: 150px;">
+                                     <a th:href="@{/fInfo/facilityInfo(facId=${dona.facId})}">
+                                        <img src="donation/board/img/featur-1.jpg" class="img-fluid rounded" alt="Image">
+
+                                    	</a>
+                                    </div>
+                                    <div>
+                                        <p class="mb-2" th:text="${dona.facName}">시설명</p>
+                                        <p class="d-flex mb-2" th:text="${dona.facIntro}">시설 간단 소개</p>
+                                        <div class="d-flex mb-2" >설립일자 : 
+                                            <p th:text="${#dates.format(dona.facEstDate, 'yyyy/MM/dd')}">설립일자</p>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div> <!-- end col-lg-4 col-xl-3 -->
+            <div class="vesitable" >
+                <h6 class="fw-bold mb-0"> 🩷 도움의 손길을 기다리고 있어요 </h6>
+                <div class="owl-carousel vegetable-carousel justify-content-center" >
+                    <div th:if="${dona.donId} != ${currentDonId}" class="border border-primary rounded position-relative vesitable-item" th:each="dona : ${randomlist}"  style="border: none !important;">
+                        <div class="vesitable-img">
+                            <img th:if="${dona.filePath} != null" th:src="${dona.filePath}" onError="this.src='../image/bonsamaru.png'" class="img-fluid w-100 rounded-top" style="height:250px" alt="">
+                        </div>
+                        <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">
+                            <span th:text="${dona.recStat} == '1' ? '모금중' : '모금완료'"></span>
+                        </div>
+                        <div class="p-4 pb-0 rounded-bottom" >
+                            <h5><a th:href="@{/donaDetail(id=${dona.donId}, facId=${dona.facId})}" th:text="${dona.title}" style="color: black;"> 제목</a></h5>
+                            <div class="info-item">
+                                목표금액 :<strong><span th:text="${#numbers.formatInteger(dona.goalAmt, 3, 'COMMA') + '원'}"></span></strong>
+                            </div>
+                            <div class="info-item">
+                                <strong><span th:text="${dona.donationCount}"></span></strong>명 참여
+                            </div>
+                              <div class="progress">
+                                     <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" th:style="'width: ' + ${dona.donationRatio} + '%'" aria-valuenow="${dona.donationRatio}" aria-valuemin="0" aria-valuemax="100"></div>
+                                 </div>
+                                 <div class="info-item" style="display: flex; justify-content: space-between;  margin-bottom:10px;">
+                                     <div style="text-align: left;">
+                                         <strong><span th:text="${dona.donationRatio}"></span></strong> %
+                                     </div>
+                                     <div style="text-align: right;">
+                                         <strong><span th:text="${#numbers.formatInteger(dona.total, 3, 'COMMA') + '원'}"></span></strong>
+                                     </div>
+                                 </div>
+                            <div class="d-flex justify-content-center flex-lg-wrap" style="margin-bottom:20px;">
+                                <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                    <span th:text="${dona.facilityName}" style="color: black;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- vesitable end -->
+				
+             </div> <!-- end row g-4 mb-5 -->
+            
+       </div>
+   </div>
+        <!-- Single Product End -->
+    
+
+
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top" type="button"><i class="fa fa-arrow-up"></i></a>   
+
+        
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="donation/board/lib/easing/easing.min.js"></script>
+    <script src="donation/board/lib/waypoints/waypoints.min.js"></script>
+    <script src="donation/board/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="donation/board/lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="donation/board/js/main.js"></script>
+    
+    
+    
+    
+    <script th:inline="javascript">
+    
+    var currentDonId = [[${dona.donId}]];
+   
+    
+    //redirect
+    function redirectToPayment(){
+       let donId = [[${dona.donId}]];
+       let sessionRole = [[${session.Role}]]; 
+       console.log(sessionRole);
+       if (sessionRole == 'M03') {
+    	
+    	   Swal.fire({
+    	     icon: "error",
+    	     title: "시설회원은 기부 불가"
+    	   
+    	     
+    	   });
+        	//alert("시설회원은 기부를 할 수 없습니다.");
+           console.log('Invalid session role');
+           return;
+       }
+       window.location.href = "/payment?donId=" + donId; //리다이렉트에 donId 추가해서 페이지넘김
+    }
+    
+    
+   
+    
+    
+    //날짜변환 
+    function dateFormat(data){
+       
+       let date = new Date(data);
+       let year = date.getFullYear();
+       let month = ('0' + (date.getMonth() + 1)).slice(-2);
+       let day = ('0' + date.getDate()).slice(-2);
+
+       
+       let today = year + '/' + month + '/' + day; 
+       
+       return today;
+       
+    }
+    
+    //기부자 목록 데이터 가져오기.
+    $(document).ready(function () {
+
+        $.ajax({
+            url: "/donaDetail/" + [[${dona.donId}]], 
+            type: "GET",
+            dataType: "json", 
+            success: function (data) {
+
+               
+               let donerList = "";
+               
+               for(let i= 0; i < data.length; i++){
+                  
+                  console.log(data[i]);
+               // 기부자가 익명인 경우 "익명"으로 표시, 그렇지 않으면 memId 값을 표시
+                  let donorName = (data[i].anonCheck === 1) ? "익명" : data[i].memId;
+                  
+                  donerList += "기부자 목록: " + donorName + ", " + data[i].donAmt + ", " + dateFormat(data[i].payDate) + "<br>";
+                  donerList += "기부자 목록: " + data[i].memId + ", " + data[i].donAmt + ", " + dateFormat(data[i].payDate) + "<br>";
+                   
+               }
+               $(".doner").html(donerList);
+            },
+            error: function () {
+             
+                alert("데이터 가져오기 실패 .");
+            }
+        });
+    });
+    
+    
+    // 댓글달기
+    function postComment(){
+   
+       let comm = document.getElementById('comment').value;
+       let memId = [[${#authentication.name}]];
+       let commDate = dateFormat(new Date());
+       let donId = [[${dona.donId}]];
+       console.log("e돈아이디" , donId);
+       console.log(memId);
+       
+       if(memId == 'anonymousUser'){
+    	   alert('로그인이 필요합니다.')
+    	   return;
+       }
+       
+       let donaVO = {
+             id: donId,
+             content : comm,
+             memId : memId,
+             detailCode : donId
+          }
+
+          
+       console.log(donaVO);
+       
+       
+       $.ajax({
+          type : "POST",
+          url : "/donaDetail?id=" + donId + "&facId=" + memId,
+          data: JSON.stringify(donaVO),
+          contentType: 'application/json', 
+          success : function(response){
+             
+             //$('#commentSection').load("../donaDetail?id=" + donId + "&facId=" + memId + " #commentList");
+			
+             // 댓글 목록을 받아와서 화면을 업데이트
+            updateCommentSection(donId, memId);
+             document.getElementById('comment').value = '';
+          },
+          error : function(error){
+             console.error('댓글등록 실패ㅠㅠ ', error);
+          }
+       });
+  
+    };
+    
+    function updateCommentSection(donId, memId) {
+    	   $.ajax({
+    	      type: "GET",
+    	      url: "/donaDetail?id=" + donId + "&facId=" + memId,
+    	      success: function(response) {
+    	         $('#commentList').html($(response).find('#commentList').html());
+    	      },
+    	      error: function(error) {
+    	         console.error('댓글업데이트 실패ㅠㅠ', error);
+    	      }
+    	   });
+    	}
+    
+</script>
+
+</section>
+    </body>
+
+</html>
